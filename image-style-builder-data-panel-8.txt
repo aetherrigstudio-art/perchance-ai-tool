@@ -1,0 +1,36 @@
+ai = {import:ai-text-plugin}
+
+settings
+  instruction() =>
+    return (window.buildStylePrompt ? window.buildStylePrompt() : "");
+  startWith = [ "=== PREFIX ===\n" ]
+  hideStartWith = [ false ]
+  outputTo = [responseEl]
+  onStart() =>
+    generateBtn.disabled = true;
+    responseEl.value = "";
+  onChunk() =>
+    if(window.activeOutputEl){
+      window.activeOutputEl.value = responseEl.value;
+      let el = window.activeOutputEl;
+      if(el.scrollTop+el.offsetHeight > el.scrollHeight-60) el.scrollTop = el.scrollHeight;
+    }
+  onFinish() =>
+    generateBtn.disabled = false;
+    stopBtn.style.display = "none";
+    loaderEl.innerHTML = "";
+    if(window.activeOutputEl) window.activeOutputEl.value = responseEl.value;
+    if(window.onStyleFinish) window.onStyleFinish();
+  render = [ null ]
+
+async generate() =>
+  let pendingObj = ai(settings);
+  stopBtn.style.display = "";
+  stopBtn.onclick = function() { pendingObj.stop(); stopBtn.style.display = "none"; };
+  loaderEl.innerHTML = pendingObj.loadingIndicatorHtml;
+  await pendingObj.onFinishPromise;
+  stopBtn.style.display = "none";
+
+$meta
+  title = AI Image Style Builder (Perchance character image prefixes)
+  description = Pick a base art style and refine it, and the AI expands it into a clean image prompt prefix and suffix to apply to every Perchance AI Character Chat character. Free, no login.

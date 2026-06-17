@@ -1,0 +1,148 @@
+<h1>AI Character Fixer</h1>
+
+<div style="width:95%; max-width:720px; margin:0 auto;">
+
+  <div class="fixCard">
+    <h3>1 - Paste the broken character</h3>
+    <p style="font-size:85%;">Garbled, truncated, mixed-format, or badly formatted text. The AI rebuilds it.</p>
+    <textarea id="brokenText" placeholder="Paste the messed-up character here." style="width:100%; height:200px; padding:0.5rem;"></textarea>
+    <div class="fixBtns">
+      <button onclick="responseEl.value=''; generate();">fix character</button>
+    </div>
+  </div>
+
+  <div class="fixCard">
+    <h3>2 - Reconstructed character (edit if you like)</h3>
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <span id="loaderEl"></span>
+      <button id="generateBtn" style="display:none;"></button>
+      <button id="stopBtn" style="display:none;">stop</button>
+    </div>
+    <textarea id="responseEl" placeholder="The repaired character appears here in labeled sections." style="width:100%; height:300px; padding:0.5rem; font-family:monospace;"></textarea>
+  </div>
+
+  <div class="fixCard">
+    <h3>3 - Export</h3>
+    <p style="font-size:85%;">Image style prefix (optional):</p>
+    <input id="stylePrefixInput" placeholder="anime artwork, masterpiece, " style="width:100%; padding:0.5rem;">
+    <div class="fixBtns" style="margin-top:0.75rem;">
+      <button onclick="buildAndDownload();">download character.json</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  if(localStorage.fixBroken) document.getElementById("brokenText").value = localStorage.fixBroken;
+  if(localStorage.fixResponse) document.getElementById("responseEl").value = localStorage.fixResponse;
+  if(localStorage.fixStyle) document.getElementById("stylePrefixInput").value = localStorage.fixStyle;
+  document.getElementById("brokenText").oninput = function(){ localStorage.fixBroken = this.value; };
+  document.getElementById("responseEl").oninput = function(){ localStorage.fixResponse = this.value; };
+  document.getElementById("stylePrefixInput").oninput = function(){ localStorage.fixStyle = this.value; };
+
+  window.buildFixerPrompt = function() {
+    return "You are an expert at repairing broken AI roleplay characters. The text below is malformed, garbled, truncated, encoding-corrupted, or badly formatted. Reconstruct it into ONE clean, consistent character - do not redesign it. Keep every real detail (name, traits, appearance, backstory, scenario, greeting, example lines), fix formatting and encoding junk, merge duplicates, and fill only gaps that are clearly missing. Refer to the character as {{char}} and the human as {{user}}. Put actions in asterisks.\n\nBROKEN CHARACTER TEXT:\n" + document.getElementById("brokenText").value + "\n\nWrite ALL sections in full, then stop. Output exactly these sections and nothing else:\n=== NAME ===\nThe character's name on one line.\n=== ROLE INSTRUCTION ===\nAbout 150 to 220 words of natural prose covering personality, appearance, speaking style, and scenario, ending with two example lines prefixed {{char}}: and {{user}}:.\n=== FIRST MESSAGE ===\nA 2 to 4 sentence in-character opening to {{user}}, actions in asterisks.\n=== APPEARANCE ===\nA short stable visual descriptor for image generation.";
+  };
+
+  function getSection(label, text) {
+    var header = "=== " + label + " ===";
+    var i = text.indexOf(header);
+    if(i < 0) return "";
+    var le = text.indexOf("\n", i);
+    if(le < 0) return "";
+    var rest = text.slice(le + 1);
+    var n = rest.search(/\n===\s+[A-Z]/);
+    if(n >= 0) rest = rest.slice(0, n);
+    return rest.trim();
+  }
+  function parseChar(raw) {
+    return {
+      name: getSection("NAME", raw) || "Character",
+      roleInstruction: getSection("ROLE INSTRUCTION", raw),
+      firstMessage: getSection("FIRST MESSAGE", raw),
+      appearance: getSection("APPEARANCE", raw)
+    };
+  }
+  function getStyle() { return document.getElementById("stylePrefixInput").value || ""; }
+  function uniqueId(seed) { return Date.now() + (seed * 1000) + Math.floor(Math.random() * 1000); }
+  function uniqueUuid() {
+    return (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + "-" + Math.floor(Math.random() * 1e9));
+  }
+
+  function characterRow(c, seed) {
+    var now = Date.now() + seed;
+    return {
+      name: c.name || "Character",
+      roleInstruction: c.roleInstruction || "",
+      reminderMessage: "", messageWrapperStyle: "", petraCustomSecretInformation: "",
+      generalWritingInstructions: "", roleplay1Instructions: "", roleplay2Instructions: "",
+      vitalWritingInstructions: "", vitalRoleInstructions: "", writingFormat: "",
+      contextInfo: "", contextInfoPrompt: "", contextInfoToggle: "no",
+      detailedContextInfo: "", detailedContextInfoPrompt: "", detailedContextInfoToggle: "no",
+      imagePromptPrefix: getStyle(),
+      imagePromptSuffix: ", highly detailed, sharp focus, high quality",
+      imagePromptTriggers: c.appearance ? (c.name + ": " + c.appearance) : "",
+      petraCustomLorebookUsageOptions: "default",
+      fitMessagesInContextMethod: "summarizeOld",
+      autoGenerateMemories: "none", maxParagraphCountPerMessage: 0,
+      markForPersona: "no", userCharacterSelection: "", autoUpdatePersona: "no",
+      customCode: "", messageInputPlaceholder: "",
+      metaTitle: "", metaDescription: "", metaImage: "",
+      modelName: "perchance-ai", temperature: 0.8, maxTokensPerMessage: 500,
+      textEmbeddingModelName: "Xenova/bge-base-en-v1.5",
+      initialMessages: [ { author: "ai", content: c.firstMessage || "Hello." } ],
+      shortcutButtons: [], loreBookUrls: [],
+      avatar: { url: "", size: 1, shape: "square" },
+      scene: { background: { url: "" }, music: { url: "" } },
+      userCharacter: { avatar: {} },
+      customData: { isPersona: false },
+      systemCharacter: { avatar: {} },
+      streamingResponse: true, folderPath: "",
+      uuid: uniqueUuid(),
+      creationTime: now, lastMessageTime: now,
+      id: uniqueId(seed),
+      "$types": { initialMessages: "arrayNonindexKeys", shortcutButtons: "arrayNonindexKeys", loreBookUrls: "arrayNonindexKeys" }
+    };
+  }
+  function buildDexie(rows) {
+    var t = [
+      { name:"characters", schema:"++id,modelName,fitMessagesInContextMethod,uuid,creationTime,lastMessageTime,folderPath", rows: rows },
+      { name:"threads", schema:"++id,name,characterId,creationTime,lastMessageTime,lastViewTime,folderPath", rows: [] },
+      { name:"messages", schema:"++id,threadId,characterId,creationTime,order", rows: [] },
+      { name:"misc", schema:"key", rows: [] },
+      { name:"summaries", schema:"hash,threadId", rows: [] },
+      { name:"memories", schema:"++id,[summaryHash+threadId],[characterId+status],[threadId+status],[threadId+index],threadId", rows: [] },
+      { name:"lore", schema:"++id,bookId,bookUrl", rows: [] },
+      { name:"textEmbeddingCache", schema:"++id,textHash,&[textHash+modelName]", rows: [] },
+      { name:"textCompressionCache", schema:"++id,uncompressedTextHash,&[uncompressedTextHash+modelName+tokenLimit]", rows: [] }
+    ];
+    return JSON.stringify({
+      formatName:"dexie", formatVersion:1,
+      data: { databaseName:"chatbot-ui-v1", databaseVersion:90,
+        tables: t.map(function(x){ return { name:x.name, schema:x.schema, rowCount:x.rows.length }; }),
+        data: t.map(function(x){ return { tableName:x.name, inbound:true, rows:x.rows }; })
+      }
+    }, null, 1);
+  }
+  function downloadFile(name, text) {
+    var blob = new Blob([text], { type:"application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name.replace(/[^a-z0-9_\-]+/gi, "_") + ".json";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(a.href); }, 100);
+  }
+  function buildAndDownload() {
+    var c = parseChar(document.getElementById("responseEl").value);
+    if(!c.roleInstruction && c.name === "Character") { alert("No character detected yet - fix or paste the sections first."); return; }
+    downloadFile(c.name || "character", buildDexie([ characterRow(c, 1) ]));
+  }
+  window.buildAndDownload = buildAndDownload;
+</script>
+
+<style>
+  .fixCard { background: var(--box-color, #f0f0f0); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; }
+  .fixCard h3 { margin-top: 0; margin-bottom: 0.25rem; }
+  .fixBtns { margin-top: 0.75rem; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .fixBtns button { font-size: 95%; padding: 0.5rem 1rem; cursor: pointer; }
+</style>

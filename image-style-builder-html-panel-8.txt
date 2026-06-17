@@ -1,0 +1,192 @@
+<h1>AI Image Style Builder</h1>
+
+<div class="wrap">
+  <div class="bar">
+    <button onclick="resetAll();">start over</button>
+    <span id="status" style="font-size:85%; opacity:0.85;"></span>
+  </div>
+
+  <div class="card">
+    <h3>1 - Pick a base style</h3>
+    <div id="mainBtns" class="btns"></div>
+  </div>
+
+  <div class="card" id="subCard" style="display:none;">
+    <h3>2 - Refine it</h3>
+    <p class="hint">Pick any number of modifiers for this style.</p>
+    <div id="subBtns" class="btns"></div>
+    <p class="hint" style="margin-top:0.75rem;">Optional extra notes (mood, palette, era):</p>
+    <input id="styleNotes" class="adj" placeholder="e.g. muted teal palette, foggy, melancholic">
+    <div class="row"><button onclick="genStyle(false);">build style</button></div>
+  </div>
+
+  <div class="card">
+    <h3>3 - Result</h3>
+    <div class="row" style="align-items:center;">
+      <span id="loaderEl"></span>
+      <button id="generateBtn" style="display:none;"></button>
+      <button id="stopBtn" style="display:none;">stop</button>
+      <span class="hint" id="busyHint"></span>
+    </div>
+
+    <p class="hint" style="margin-top:0.5rem;">imagePromptPrefix (goes before every image prompt):</p>
+    <textarea id="prefixOut" class="out2" placeholder="The style prefix appears here (editable)"></textarea>
+    <div class="row"><button onclick="copyField('prefixOut','cp1');">copy prefix</button><span class="hint" id="cp1"></span></div>
+
+    <p class="hint" style="margin-top:0.75rem;">imagePromptSuffix (goes after every image prompt):</p>
+    <textarea id="suffixOut" class="out2" placeholder="The quality suffix appears here (editable)"></textarea>
+    <div class="row"><button onclick="copyField('suffixOut','cp2');">copy suffix</button><span class="hint" id="cp2"></span></div>
+
+    <p class="hint" style="margin-top:0.75rem;">Adjustment (regenerates both, keeping your base style):</p>
+    <input id="styleAdj" class="adj" placeholder="e.g. warmer, less saturated, more painterly">
+    <div class="row"><button onclick="genStyle(true);">apply adjustment</button></div>
+
+    <details style="margin-top:0.75rem;">
+      <summary class="hint">show raw AI output</summary>
+      <textarea id="styleRaw" class="out" placeholder="Raw labeled output"></textarea>
+    </details>
+  </div>
+
+  <textarea id="responseEl" style="display:none;"></textarea>
+</div>
+
+<script>
+  var STORE_KEY = "accStyleV1";
+  var STYLES = {
+    "Anime": ["modern anime", "retro 90s anime", "Ghibli-esque", "dark seinen", "soft cel shading", "vibrant colors", "manhwa webtoon"],
+    "Photoreal": ["cinematic film still", "portrait photography", "35mm film grain", "golden hour", "studio lighting", "moody low-key", "hyperreal"],
+    "Oil painting": ["classical", "impressionist", "baroque chiaroscuro", "alla prima", "thick impasto", "romanticism"],
+    "Watercolor": ["soft wash", "ink and wash", "loose brushwork", "pastel palette", "storybook"],
+    "Comic / ink": ["western comic", "manga ink", "film noir", "graphic novel", "bold line art", "halftone"],
+    "Fantasy art": ["dark fantasy", "high fantasy", "painterly", "concept art", "matte painting", "ethereal"],
+    "3D render": ["Pixar-style", "octane render", "Unreal Engine", "claymation", "stylized 3D", "soft global illumination"],
+    "Retro / pixel": ["pixel art", "16-bit", "vaporwave", "synthwave", "80s airbrush", "VHS grain"]
+  };
+
+  var state = { main: "", subsByMain: {}, notes: "", prefix: "", suffix: "", raw: "" };
+  try { var s = JSON.parse(localStorage.getItem(STORE_KEY)); if(s && typeof s === "object"){ for(var k in s) state[k] = s[k]; } } catch(e){}
+  if(!state.subsByMain || typeof state.subsByMain !== "object") state.subsByMain = {};
+
+  function el(id){ return document.getElementById(id); }
+  function val(id){ var e = el(id); return e ? e.value : ""; }
+  function setVal(id,v){ var e = el(id); if(e) e.value = (v==null?"":v); }
+  function getSection(label, text){
+    var header = "=== " + label + " ===";
+    var i = text.indexOf(header); if(i<0) return "";
+    var le = text.indexOf("\n", i); if(le<0) return "";
+    var rest = text.slice(le+1);
+    var n = rest.search(/\n===\s+[A-Z]/); if(n>=0) rest = rest.slice(0,n);
+    return rest.trim();
+  }
+
+  function save(){
+    state.notes = val("styleNotes"); state.prefix = val("prefixOut");
+    state.suffix = val("suffixOut"); state.raw = val("styleRaw");
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch(e){}
+  }
+
+  function renderMains(){
+    var c = el("mainBtns"); c.innerHTML = "";
+    Object.keys(STYLES).forEach(function(name){
+      var b = document.createElement("button");
+      b.className = "styleBtn" + (state.main === name ? " active" : "");
+      b.textContent = name;
+      b.onclick = function(){ state.main = name; if(!state.subsByMain[name]) state.subsByMain[name] = []; save(); renderMains(); renderSubs(); updateStatus(); };
+      c.appendChild(b);
+    });
+  }
+  function renderSubs(){
+    if(!state.main){ el("subCard").style.display = "none"; return; }
+    el("subCard").style.display = "";
+    var c = el("subBtns"); c.innerHTML = "";
+    var sel = state.subsByMain[state.main] || [];
+    STYLES[state.main].forEach(function(sub){
+      var b = document.createElement("button");
+      b.className = "styleBtn" + (sel.indexOf(sub) >= 0 ? " active" : "");
+      b.textContent = sub;
+      b.onclick = function(){
+        var arr = state.subsByMain[state.main] || [];
+        var i = arr.indexOf(sub);
+        if(i >= 0) arr.splice(i,1); else arr.push(sub);
+        state.subsByMain[state.main] = arr; save(); renderSubs(); updateStatus();
+      };
+      c.appendChild(b);
+    });
+  }
+  function updateStatus(){
+    if(!state.main){ el("status").textContent = "pick a base style"; return; }
+    var subs = state.subsByMain[state.main] || [];
+    el("status").textContent = state.main + (subs.length ? " + " + subs.join(", ") : "");
+  }
+
+  window.buildStylePrompt = function(){
+    var subs = (state.subsByMain[state.main] || []).join(", ");
+    var base = "You are an expert image-prompt engineer for a diffusion model used in a roleplay chat. Turn the chosen art style into reusable prompt fragments that are PREPENDED and APPENDED to EVERY image. Describe ONLY medium, art style, rendering technique, lighting and atmosphere. NEVER mention characters, subjects, poses, or specific backgrounds. Do NOT use any negativePrompt syntax.\n\n" +
+      "BASE STYLE: " + state.main + "\nMODIFIERS: " + (subs || "(none)") + "\nEXTRA NOTES: " + (val("styleNotes") || "(none)") + "\n\n" +
+      "Output exactly these two sections and nothing else:\n" +
+      "=== PREFIX ===\nA comma-separated list of style / medium / lighting / atmosphere tags to place BEFORE every prompt. End with a trailing comma and a space. Keep it under about 12 tags.\n" +
+      "=== SUFFIX ===\nA short comma-separated list of positive quality tags to place AFTER every prompt, beginning with a comma and a space (for example: , highly detailed, sharp focus, high quality). Under about 6 tags. No negative prompts.";
+    if(window.refineMode){
+      base += "\n\nCURRENT PREFIX:\n" + val("prefixOut") + "\n\nCURRENT SUFFIX:\n" + val("suffixOut") +
+        "\n\nADJUSTMENT REQUESTED:\n" + (val("styleAdj") || "(just refine and tighten)") +
+        "\n\nRewrite BOTH sections incorporating the adjustment. Keep the same two === labels and output only those.";
+    }
+    return base;
+  };
+
+  window.genStyle = function(refine){
+    if(!state.main){ alert("Pick a base style first."); return; }
+    window.activeSection = "style"; window.refineMode = !!refine;
+    window.activeOutputEl = el("styleRaw");
+    el("styleRaw").value = "";
+    el("busyHint").textContent = "building style...";
+    generate();
+  };
+  window.onStyleFinish = function(){
+    el("busyHint").textContent = "";
+    var raw = val("styleRaw");
+    var pre = getSection("PREFIX", raw), suf = getSection("SUFFIX", raw);
+    if(pre) setVal("prefixOut", pre);
+    if(suf) setVal("suffixOut", suf);
+    save();
+  };
+
+  window.copyField = function(id, noteId){
+    var t = val(id);
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t).then(function(){ el(noteId).textContent = "copied"; setTimeout(function(){ el(noteId).textContent = ""; }, 1500); });
+    } else {
+      var e = el(id); e.focus(); e.select(); el(noteId).textContent = "select + copy";
+    }
+  };
+
+  window.resetAll = function(){
+    if(!confirm("Clear the selected style and result?")) return;
+    localStorage.removeItem(STORE_KEY);
+    state = { main: "", subsByMain: {}, notes: "", prefix: "", suffix: "", raw: "" };
+    ["styleNotes","prefixOut","suffixOut","styleRaw","styleAdj"].forEach(function(id){ setVal(id,""); });
+    renderMains(); renderSubs(); updateStatus();
+  };
+
+  // restore
+  setVal("styleNotes", state.notes); setVal("prefixOut", state.prefix);
+  setVal("suffixOut", state.suffix); setVal("styleRaw", state.raw);
+  ["styleNotes","prefixOut","suffixOut"].forEach(function(id){ var e = el(id); if(e) e.oninput = save; });
+  renderMains(); renderSubs(); updateStatus();
+</script>
+
+<style>
+  .wrap { width:95%; max-width:720px; margin:0 auto; }
+  .bar { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
+  .card { background: var(--box-color, #f0f0f0); padding:1rem; border-radius:8px; margin-bottom:1rem; }
+  .card h3 { margin:0 0 0.25rem 0; }
+  .hint { font-size:85%; opacity:0.8; margin:0.25rem 0; }
+  .btns { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem; }
+  .styleBtn { padding:0.4rem 0.8rem; cursor:pointer; border-radius:6px; }
+  .styleBtn.active { outline:2px solid currentColor; font-weight:bold; }
+  .out { width:100%; height:140px; padding:0.5rem; font-family:monospace; margin-top:0.5rem; }
+  .out2 { width:100%; height:60px; padding:0.5rem; font-family:monospace; }
+  .adj { width:100%; padding:0.5rem; }
+  .row { margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; align-items:center; }
+  .row button { font-size:95%; padding:0.5rem 1rem; cursor:pointer; }
+</style>

@@ -1,0 +1,31 @@
+ai = {import:ai-text-plugin}
+
+settings
+  instruction() =>
+    return (window.buildFixerPrompt ? window.buildFixerPrompt() : "");
+  startWith = [ "=== NAME ===\n" ]
+  hideStartWith = [ false ]
+  outputTo = [responseEl]
+  onChunk() =>
+    if(responseEl.scrollTop+responseEl.offsetHeight > responseEl.scrollHeight-60) {
+      responseEl.scrollTop = responseEl.scrollHeight;
+    }
+  onStart() =>
+    generateBtn.disabled = true;
+  onFinish() =>
+    generateBtn.disabled = false;
+    stopBtn.style.display = "none";
+    loaderEl.innerHTML = "";
+  render = [ null ]
+
+async generate() =>
+  let pendingObj = ai(settings);
+  stopBtn.style.display = "";
+  stopBtn.onclick = function() { pendingObj.stop(); stopBtn.style.display = "none"; };
+  loaderEl.innerHTML = pendingObj.loadingIndicatorHtml;
+  await pendingObj.onFinishPromise;
+  stopBtn.style.display = "none";
+
+$meta
+  title = AI Character Fixer (broken text to importable JSON)
+  description = Paste a broken, garbled, or badly formatted AI roleplay character and get a clean, ready-to-import JSON file for Perchance AI Character Chat. Free, no login.
