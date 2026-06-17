@@ -63,9 +63,9 @@ names, and the differences between near-versions are the real signal — diff
 before assuming. Current state at time of writing:
 
 - `char-info` == `perchance-character-creation-3.md` (identical).
-- **Wizard current build:** `char-wiz-html` == `wizard-html-panel-9.txt`
+- **Wizard current build:** `char-wiz-html` == `wizard-html-panel-10.txt`
   (canonical HTML) and `char-wiz-dat` == `wizard-data-panel-8.txt` (canonical
-  data). These are the newest and the ones to edit. Older `wizard-html-panel-7/8`
+  data). These are the newest and the ones to edit. Older `wizard-html-panel-7/8/9`
   and `wizard-data-panel-6/7` are historical snapshots — do not edit them.
 
 When editing, update the canonical pair (`char-wiz-html` / `char-wiz-dat`),
