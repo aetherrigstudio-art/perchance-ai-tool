@@ -1,0 +1,48 @@
+ai = {import:ai-text-plugin}
+imageGen = {import:text-to-image-plugin}
+
+settings
+  instruction() =>
+    return (window.buildWizardPrompt ? window.buildWizardPrompt() : "");
+  startWith = [ "" ]
+  hideStartWith = [ false ]
+  outputTo = [responseEl]
+  onStart() =>
+    responseEl.value = "";
+  onChunk() =>
+    if(window.activeOutputEl){
+      window.activeOutputEl.value = responseEl.value;
+      let e = window.activeOutputEl;
+      if(e.scrollTop + e.offsetHeight > e.scrollHeight - 60) e.scrollTop = e.scrollHeight;
+    }
+  onFinish() =>
+    if(window.activeOutputEl) window.activeOutputEl.value = responseEl.value;
+    if(window.onWizFinish) window.onWizFinish();
+  render = [ null ]
+
+async generate() =>
+  let pendingObj = ai(settings);
+  stopBtn.style.display = "";
+  stopBtn.onclick = function() { pendingObj.stop(); stopBtn.style.display = "none"; };
+  loaderEl.innerHTML = pendingObj.loadingIndicatorHtml;
+  await pendingObj.onFinishPromise;
+  stopBtn.style.display = "none";
+
+async genCharacterImage(prompt, negativePrompt) =>
+  let opts = { prompt: prompt, negativePrompt: (negativePrompt || ""), resolution: "512x768" };
+  let result = null;
+  try { result = await imageGen(opts); }
+  catch(e) { try { result = await imageGen.image(opts); } catch(e2) { return ""; } }
+  if(!result) return "";
+  if(typeof result === "string") return result;
+  if(result.imageURL) return result.imageURL;
+  if(result.imageUrl) return result.imageUrl;
+  if(result.url) return result.url;
+  if(result.src) return result.src;
+  if(result.outputEl && result.outputEl.src) return result.outputEl.src;
+  if(typeof result.querySelector === "function") { let im = result.querySelector("img"); if(im) return im.src; }
+  return "";
+
+$meta
+  title = AI Character Set Builder
+  description = Build a whole cast for AI Character Chat - scenario, main character, your persona, side characters, lore, relationships, generated portraits, and varied scene images - then export ready to import. Free, no login.
