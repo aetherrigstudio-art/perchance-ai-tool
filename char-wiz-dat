@@ -1,0 +1,38 @@
+ai = {import:ai-text-plugin}
+imageGen = {import:text-to-image-plugin}
+
+settings
+  instruction() =>
+    return (window.buildWizardPrompt ? window.buildWizardPrompt() : "");
+  startWith = [ "" ]
+  hideStartWith = [ false ]
+  outputTo = [responseEl]
+  onStart() =>
+    responseEl.value = "";
+  onChunk() =>
+    if(window.activeOutputEl){
+      window.activeOutputEl.value = responseEl.value;
+      let e = window.activeOutputEl;
+      if(e.scrollTop + e.offsetHeight > e.scrollHeight - 60) e.scrollTop = e.scrollHeight;
+    }
+  onFinish() =>
+    if(window.activeOutputEl) window.activeOutputEl.value = responseEl.value;
+    if(window.onWizFinish) window.onWizFinish();
+  render = [ null ]
+
+async generate() =>
+  let pendingObj = ai(settings);
+  stopBtn.style.display = "";
+  stopBtn.onclick = function() { pendingObj.stop(); stopBtn.style.display = "none"; };
+  loaderEl.innerHTML = pendingObj.loadingIndicatorHtml;
+  await pendingObj.onFinishPromise;
+  stopBtn.style.display = "none";
+
+async genCharacterImage(prompt) =>
+  let result = await imageGen.image({ prompt: prompt });
+  if(!result) return "";
+  return result.imageURL || result.imageUrl || result.url || "";
+
+$meta
+  title = AI Character Set Builder
+  description = Build a whole cast for AI Character Chat - scenario, main character, your persona, side characters, lore, relationships, generated portraits, and varied scene images - then export ready to import. Free, no login.
