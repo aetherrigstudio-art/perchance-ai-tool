@@ -1,0 +1,1240 @@
+<h1>AI Character Set Builder</h1>
+
+<div class="tabbar">
+  <button id="tabBtnBuilder" class="tabbtn active" onclick="showTab('builder');">Character Builder</button>
+  <button id="tabBtnImage" class="tabbtn" onclick="showTab('image');">Image Generator</button>
+</div>
+
+<div id="tab-builder">
+<div class="wrap">
+  <div class="bar">
+    <button onclick="resetAll();">start over</button>
+    <span id="status" style="font-size:85%; opacity:0.85;"></span>
+  </div>
+
+  <div class="card">
+    <h3>Scenario</h3>
+    <p class="hint">Describe the world / situation. Everything else builds from this.</p>
+    <textarea id="scenarioNotes" class="notes" placeholder="e.g. A rainy cyberpunk city where you are a rookie detective..."></textarea>
+    <div class="row"><button onclick="genScenario(false);">generate scenario</button></div>
+    <textarea id="scenarioOut" class="out" placeholder="Generated scenario (editable)"></textarea>
+    <input id="scenarioAdj" class="adj" placeholder="Adjustment (e.g. make it darker, set it at night)">
+    <div class="row"><button onclick="genScenario(true);">apply adjustment</button></div>
+  </div>
+
+  <div class="card">
+    <h3>Main character</h3>
+    <p class="hint">The character you mainly talk to.</p>
+    <textarea id="mainNotes" class="notes" placeholder="Name, personality, role in the scenario..."></textarea>
+    <div class="row"><button onclick="genChar('main',false);">generate</button></div>
+    <textarea id="mainOut" class="out" placeholder="Generated character (editable)"></textarea>
+    <input id="mainAdj" class="adj" placeholder="Adjustment (e.g. make her older, add a scar)">
+    <div class="row"><button onclick="genChar('main',true);">apply adjustment</button></div>
+    <div class="row">
+      <select id="mainRerollSel"><option>ROLE INSTRUCTION</option><option>FIRST MESSAGE</option><option>APPEARANCE</option><option>DEFAULT OUTFIT</option><option>WARDROBE</option><option>IMAGE TRIGGERS</option><option>REMINDER</option><option>TAGLINE</option><option>WRITING INSTRUCTION</option><option>NAME</option></select>
+      <button onclick="doReroll('mainOut','mainRerollSel','main');">re-roll section</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Your persona (you)</h3>
+    <p class="hint">Who you play as. Optional - leave blank to skip.</p>
+    <textarea id="personaNotes" class="notes" placeholder="Your name, who you are in this world."></textarea>
+    <div class="row"><button onclick="genChar('persona',false);">generate</button></div>
+    <textarea id="personaOut" class="out" placeholder="Generated persona (editable)"></textarea>
+    <input id="personaAdj" class="adj" placeholder="Adjustment (e.g. make me a veteran, not a rookie)">
+    <div class="row"><button onclick="genChar('persona',true);">apply adjustment</button></div>
+    <div class="row">
+      <select id="personaRerollSel"><option>ROLE INSTRUCTION</option><option>APPEARANCE</option><option>DEFAULT OUTFIT</option><option>IMAGE TRIGGERS</option><option>WRITING INSTRUCTION</option><option>TAGLINE</option><option>NAME</option></select>
+      <button onclick="doReroll('personaOut','personaRerollSel','persona');">re-roll section</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Additional characters</h3>
+    <p class="hint">Each is built aware of everything above.</p>
+    <div id="extrasContainer"></div>
+    <div class="row"><button onclick="addExtra();">add another character</button></div>
+  </div>
+
+  <div class="card">
+    <h3>Lore</h3>
+    <p class="hint">Generates a keyworded lorebook: each entry has trigger words in [brackets] so it's pulled into a scene only when relevant. Covers places, people, history, customs, relationships, and hooks. Attached to the main character and embedded in the card. Editable.</p>
+    <textarea id="loreNotes" class="notes" placeholder="Optional focus (e.g. the rival bakery across the street, the town's summer festival, the cafe regulars)"></textarea>
+    <div class="row"><button onclick="genLore(false);">generate lore</button></div>
+    <textarea id="loreOut" class="out" placeholder="[trigger, trigger] A self-contained fact (editable)"></textarea>
+    <input id="loreAdj" class="adj" placeholder="Adjustment (e.g. add more about the festival, fewer secrets)">
+    <div class="row"><button onclick="genLore(true);">apply adjustment</button></div>
+  </div>
+
+  <div class="card">
+    <h3>Relationships</h3>
+    <p class="hint">Optional. Each line is woven into the relevant character's role instruction. Uncheck "both know" for secrets or one-sided feelings.</p>
+    <div class="row">
+      <select id="relA"></select>
+      <select id="relType"></select>
+    </div>
+    <p class="hint" style="margin-top:0.5rem;">related to (pick one or more - hold Ctrl/Cmd or drag):</p>
+    <select id="relB" multiple size="4" style="width:100%; padding:0.4rem;"></select>
+    <input id="relNote" class="adj" placeholder="Optional detail (e.g. since the war)">
+    <label class="hint" style="display:block; margin-top:0.5rem;"><input type="checkbox" id="relMutual" checked> both characters know it</label>
+    <div class="row"><button onclick="addRel();">add relationship</button></div>
+    <div id="relList" style="margin-top:0.5rem;"></div>
+  </div>
+
+  <div class="card">
+    <h3>Consistency check</h3>
+    <p class="hint">Reviews the whole cast against the scenario and flags contradictions. Suggestions only - nothing changes automatically.</p>
+    <div class="row"><button onclick="genConsistency();">check consistency</button></div>
+    <textarea id="consistencyOut" class="out" placeholder="Issues will be listed here" readonly></textarea>
+    <div id="consistencyList" style="margin-top:0.5rem;"></div>
+  </div>
+
+  <div class="card">
+    <h3>Opening scene (run after generating the whole cast)</h3>
+    <p class="hint">Generates one shared opening that brings every character into the scene, plus a hidden [SYSTEM] context line. This becomes the chat's first messages on export. Editable.</p>
+    <div class="row"><button onclick="genOpening(false);">generate opening scene</button></div>
+    <textarea id="openingOut" class="out" placeholder="[SYSTEM]: ...&#10;[CharacterName]: *...* &quot;...&quot;"></textarea>
+    <input id="openingAdj" class="adj" placeholder="Adjustment (e.g. start outside, make it more playful)">
+    <div class="row"><button onclick="genOpening(true);">apply adjustment</button></div>
+    <p class="hint">Relationships, persona context, world facts, and this opening are all assembled onto the cast automatically when you export - no need to apply them per character.</p>
+  </div>
+
+  <div class="card">
+    <h3>Import &amp; portability</h3>
+    <p class="hint">Paste an exported character .json to edit it again, or to teach the exporter your install's real schema/defaults.</p>
+    <textarea id="importJson" class="out" placeholder="Paste an exported .json here"></textarea>
+    <div class="row">
+      <button onclick="importBack();">load into workbench</button>
+      <button onclick="learnSchema();">read real schema from this file</button>
+    </div>
+    <div id="importStatus" class="hint" style="margin-top:0.5rem;"></div>
+  </div>
+
+  <div class="card">
+    <h3>Image style (applies to all characters)</h3>
+    <p class="hint">Pick a base look and refine it. The AI turns it into an image prefix and suffix that are applied to every character on export. Style only - no character looks here.</p>
+    <div id="styleMainBtns" class="btns"></div>
+    <div id="styleSubWrap" style="display:none;">
+      <p class="hint" style="margin-top:0.5rem;">Refine (pick any):</p>
+      <div id="styleSubBtns" class="btns"></div>
+    </div>
+    <input id="styleNotes" class="adj" placeholder="Optional extra notes (mood, palette, era)">
+    <div class="row"><button onclick="genStyle(false);">build style</button></div>
+    <p class="hint" style="margin-top:0.5rem;">imagePromptPrefix (before every prompt):</p>
+    <textarea id="prefixOut" class="out2" placeholder="Generated style prefix (editable)"></textarea>
+    <p class="hint">imagePromptSuffix (after every prompt):</p>
+    <textarea id="suffixOut" class="out2" placeholder="Generated quality suffix (editable)"></textarea>
+    <input id="styleAdj" class="adj" placeholder="Adjustment (e.g. warmer, less saturated, more painterly)">
+    <div class="row"><button onclick="genStyle(true);">apply adjustment</button></div>
+    <label class="hint" style="display:block; margin-top:0.5rem;"><input type="checkbox" id="imgVariety" checked> Add {a|b|c} lighting variety to the prefix (test once; untick if you see literal braces in images)</label>
+  </div>
+
+  <div class="card">
+    <h3>Export</h3>
+    <div id="budget" class="hint"></div>
+    <div class="row" style="margin-top:0.5rem;">
+      <button onclick="exportSeparate();">download separate files</button>
+      <button onclick="exportCombined();">download one combined file</button>
+      <button onclick="exportTavern();">download Tavern PNG cards (with portraits)</button>
+    </div>
+    <p class="hint">Tavern PNG export generates a portrait for each character (a few seconds each) and embeds it as the card art. If a portrait can't be generated, that card falls back to a name placeholder.</p>
+    <p class="hint">Import in AI Character Chat, then build the group with the pencil icon above the reply box. After each reply, custom code posts one grounded scene image based on what is actually happening, with the focused character dressed from their wardrobe.</p>
+    <p class="hint">Tip: export regularly - Perchance keeps everything in your browser and can drop old data. The safe validation is to import a file, then re-export and compare.</p>
+  </div>
+
+  <div class="card">
+    <div class="row" style="align-items:center;">
+      <span id="loaderEl"></span>
+      <button id="generateBtn" style="display:none;"></button>
+      <button id="stopBtn" style="display:none;">stop</button>
+      <span class="hint" id="busyHint"></span>
+    </div>
+    <textarea id="responseEl" style="display:none;"></textarea>
+    <textarea id="rerollBuf" style="display:none;"></textarea>
+    <textarea id="styleBuf" style="display:none;"></textarea>
+  </div>
+</div>
+</div>
+
+<div id="tab-image" style="display:none;">
+  <div class="wrap">
+    <div class="card">
+      <h3>Image generator</h3>
+      <p class="hint">Generate standalone images with the same wholesome semi-real style. Right-click or long-press an image to save it.</p>
+      <textarea id="igPrompt" class="notes" placeholder="Describe the image (e.g. two friends laughing at a sunny cafe)"></textarea>
+      <input id="igNeg" class="adj" placeholder="Anti-description (things to avoid)">
+      <div class="row">
+        <select id="igStyle">
+          <option value="default">Semi-real (idol) default</option>
+          <option value="built">Use my built style</option>
+          <option value="none">No style</option>
+        </select>
+        <select id="igShape">
+          <option value="512x768">Portrait</option>
+          <option value="512x512">Square</option>
+          <option value="768x512">Landscape</option>
+        </select>
+        <select id="igCount"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+      </div>
+      <div class="row"><button onclick="igGenerate();">generate image</button><span class="hint" id="igBusy"></span></div>
+      <div id="igResults" class="igresults"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  var STORE_KEY = "accWizardV4";
+  var extras = [];
+  var rels = [];
+  var styleMain = "";
+  var styleSubs = {};
+  var RELTYPES = ["is allied with","is a close friend of","is a rival of","is an enemy of","is family to","is romantically interested in","is a mentor to","is a student of","distrusts","owes a debt to","protects","harbors a secret about","is a stranger to"];
+
+  function el(id){ return document.getElementById(id); }
+  function val(id){ var e = el(id); return e ? e.value : ""; }
+  function setVal(id, v){ var e = el(id); if(e) e.value = (v == null ? "" : v); }
+  function short(t){ t = (t||"").replace(/\s+/g," ").trim(); return t.length>140 ? t.slice(0,140)+"..." : t; }
+  function wc(s){ s = (s||"").trim(); return s ? s.split(/\s+/).length : 0; }
+
+  function roll(s){
+    s = String(s); var prev;
+    do { prev = s; s = s.replace(/\{([^{}]*)\}/g, function(_, g){ var o = g.split("|"); return o[Math.floor(Math.random()*o.length)]; }); } while(s !== prev);
+    return s;
+  }
+  var SEED = {
+    tone: "{brooding|warm|playful|sardonic|stoic|eccentric|melancholic|fierce|gentle|aloof|world-weary|earnest}",
+    trait: "{an unexpected hobby|a hidden fear|a nervous habit|a secret talent|a stubborn opinion|a peculiar obsession|a guarded soft spot|a recurring vice|an old regret}",
+    speech: "{clipped and dry|florid and theatrical|warm and rambling|terse|teasing|formal and precise|blunt|measured and careful}",
+    vibe: "{tense|cozy|ominous|hopeful|chaotic|melancholy|electric|uneasy|serene|gritty}",
+    loreFocus: "{the factions and powers|the history and old conflicts|the geography and notable places|the magic or technology|daily life and customs|myths, rumors and secrets}"
+  };
+  function charSeed(){ return roll("Creative direction (use loosely; do NOT mention these words or list them): lean toward a " + SEED.tone + " tone, give them " + SEED.trait + ", and a " + SEED.speech + " way of speaking."); }
+  function scenarioSeed(){ return roll("Creative direction (do NOT mention this): lean toward a " + SEED.vibe + " atmosphere."); }
+  function loreSeed(){ return roll("Lean the facts toward " + SEED.loreFocus + "."); }
+
+  function getSection(label, text){
+    var header = "=== " + label + " ===";
+    var i = text.indexOf(header);
+    if(i < 0) return "";
+    var le = text.indexOf("\n", i);
+    if(le < 0) return "";
+    var rest = text.slice(le + 1);
+    var n = rest.search(/\n===\s+[A-Z]/);
+    if(n >= 0) rest = rest.slice(0, n);
+    return rest.trim();
+  }
+  function replaceSection(full, label, newBody){
+    var header = "=== " + label + " ===";
+    newBody = (newBody || "").trim();
+    var i = full.indexOf(header);
+    if(i < 0) return full.trim() + "\n\n" + header + "\n" + newBody + "\n";
+    var afterHeader = full.indexOf("\n", i);
+    if(afterHeader < 0) return full + "\n" + newBody;
+    var rest = full.slice(afterHeader + 1);
+    var n = rest.search(/\n===\s+[A-Z]/);
+    var tail = (n >= 0) ? rest.slice(n) : "";
+    return full.slice(0, afterHeader + 1) + newBody + (tail || "\n");
+  }
+  function parseChar(raw){
+    return {
+      name: getSection("NAME", raw) || "Character",
+      tagline: getSection("TAGLINE", raw),
+      roleInstruction: getSection("ROLE INSTRUCTION", raw),
+      reminder: getSection("REMINDER", raw),
+      firstMessage: getSection("FIRST MESSAGE", raw),
+      appearance: getSection("APPEARANCE", raw),
+      outfit: getSection("DEFAULT OUTFIT", raw),
+      wardrobe: getSection("WARDROBE", raw),
+      imageTriggers: getSection("IMAGE TRIGGERS", raw),
+      writing: getSection("WRITING INSTRUCTION", raw)
+    };
+  }
+
+  function buildContext(excludeKey){
+    var scen = val("scenarioOut").trim() || val("scenarioNotes").trim();
+    var bible = "Scenario: " + short(scen);
+    if(excludeKey !== "main"){
+      var m = val("mainOut").trim();
+      if(m){ var mc = parseChar(m); bible += "\nMain character " + mc.name + ": " + short(mc.roleInstruction); }
+    }
+    if(excludeKey !== "persona"){
+      var p = val("personaOut").trim();
+      if(p){ var pc = parseChar(p); bible += "\nUser persona: " + pc.name; }
+    }
+    extras.forEach(function(ex,i){
+      if(excludeKey === ("extra"+i)) return;
+      var o = (getExtraOut(i)||"").trim();
+      if(o){ var c = parseChar(o); bible += "\nCharacter " + c.name + ": " + short(c.roleInstruction); }
+    });
+    return { scenario: scen, bible: bible };
+  }
+
+  function charPromptCtx(role, notes, ctx){
+    return "You are a character designer for AI roleplay chat. Create a " + role + ", consistent with the scenario and the existing characters. Refer to the character as {{char}} and the human as {{user}}. Show personality through concrete detail and dialogue.\n\n" +
+      "SCENARIO:\n" + ctx.scenario + "\n\nSTORY SO FAR:\n" + ctx.bible + "\n\nUSER'S NOTES:\n" + notes + "\n\n" +
+      "Write ALL sections in full, then stop. Output exactly these sections and nothing else:\n" +
+      "=== NAME ===\nThe name on one line.\n" +
+      "=== TAGLINE ===\nA single short sentence describing {{char}} at a glance.\n" +
+      "=== ROLE INSTRUCTION ===\nAbout 150 to 220 words: who {{char}} is, personality, quirks, appearance, speaking style, and how they fit the scenario with {{user}}. End with two example lines prefixed {{char}}: and {{user}}:.\n" +
+      "=== REMINDER ===\nOne or two sentences restating {{char}}'s core identity and behaviour, phrased as an ongoing reminder to stay in character.\n" +
+      "=== FIRST MESSAGE ===\nA fully written opening in {{char}}'s voice, addressed to {{user}}, that sets the style for the whole chat. At least 2 to 3 paragraphs with a blank line between them. Use roleplay storytelling formatting: narration, actions, and body language in *italics* (single asterisks); spoken words in \"double quotes\"; **bold** for occasional emphasis. Establish the setting and atmosphere, show {{char}}'s mood and movement, include at least one line of spoken dialogue, and end on a hook or a question that invites {{user}} to respond.\n" +
+      "=== APPEARANCE ===\nA short comma-separated list of PERMANENT physical features only (hair, eyes, build, skin, distinctive marks) - no clothing, no background, no art style.\n" +
+      "=== DEFAULT OUTFIT ===\nA short comma-separated default outfit, used only as a fallback.\n" +
+      "=== WARDROBE ===\nTwo or three outfits, each on its own line, written as a plain comma-separated list of clothing items only - no labels, no quotation marks, no outfit names. Each line should read like an image description, for example: red flannel shirt, dark jeans, scuffed leather boots.\n" +
+      "=== IMAGE TRIGGERS ===\nImage-generation trigger lines that lock {{char}}'s look whenever they are drawn. Format: each line is a trigger word, then a colon, then a comma-separated visual description. First line MUST start with the character's exact name, then a colon, then their permanent features plus signature outfit as plain image tags (no art-style words, no lighting). Optionally add one extra line for a nickname or a key alternate outfit. Example:\nNina: warm brown skin, dark curly hair, freckles, slim build, mustard cardigan, jeans\n" +
+      "=== WRITING INSTRUCTION ===\nTwo or three sentences on how to write {{char}}: point of view, tone, pacing, content rules.";
+  }
+  function personaPromptCtx(notes, ctx){
+    return "You are a character designer for AI roleplay chat. Create the USER'S PERSONA - the character the human plays as, referred to as {{user}}. Keep it consistent with the scenario and existing characters.\n\n" +
+      "SCENARIO:\n" + ctx.scenario + "\n\nSTORY SO FAR:\n" + ctx.bible + "\n\nUSER'S NOTES:\n" + notes + "\n\n" +
+      "Output exactly these sections and nothing else:\n=== NAME ===\nThe persona's name.\n=== TAGLINE ===\nA single short sentence describing {{user}} at a glance.\n=== ROLE INSTRUCTION ===\nAbout 100 to 160 words describing who {{user}} is, personality and appearance, so the AI knows who it talks to.\n=== APPEARANCE ===\nA short comma-separated list of PERMANENT physical features only - no clothing, no background, no art style.\n=== DEFAULT OUTFIT ===\nA short comma-separated default outfit, used only as a fallback.\n=== IMAGE TRIGGERS ===\nOne line: the persona's exact name, then a colon, then their permanent features plus default outfit as plain image tags (no art-style words, no lighting).\n=== WRITING INSTRUCTION ===\nOne or two sentences on how the AI should treat {{user}} in scenes.";
+  }
+  function refineWrap(prompt, current, adj, fmt){
+    return prompt + "\n\nCURRENT VERSION (improve this, do not start from scratch):\n" + current +
+      "\n\nADJUSTMENT REQUESTED:\n" + (adj || "(no specific note - just improve and tighten it)") +
+      "\n\nRewrite it incorporating the adjustment. " + fmt;
+  }
+
+  window.buildWizardPrompt = function(){
+    if(window.rerollInfo){
+      var info = window.rerollInfo;
+      var raw = val(info.outId);
+      var ctx0 = buildContext(info.exclude);
+      return "You are refining ONE section of an AI roleplay character. Keep it consistent with the rest of the character and the scenario, but make it a fresh, different take.\n\nSCENARIO:\n" + ctx0.scenario + "\n\nCHARACTER SO FAR:\n" + raw + "\n\nProduce ONLY the \"" + info.label + "\" section in this exact format and nothing else:\n=== " + info.label + " ===\n<new content>";
+    }
+    var sec = window.activeSection, refine = window.refineMode;
+    if(sec === "style"){ return buildStyleText(refine); }
+    if(sec === "consistency"){
+      var scenC = val("scenarioOut").trim() || val("scenarioNotes").trim();
+      var dump = "";
+      var cm = val("mainOut").trim(); if(cm) dump += "MAIN CHARACTER:\n" + cm + "\n\n";
+      var cp = val("personaOut").trim(); if(cp) dump += "PERSONA:\n" + cp + "\n\n";
+      syncExtrasFromDOM();
+      extras.forEach(function(ex,i){ if((ex.out||"").trim()) dump += "CHARACTER " + (i+1) + ":\n" + ex.out.trim() + "\n\n"; });
+      return "You are a story editor reviewing a roleplay cast for consistency.\n\nSCENARIO:\n" + scenC + "\n\nCAST:\n" + dump + "\nFind real problems only: duplicate or clashing names, characters that ignore or contradict the scenario, contradictory facts between characters, or timeline/relationship contradictions. Do not comment on things that are fine.\n\nFor each problem, output a block in EXACTLY this format, with a blank line between blocks and nothing else:\nISSUE: <one short sentence describing the problem>\nCHARACTER: <the exact name of the single character whose card should be changed to fix it>\nFIX: <a concrete instruction that, applied to that one character, resolves the problem>\n\nIf there are no real problems, reply with exactly: No issues found.";
+    }
+    if(sec === "opening"){
+      var scenO = val("scenarioOut").trim() || val("scenarioNotes").trim();
+      var personaName = val("personaOut").trim() ? parseChar(val("personaOut")).name : "the user";
+      var dumpO = "";
+      var mo = val("mainOut").trim(); if(mo){ var mc = parseChar(mo); dumpO += "[" + mc.name + "] (main): " + short(mc.roleInstruction) + "\n"; }
+      syncExtrasFromDOM();
+      extras.forEach(function(ex){ if((ex.out||"").trim()){ var c = parseChar(ex.out); dumpO += "[" + c.name + "]: " + short(c.roleInstruction) + "\n"; } });
+      var po = "You are scripting the OPENING of a group roleplay chat that brings the WHOLE cast into one shared scene. " + personaName + " is the user and must NOT be scripted.\n\nSCENARIO:\n" + scenO + "\n\nCAST (every one of them must appear in the opening, interacting in the same place at the same time - not separate greetings):\n" + dumpO + "\nOutput the opening as a sequence of lines in EXACTLY this format and nothing else:\n[SYSTEM]: one or two sentences of hidden stage-setting context for the AI - the location, time, who is present - written as notes, not dialogue.\n[CharacterName]: that character's moment in the scene - one or two short paragraphs using *italic narration and actions* and \"quoted dialogue\". Use the character's exact name in the brackets.\n\nInclude every listed character at least once in a natural order, have them react to each other, and end on a beat that invites " + personaName + " to jump in. Do not write any line for " + personaName + ".";
+      return refine ? refineWrap(po, val("openingOut"), val("openingAdj"), "Keep the same [SYSTEM]: and [CharacterName]: line format.") : po;
+    }
+    if(sec === "scenario"){
+      var p = "You are a worldbuilding assistant for AI roleplay chat. Expand the user's idea into a vivid but concise SCENARIO (setting, situation, tone) of about 120 to 180 words. Address the user as {{user}}.\n\nUSER'S IDEA:\n" + val("scenarioNotes") + "\n\nOutput ONLY the scenario prose - no preamble, no headers.";
+      return refine ? refineWrap(p, val("scenarioOut"), val("scenarioAdj"), "Output ONLY the scenario prose.") : (p + "\n\n" + scenarioSeed());
+    }
+    if(sec === "main" || sec === "extra"){
+      var key = sec === "main" ? "main" : ("extra" + window.activeExtraIndex);
+      var ctx = buildContext(key);
+      var notes = sec === "main" ? val("mainNotes") : getExtraNotes(window.activeExtraIndex);
+      var role = sec === "main" ? "MAIN character the user mainly talks to" : "ADDITIONAL side character in this world";
+      var p = charPromptCtx(role, notes, ctx);
+      if(refine){
+        var cur = sec === "main" ? val("mainOut") : getExtraOut(window.activeExtraIndex);
+        var adj = sec === "main" ? val("mainAdj") : getExtraAdj(window.activeExtraIndex);
+        return refineWrap(p, cur, adj, "Keep the exact same === SECTION === labels and output only those sections.");
+      }
+      return p + "\n\n" + charSeed();
+    }
+    if(sec === "persona"){
+      var ctx2 = buildContext("persona");
+      var p2 = personaPromptCtx(val("personaNotes"), ctx2);
+      return refine ? refineWrap(p2, val("personaOut"), val("personaAdj"), "Keep the same === SECTION === labels and output only those sections.") : (p2 + "\n\n" + charSeed());
+    }
+    if(sec === "lore"){
+      var ctx3 = buildContext("lore");
+      var focus = val("loreNotes").trim();
+      var p3 = "You are the loremaster for a cute, wholesome, slice-of-life roleplay. Using the story so far, write a LOREBOOK - the world and character facts the AI should remember.\n\n" +
+        "SCENARIO:\n" + ctx3.scenario + "\n\nSTORY SO FAR:\n" + ctx3.bible + "\n\n" +
+        (focus ? ("FOCUS ON:\n" + focus + "\n\n") : "") +
+        "Write 12 to 18 entries spread across these areas: key places, important people and groups, how things came to be (history), everyday customs and the unwritten rules of this world, the relationships between the characters, and a few gentle hooks, rumours, or little secrets that could spark a scene.\n\n" +
+        "Output ONE entry per line in EXACTLY this format and nothing else:\n" +
+        "[trigger, trigger] A self-contained fact of one or two sentences that repeats the proper noun so it reads on its own.\n\n" +
+        "The words in [square brackets] are the trigger words that should pull this fact into a scene - usually the place name, person, group, or topic the fact is about. Keep everything wholesome and consistent with the scenario.";
+      return refine ? refineWrap(p3, val("loreOut"), val("loreAdj"), "Keep the same [trigger] line format, one entry per line, and output only the entries.") : (p3 + "\n\n" + loreSeed());
+    }
+    return "";
+  };
+
+  function startGen(section, outId, refine, extraIndex){
+    window.rerollInfo = null;
+    window.activeSection = section;
+    window.activeOutputEl = el(outId);
+    window.refineMode = !!refine;
+    window.activeExtraIndex = (extraIndex == null ? -1 : extraIndex);
+    if(window.activeOutputEl && !refine) window.activeOutputEl.value = "";
+    el("busyHint").textContent = "generating " + section + "...";
+    generate();
+  }
+  window.genScenario = function(refine){ startGen("scenario","scenarioOut",refine); };
+  window.genChar = function(which,refine){ startGen(which, which+"Out", refine); };
+  window.genLore = function(refine){ startGen("lore","loreOut",refine); };
+  window.genExtra = function(i,refine){ startGen("extra","exOut_"+i,refine,i); };
+  window.genOpening = function(refine){
+    if(!val("mainOut").trim() && !castNames().length){ alert("Generate the cast first."); return; }
+    startGen("opening","openingOut",refine);
+  };
+
+  window.doReroll = function(outId, selId, exclude){
+    if(!val(outId).trim()){ alert("Generate this character first."); return; }
+    window.rerollInfo = { outId: outId, label: val(selId), exclude: exclude };
+    window.activeSection = "reroll"; window.refineMode = false;
+    window.activeOutputEl = el("rerollBuf");
+    el("rerollBuf").value = "";
+    el("busyHint").textContent = "re-rolling " + val(selId) + "...";
+    generate();
+  };
+
+  window.genConsistency = function(){
+    if(!val("mainOut").trim() && !castNames().length){ alert("Generate some characters first."); return; }
+    window.rerollInfo = null;
+    window.activeSection = "consistency"; window.refineMode = false;
+    window.activeOutputEl = el("consistencyOut");
+    el("consistencyOut").value = "";
+    el("busyHint").textContent = "checking consistency...";
+    generate();
+  };
+  var consistencyIssues = [];
+  function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+  function parseConsistency(raw){
+    var out = [];
+    raw.split(/\n(?=ISSUE:)/).forEach(function(b){
+      var issue = (b.match(/ISSUE:\s*(.*)/) || [])[1];
+      var ch = (b.match(/CHARACTER:\s*(.*)/) || [])[1];
+      var fi = b.indexOf("FIX:");
+      var fix = fi >= 0 ? b.slice(fi + 4).trim() : "";
+      if(issue && fix) out.push({ issue: issue.trim(), character: (ch || "").trim(), fix: fix, applied: false });
+    });
+    return out;
+  }
+  function resolveCharBox(name){
+    name = (name || "").trim().toLowerCase();
+    if(!name) return null;
+    if(val("mainOut").trim() && parseChar(val("mainOut")).name.toLowerCase() === name) return { kind:"main" };
+    if(val("personaOut").trim() && parseChar(val("personaOut")).name.toLowerCase() === name) return { kind:"persona" };
+    syncExtrasFromDOM();
+    for(var i=0; i<extras.length; i++){ if((extras[i].out||"").trim() && parseChar(extras[i].out).name.toLowerCase() === name) return { kind:"extra", index:i }; }
+    return null;
+  }
+  window.applyFix = function(i){
+    var it = consistencyIssues[i]; if(!it) return;
+    var box = resolveCharBox(it.character);
+    if(!box){ alert("Couldn't match \"" + it.character + "\" to a current character. You can edit that character manually using this fix:\n\n" + it.fix); return; }
+    it.applied = true; renderConsistency();
+    if(box.kind === "main"){ setVal("mainAdj", it.fix); genChar("main", true); }
+    else if(box.kind === "persona"){ setVal("personaAdj", it.fix); genChar("persona", true); }
+    else { setVal("exAdj_" + box.index, it.fix); genExtra(box.index, true); }
+  };
+  function renderConsistency(){
+    var c = el("consistencyList"); if(!c) return; c.innerHTML = "";
+    consistencyIssues.forEach(function(it,i){
+      var d = document.createElement("div"); d.className = "subcard";
+      var t = document.createElement("div"); t.className = "hint";
+      t.innerHTML = "<strong>" + escHtml(it.character || "?") + ":</strong> " + escHtml(it.issue) + "<br><em>Fix:</em> " + escHtml(it.fix);
+      var btn = document.createElement("button");
+      if(it.applied){ btn.textContent = "applied"; btn.disabled = true; }
+      else { btn.textContent = "apply to " + (it.character || "character"); btn.onclick = (function(idx){ return function(){ applyFix(idx); }; })(i); }
+      var row = document.createElement("div"); row.className = "row"; row.appendChild(btn);
+      d.appendChild(t); d.appendChild(row); c.appendChild(d);
+    });
+  }
+
+  window.onWizFinish = function(){
+    el("busyHint").textContent = "";
+    if(window.rerollInfo){
+      var info = window.rerollInfo; window.rerollInfo = null;
+      var produced = el("rerollBuf") ? el("rerollBuf").value : "";
+      var body = getSection(info.label, produced); if(!body) body = produced.trim();
+      if(body) setVal(info.outId, replaceSection(val(info.outId), info.label, body));
+      if(el("rerollBuf")) el("rerollBuf").value = "";
+    }
+    if(window.activeSection === "style"){
+      var sraw = el("styleBuf") ? el("styleBuf").value : "";
+      var pre = getSection("PREFIX", sraw), suf = getSection("SUFFIX", sraw);
+      if(pre) setVal("prefixOut", pre);
+      if(suf) setVal("suffixOut", suf);
+    }
+    if(window.activeSection === "consistency"){
+      consistencyIssues = parseConsistency(val("consistencyOut"));
+      renderConsistency();
+    }
+    save(); updateStatus();
+  };
+
+  function getExtraNotes(i){ var e = el("exNotes_"+i); return e ? e.value : ""; }
+  function getExtraOut(i){ var e = el("exOut_"+i); return e ? e.value : ""; }
+  function getExtraAdj(i){ var e = el("exAdj_"+i); return e ? e.value : ""; }
+  function syncExtrasFromDOM(){
+    extras.forEach(function(ex,i){
+      var n = el("exNotes_"+i), o = el("exOut_"+i);
+      if(n) ex.notes = n.value; if(o) ex.out = o.value;
+    });
+  }
+  window.removeExtra = function(i){ syncExtrasFromDOM(); extras.splice(i,1); renderExtras(); save(); updateStatus(); };
+  window.addExtra = function(){ syncExtrasFromDOM(); extras.push({notes:"",out:""}); renderExtras(); save(); };
+  function renderExtras(){
+    var c = el("extrasContainer"); c.innerHTML = "";
+    extras.forEach(function(ex,i){
+      var d = document.createElement("div"); d.className = "subcard";
+      d.innerHTML =
+        '<div class="row" style="justify-content:space-between;"><strong>Character ' + (i+1) + '</strong><button onclick="removeExtra(' + i + ');">remove</button></div>' +
+        '<textarea class="notes" id="exNotes_' + i + '" placeholder="Name, role, how they relate to the others."></textarea>' +
+        '<div class="row"><button onclick="genExtra(' + i + ',false);">generate</button></div>' +
+        '<textarea class="out" id="exOut_' + i + '" placeholder="Generated character (editable)"></textarea>' +
+        '<input class="adj" id="exAdj_' + i + '" placeholder="Adjustment for this character">' +
+        '<div class="row"><button onclick="genExtra(' + i + ',true);">apply adjustment</button></div>' +
+        '<div class="row"><select id="exReroll_' + i + '"><option>ROLE INSTRUCTION</option><option>FIRST MESSAGE</option><option>APPEARANCE</option><option>DEFAULT OUTFIT</option><option>WARDROBE</option><option>IMAGE TRIGGERS</option><option>REMINDER</option><option>TAGLINE</option><option>WRITING INSTRUCTION</option><option>NAME</option></select><button onclick="doReroll(\'exOut_' + i + '\',\'exReroll_' + i + '\',\'extra' + i + '\');">re-roll section</button></div>';
+      c.appendChild(d);
+      setVal("exNotes_"+i, ex.notes); setVal("exOut_"+i, ex.out);
+      el("exNotes_"+i).oninput = function(){ extras[i].notes = this.value; save(); };
+      el("exOut_"+i).oninput = function(){ extras[i].out = this.value; save(); updateStatus(); };
+    });
+  }
+
+  function save(){
+    syncExtrasFromDOM();
+    var snap = {
+      scenarioNotes: val("scenarioNotes"), scenarioOut: val("scenarioOut"),
+      mainNotes: val("mainNotes"), mainOut: val("mainOut"),
+      personaNotes: val("personaNotes"), personaOut: val("personaOut"),
+      loreOut: val("loreOut"), loreNotes: val("loreNotes"),
+      openingOut: val("openingOut"), openingAdj: val("openingAdj"),
+      styleMain: styleMain, styleSubs: styleSubs, styleNotes: val("styleNotes"),
+      prefixOut: val("prefixOut"), suffixOut: val("suffixOut"),
+      imgVariety: (el("imgVariety") ? el("imgVariety").checked : true),
+      extras: extras, rels: rels
+    };
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(snap)); } catch(e){}
+  }
+  function load(){
+    var snap = null;
+    try { snap = JSON.parse(localStorage.getItem(STORE_KEY)); } catch(e){}
+    if(snap && typeof snap === "object"){
+      setVal("scenarioNotes", snap.scenarioNotes); setVal("scenarioOut", snap.scenarioOut);
+      setVal("mainNotes", snap.mainNotes); setVal("mainOut", snap.mainOut);
+      setVal("personaNotes", snap.personaNotes); setVal("personaOut", snap.personaOut);
+      setVal("loreOut", snap.loreOut); setVal("loreNotes", snap.loreNotes || "");
+      setVal("openingOut", snap.openingOut || ""); setVal("openingAdj", snap.openingAdj || "");
+      styleMain = snap.styleMain || "";
+      styleSubs = (snap.styleSubs && typeof snap.styleSubs === "object") ? snap.styleSubs : {};
+      setVal("styleNotes", snap.styleNotes); setVal("prefixOut", snap.prefixOut); setVal("suffixOut", snap.suffixOut);
+      if(el("imgVariety")) el("imgVariety").checked = (snap.imgVariety !== false);
+      extras = Array.isArray(snap.extras) ? snap.extras.filter(function(x){ return x && typeof x === "object"; }) : [];
+      rels = Array.isArray(snap.rels) ? snap.rels.filter(function(x){ return x && typeof x === "object"; }) : [];
+    } else { extras = []; rels = []; styleMain = ""; styleSubs = {}; }
+    renderExtras();
+    ["scenarioNotes","scenarioOut","mainNotes","mainOut","personaNotes","personaOut","loreOut","loreNotes","openingOut","openingAdj","styleNotes","prefixOut","suffixOut"].forEach(function(id){
+      var e = el(id); if(e) e.oninput = function(){ save(); updateStatus(); };
+    });
+    if(el("imgVariety")) el("imgVariety").onchange = save;
+    renderStyleMains(); renderStyleSubs();
+    if(el("igNeg") && !val("igNeg").trim()) setVal("igNeg", IMG_NEG);
+    updateStatus();
+    refreshRelSelects(); renderRels();
+    try { window.learned = JSON.parse(localStorage.getItem("accSchemaV1")); } catch(e){ window.learned = null; }
+  }
+  window.resetAll = function(){
+    if(!confirm("Start over and erase the scenario, cast, and lore?")) return;
+    localStorage.removeItem(STORE_KEY); extras = []; rels = []; styleMain = ""; styleSubs = {};
+    ["scenarioNotes","scenarioOut","mainNotes","mainOut","personaNotes","personaOut","loreOut","loreNotes","openingOut","openingAdj","styleNotes","prefixOut","suffixOut"].forEach(function(id){ setVal(id,""); });
+    if(el("imgVariety")) el("imgVariety").checked = true;
+    renderExtras(); renderStyleMains(); renderStyleSubs(); updateStatus(); refreshRelSelects(); renderRels();
+  };
+  function updateBudget(){
+    var parts = [], total = 0, warn = false;
+    function add(label, raw){
+      if(!raw) return;
+      var n = wc(parseChar(raw).roleInstruction);
+      total += n; if(n > 500) warn = true;
+      parts.push(label + " " + n + "w" + (n > 500 ? " (!)" : ""));
+    }
+    add("Main", val("mainOut").trim());
+    add("You", val("personaOut").trim());
+    syncExtrasFromDOM();
+    extras.forEach(function(ex,i){ add("C"+(i+1), (ex.out||"").trim()); });
+    var b = el("budget"); if(!b) return;
+    b.textContent = parts.length ? ("Role-instruction size: " + parts.join(", ") + "  -  cast total " + total + "w" + (warn ? "  -  (!) some over ~500w; trim or move detail to lore" : "")) : "";
+  }
+  function updateStatus(){
+    var names = [];
+    var m = val("mainOut").trim(); if(m) names.push("Main: " + parseChar(m).name);
+    var p = val("personaOut").trim(); if(p) names.push("You: " + parseChar(p).name);
+    syncExtrasFromDOM();
+    extras.forEach(function(ex){ if((ex.out||"").trim()) names.push(parseChar(ex.out).name); });
+    var lore = val("loreOut").split("\n").filter(function(x){ return x.trim().length>0; }).length;
+    el("status").textContent = (names.length ? "cast: " + names.join(", ") : "no characters yet") + (lore ? "  -  " + lore + " lore facts" : "");
+    updateBudget(); refreshRelSelects(); renderRels();
+  }
+
+  function validateCast(){
+    var issues = [];
+    var m = val("mainOut").trim(), p = val("personaOut").trim();
+    syncExtrasFromDOM();
+    var anyChar = m || extras.some(function(ex){ return (ex.out||"").trim(); });
+    if(!anyChar) issues.push("- No main or additional character has been generated.");
+    function check(label, raw, needFirst){
+      if(!raw) return;
+      var c = parseChar(raw);
+      if(!getSection("NAME", raw)) issues.push("- " + label + ": missing === NAME ===");
+      if(!c.roleInstruction) issues.push("- " + label + ": missing === ROLE INSTRUCTION ===");
+      if(needFirst && !c.firstMessage) issues.push("- " + label + ": missing === FIRST MESSAGE ===");
+    }
+    check("Main character", m, true);
+    check("Persona", p, false);
+    extras.forEach(function(ex,i){ if((ex.out||"").trim()) check("Character " + (i+1), ex.out.trim(), true); });
+    return issues;
+  }
+
+  function castNames(){
+    var names = [];
+    var m = val("mainOut").trim(); if(m) names.push(parseChar(m).name);
+    var p = val("personaOut").trim(); if(p) names.push(parseChar(p).name);
+    syncExtrasFromDOM();
+    extras.forEach(function(ex){ if((ex.out||"").trim()) names.push(parseChar(ex.out).name); });
+    return names.filter(function(n,i){ return n && names.indexOf(n) === i; });
+  }
+  function refreshRelSelects(){
+    var names = castNames();
+    ["relA","relB"].forEach(function(id){
+      var s = el(id); if(!s) return;
+      var cur = s.value;
+      s.innerHTML = names.map(function(n){ return '<option>' + n.replace(/</g,"&lt;") + '</option>'; }).join("");
+      if(names.indexOf(cur) >= 0) s.value = cur;
+    });
+    var t = el("relType");
+    if(t && !t.options.length){ t.innerHTML = RELTYPES.map(function(x){ return '<option>' + x + '</option>'; }).join(""); }
+  }
+  window.addRel = function(){
+    var a = val("relA"), type = val("relType"), note = val("relNote").trim(), mutual = el("relMutual") ? el("relMutual").checked : true;
+    var sel = el("relB");
+    var bs = sel ? Array.prototype.slice.call(sel.selectedOptions).map(function(o){ return o.value; }) : [];
+    if(!a || !bs.length){ alert("Pick a character and at least one related character."); return; }
+    var added = 0;
+    bs.forEach(function(b){ if(b && b !== a){ rels.push({ a:a, b:b, type:type, note:note, mutual:mutual }); added++; } });
+    if(!added){ alert("Pick related characters other than the first one."); return; }
+    setVal("relNote",""); save(); renderRels();
+  };
+  window.removeRel = function(i){ rels.splice(i,1); save(); renderRels(); };
+  function renderRels(){
+    var c = el("relList"); if(!c) return;
+    var names = castNames(); c.innerHTML = "";
+    rels.forEach(function(r,i){
+      var stale = (names.indexOf(r.a) < 0 || names.indexOf(r.b) < 0);
+      var d = document.createElement("div"); d.className = "row"; d.style.justifyContent = "space-between";
+      var span = document.createElement("span"); span.className = "hint";
+      span.textContent = r.a + " " + r.type + " " + r.b + (r.note ? " (" + r.note + ")" : "") + (r.mutual ? "" : " [one-sided]") + (stale ? "  - not in current cast" : "");
+      if(stale) span.style.opacity = "0.5";
+      var btn = document.createElement("button"); btn.textContent = "remove"; btn.onclick = (function(idx){ return function(){ removeRel(idx); }; })(i);
+      d.appendChild(span); d.appendChild(btn); c.appendChild(d);
+    });
+  }
+  function relLinesFor(name){
+    var out = [];
+    rels.forEach(function(r){
+      if(!r || !r.type) return;
+      if(r.a === name) out.push(name + " " + r.type + " " + r.b + (r.note ? " (" + r.note + ")" : "") + ".");
+      else if(r.mutual && r.b === name) out.push(r.a + " " + r.type + " " + name + (r.note ? " (" + r.note + ")" : "") + ".");
+    });
+    return out;
+  }
+  function withRels(row){
+    var lines = relLinesFor(row.name);
+    if(lines.length) row.roleInstruction += "\n\nRelationships:\n- " + lines.join("\n- ");
+    return row;
+  }
+
+  var SCENE_SHOTS_TEMPLATE = `oc.thread.on("MessageAdded", async function({ message }) {
+  try {
+    var WARDROBE = __WARDROBE__;
+    var STYLE_PREFIX = __STYLEPREFIX__;
+    var STYLE_SUFFIX = __STYLESUFFIX__;
+    if (!message || message.author !== "ai") return;
+    if (/<image>/.test(message.content || "")) return;
+    await new Promise(function(r){ setTimeout(r, 500); });
+    var msgs = oc.thread.messages.slice(-6);
+    var ctx = msgs.map(function(m){ return (m.name || m.author) + ": " + (m.content || ""); }).join("\\n");
+    var who = (message.name || "").toLowerCase().trim();
+    var ws = (WARDROBE && WARDROBE[who]) || [];
+    var outfit = ws.length ? ws[Math.floor(Math.random()*ws.length)] : "";
+    var result = await oc.getInstructCompletion({
+      instruction: "You generate ONE image-generation prompt that depicts the current moment of this cute, wholesome, flirty slice-of-life roleplay, read mainly from the LATEST message below. Work through this silently, then output only the prompt:\\n1. Use the location already established in the conversation - never invent a new place.\\n2. Name every character physically present in this moment, by name, so their appearance is applied; do not add people who are not there.\\n3. Describe the single clearest action plus the expression and body language of the character whose latest message this is.\\n4. Keep the imagery pleasant, attractive and wholesome - never scary, disturbing, gory, or distorted.\\n5. Add time of day or lighting only if the conversation establishes it.\\nKeep each described feature attached to the correct named character so nothing blends between people. No surreal, floating, or fantastical elements. No art-style words. Output one comma-separated line, present tense, under 70 words.\\n\\nCONVERSATION (most recent last):\\n" + ctx + "\\n\\nDEPICT THIS LATEST MOMENT - " + (message.name || "the speaker") + ": " + (message.content || "") + (outfit ? ("\\n\\n" + (message.name || "") + " is wearing: " + outfit) : ""),
+      startWith: "",
+      stopSequences: ["\\n"]
+    });
+    var prompt = ("" + (result && (result.text != null ? result.text : result))).trim().replace(/^["']|["']$/g, "");
+    if (!prompt) return;
+    var frame = ["medium shot","close-up","over-the-shoulder","two-shot","candid"][Math.floor(Math.random()*5)];
+    oc.thread.messages.push({ author: "ai", name: "Narrator", content: "<image>" + STYLE_PREFIX + prompt + ", " + frame + STYLE_SUFFIX + "</image>" });
+  } catch (e) { console.log("scene-shot error", e); }
+});`;
+  function buildSceneCode(wardrobe){
+    var pre = (val("prefixOut").trim() || DEFAULT_PREFIX);
+    var suf = styleSuffix();
+    return SCENE_SHOTS_TEMPLATE
+      .replace("__WARDROBE__", function(){ return JSON.stringify(wardrobe || {}); })
+      .replace("__STYLEPREFIX__", function(){ return JSON.stringify(pre); })
+      .replace("__STYLESUFFIX__", function(){ return JSON.stringify(suf); });
+  }
+  function wardrobeMap(cast){
+    var map = {};
+    cast.forEach(function(o){
+      if(o.p) return;
+      var name = (o.c.name || "").toLowerCase().trim();
+      var w = (o.c.wardrobe || "").split("\n").map(function(x){
+        x = x.replace(/^[-*\d.\)\s]+/, "").trim();
+        x = x.replace(/^["'\u201c][^"'\u201d]{0,40}["'\u201d]\s*[:\-]\s*/, "");
+        return x.replace(/["'\u201c\u201d]/g, "").trim();
+      }).filter(function(x){ return x.length; });
+      if(name && w.length) map[name] = w;
+    });
+    return map;
+  }
+
+  var STYLES = {
+    "Semi-real (idol)": ["polished CG sheen","editorial photo","soft glam","K-pop/idol styling","dewy flawless skin","bright studio light","pastel palette","candid lifestyle"],
+    "Slice of life": ["warm natural light","cozy realism","candid","bright airy","pastel palette","shallow depth of field"],
+    "Anime": ["modern anime","retro 90s anime","Ghibli-esque","soft cel shading","vibrant colors","manhwa webtoon"],
+    "Photoreal": ["portrait photography","soft daylight","studio lighting","bright clean","hyperreal","editorial"],
+    "Oil painting": ["classical","impressionist","alla prima","romanticism","soft pastel"],
+    "Watercolor": ["soft wash","ink and wash","loose brushwork","pastel palette","storybook"],
+    "Comic / ink": ["western comic","manga ink","graphic novel","bold line art","halftone"],
+    "Fantasy art": ["high fantasy","painterly","concept art","matte painting","ethereal"],
+    "3D render": ["Pixar-style","octane render","Unreal Engine","stylized 3D","soft global illumination"],
+    "Retro / pixel": ["pixel art","16-bit","vaporwave","synthwave","80s airbrush"]
+  };
+  function renderStyleMains(){
+    var c = el("styleMainBtns"); if(!c) return; c.innerHTML = "";
+    Object.keys(STYLES).forEach(function(name){
+      var b = document.createElement("button");
+      b.className = "styleBtn" + (styleMain === name ? " active" : "");
+      b.textContent = name;
+      b.onclick = function(){ styleMain = name; if(!styleSubs[name]) styleSubs[name] = []; save(); renderStyleMains(); renderStyleSubs(); };
+      c.appendChild(b);
+    });
+  }
+  function renderStyleSubs(){
+    var wrap = el("styleSubWrap"), c = el("styleSubBtns"); if(!wrap || !c) return;
+    if(!styleMain){ wrap.style.display = "none"; return; }
+    wrap.style.display = ""; c.innerHTML = "";
+    var sel = styleSubs[styleMain] || [];
+    STYLES[styleMain].forEach(function(sub){
+      var b = document.createElement("button");
+      b.className = "styleBtn" + (sel.indexOf(sub) >= 0 ? " active" : "");
+      b.textContent = sub;
+      b.onclick = function(){
+        var arr = styleSubs[styleMain] || [];
+        var i = arr.indexOf(sub); if(i >= 0) arr.splice(i,1); else arr.push(sub);
+        styleSubs[styleMain] = arr; save(); renderStyleSubs();
+      };
+      c.appendChild(b);
+    });
+  }
+  function buildStyleText(refine){
+    var subs = (styleSubs[styleMain] || []).join(", ");
+    var base = "You are an expert image-prompt engineer for a diffusion model used in a wholesome, cute, flirty slice-of-life roleplay chat. Turn the chosen art style into reusable prompt fragments that are PREPENDED and APPENDED to EVERY image. Describe ONLY medium, art style, rendering technique, lighting and atmosphere. NEVER mention characters, subjects, poses, or specific backgrounds. Strongly favor bright, soft, clean, natural lighting and a flattering, attractive, wholesome look. AVOID dark, moody, low-key, dramatic, cinematic, horror, gritty, or anime/cartoon styling. Do NOT use any negativePrompt syntax.\n\nBASE STYLE: " + styleMain + "\nMODIFIERS: " + (subs || "(none)") + "\nEXTRA NOTES: " + (val("styleNotes") || "(none)") + "\n\nOutput exactly these two sections and nothing else:\n=== PREFIX ===\nA comma-separated list of style / medium / lighting / atmosphere tags to place BEFORE every prompt. Favor bright, clean, soft, natural light. End with a trailing comma and a space. Under about 12 tags.\n=== SUFFIX ===\nA short comma-separated list of positive quality tags to place AFTER every prompt, beginning with a comma and a space (for example: , soft bright lighting, detailed, pretty, high quality). Under about 6 tags. No negative prompts, no dark or moody words.";
+    if(refine){
+      base += "\n\nCURRENT PREFIX:\n" + val("prefixOut") + "\n\nCURRENT SUFFIX:\n" + val("suffixOut") + "\n\nADJUSTMENT REQUESTED:\n" + (val("styleAdj") || "(just refine and tighten)") + "\n\nRewrite BOTH sections incorporating the adjustment. Keep the same two === labels and output only those.";
+    }
+    return base;
+  }
+  window.genStyle = function(refine){
+    if(!styleMain){ alert("Pick a base style first."); return; }
+    window.rerollInfo = null;
+    window.activeSection = "style"; window.refineMode = !!refine;
+    window.activeOutputEl = el("styleBuf");
+    el("styleBuf").value = "";
+    el("busyHint").textContent = "building style...";
+    generate();
+  };
+
+  var IMG_VARIETY = "{soft daylight|bright natural light|warm sunlight|soft window light|bright ambient light}, ";
+  var DEFAULT_PREFIX = "semi-realistic, mostly photorealistic with a subtle polished CG sheen, beautiful idol-like features, flawless smooth skin, ";
+  var DEFAULT_SUFFIX = ", soft bright natural lighting, clean, sharp focus, highly detailed, pretty, wholesome, cheerful, high quality, natural skin texture";
+  var IMG_NEG = "deformed, disfigured, mutated, extra limbs, extra fingers, fused fingers, missing fingers, malformed hands, bad anatomy, distorted face, asymmetrical eyes, dead eyes, creepy, horror, scary, gore, uncanny, monster, grotesque, blurry, low quality, dark, underexposed, anime, cartoon, 2d, cel shaded, sketch, watermark, text";
+  function styleOnly(){
+    var base = (val("prefixOut") || "").trim() || DEFAULT_PREFIX;
+    if(base && !/[,\s]$/.test(base)) base += ", ";
+    var v = (el("imgVariety") && el("imgVariety").checked) ? IMG_VARIETY : "";
+    return base + v;
+  }
+  function styleSuffix(){
+    var s = (val("suffixOut") || "").trim();
+    if(!s) return DEFAULT_SUFFIX;
+    return /^[,\s]/.test(s) ? s : (", " + s);
+  }
+  function uniqueId(seed){ return Date.now() + (seed*1000) + Math.floor(Math.random()*1000); }
+  function uniqueUuid(){ return (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + "-" + Math.floor(Math.random()*1e9)); }
+
+  function defaultTemplate(){
+    return { name:"Character", roleInstruction:"", reminderMessage:"", messageWrapperStyle:"", petraCustomSecretInformation:"",
+      generalWritingInstructions:"", roleplay1Instructions:"", roleplay2Instructions:"", vitalWritingInstructions:"", vitalRoleInstructions:"", writingFormat:"",
+      contextInfo:"", contextInfoPrompt:"", contextInfoToggle:"no", detailedContextInfo:"", detailedContextInfoPrompt:"", detailedContextInfoToggle:"no",
+      imagePromptPrefix:"", imagePromptSuffix:"", imagePromptTriggers:"", petraCustomLorebookUsageOptions:"default", fitMessagesInContextMethod:"summarizeOld",
+      autoGenerateMemories:"none", maxParagraphCountPerMessage:0, markForPersona:"no", userCharacterSelection:"", autoUpdatePersona:"no",
+      customCode:"", messageInputPlaceholder:"", metaTitle:"", metaDescription:"", metaImage:"",
+      modelName:"perchance-ai", temperature:0.8, maxTokensPerMessage:500, textEmbeddingModelName:"Xenova/bge-base-en-v1.5",
+      initialMessages:[], shortcutButtons:[], loreBookUrls:[], avatar:{url:"",size:1,shape:"square"}, scene:{background:{url:""},music:{url:""}},
+      userCharacter:{avatar:{}}, customData:{}, systemCharacter:{avatar:{}}, streamingResponse:true, folderPath:"" };
+  }
+  function characterRow(c, seed, isPersona, sceneCode){
+    var now = Date.now() + seed;
+    var base = (window.learned && window.learned.template) ? JSON.parse(JSON.stringify(window.learned.template)) : defaultTemplate();
+    base.name = c.name || "Character";
+    base.roleInstruction = c.roleInstruction || "";
+    base.reminderMessage = isPersona ? "" : (c.reminder ? c.reminder.trim() : "");
+    if(!isPersona) base.reminderMessage += (base.reminderMessage ? " " : "") + "Always reply in at least two full paragraphs, blending narration, action, and dialogue. Never answer with a single short line.";
+    base.generalWritingInstructions = (c.writing ? c.writing.trim() : "");
+    if(!isPersona) base.generalWritingInstructions += (base.generalWritingInstructions ? " " : "") + "Every reply must be at least two full paragraphs that weave narration, action, and dialogue together; even for terse characters, never reply with a single short line.";
+    if(!isPersona) base.maxTokensPerMessage = 800;
+    base.imagePromptPrefix = styleOnly();
+    base.imagePromptSuffix = styleSuffix();
+    base.imagePromptTriggers = (c.imageTriggers && c.imageTriggers.trim()) ? c.imageTriggers.trim() : (c.appearance ? (c.name + ": " + c.appearance) : "");
+    base.initialMessages = isPersona ? [] : [ { author:"ai", content: c.firstMessage || "Hello." } ];
+    base.customCode = isPersona ? "" : (sceneCode || "");
+    base.metaTitle = c.name || ""; base.metaDescription = c.tagline || "";
+    if(!base.customData || typeof base.customData !== "object") base.customData = {};
+    base.customData.isPersona = !!isPersona;
+    base.uuid = uniqueUuid(); base.id = uniqueId(seed);
+    base.creationTime = now; base.lastMessageTime = now;
+    if(base.folderPath == null) base.folderPath = "";
+    base["$types"] = { initialMessages:"arrayNonindexKeys", shortcutButtons:"arrayNonindexKeys", loreBookUrls:"arrayNonindexKeys" };
+    return base;
+  }
+  function buildDexie(rows){
+    var L = window.learned;
+    if(L && L.tables && L.tables.length){
+      return JSON.stringify({
+        formatName:"dexie", formatVersion:1,
+        data:{ databaseName:"chatbot-ui-v1", databaseVersion:(L.databaseVersion || 90),
+          tables: L.tables.map(function(t){ return { name:t.name, schema:t.schema, rowCount:(t.name==="characters"?rows.length:0) }; }),
+          data: L.tables.map(function(t){ return { tableName:t.name, inbound:true, rows:(t.name==="characters"?rows:[]) }; })
+        }
+      }, null, 1);
+    }
+    var t = [
+      { name:"characters", schema:"++id,modelName,fitMessagesInContextMethod,uuid,creationTime,lastMessageTime,folderPath", rows: rows },
+      { name:"threads", schema:"++id,name,characterId,creationTime,lastMessageTime,lastViewTime,folderPath", rows: [] },
+      { name:"messages", schema:"++id,threadId,characterId,creationTime,order", rows: [] },
+      { name:"misc", schema:"key", rows: [] },
+      { name:"summaries", schema:"hash,threadId", rows: [] },
+      { name:"memories", schema:"++id,[summaryHash+threadId],[characterId+status],[threadId+status],[threadId+index],threadId", rows: [] },
+      { name:"lore", schema:"++id,bookId,bookUrl", rows: [] },
+      { name:"textEmbeddingCache", schema:"++id,textHash,&[textHash+modelName]", rows: [] },
+      { name:"textCompressionCache", schema:"++id,uncompressedTextHash,&[uncompressedTextHash+modelName+tokenLimit]", rows: [] }
+    ];
+    return JSON.stringify({
+      formatName:"dexie", formatVersion:1,
+      data:{ databaseName:"chatbot-ui-v1", databaseVersion:90,
+        tables: t.map(function(x){ return { name:x.name, schema:x.schema, rowCount:x.rows.length }; }),
+        data: t.map(function(x){ return { tableName:x.name, inbound:true, rows:x.rows }; })
+      }
+    }, null, 1);
+  }
+  function parseLore(){
+    return val("loreOut").split("\n").map(function(line){
+      line = line.trim(); if(!line) return null;
+      var m = line.match(/^\[([^\]]*)\]\s*(.*)$/);
+      if(m){
+        var keys = m[1].split(",").map(function(k){ return k.trim(); }).filter(Boolean);
+        return { keys: keys.length ? keys : ["lore"], content: m[2].trim() };
+      }
+      var content = line.replace(/^[-*\d.\s]+/, "").trim();
+      var key = (content.match(/[A-Z][a-zA-Z'\-]+/) || [content.split(" ")[0] || "lore"])[0];
+      return { keys: [key], content: content };
+    }).filter(function(x){ return x && x.content; });
+  }
+  function loreLines(){ return parseLore().map(function(e){ return e.content; }); }
+  function withLore(row, isFirst){
+    var lore = loreLines();
+    if(isFirst && lore.length) row.roleInstruction += "\n\nWorld facts:\n- " + lore.join("\n- ");
+    return row;
+  }
+  function personaSummary(){
+    var p = val("personaOut").trim(); if(!p) return "";
+    var pc = parseChar(p);
+    var ri = (pc.roleInstruction || "").replace(/\s+/g, " ").trim();
+    var words = ri.split(" ");
+    if(words.length > 80) ri = words.slice(0, 80).join(" ") + "...";
+    return pc.name + (ri ? (": " + ri) : "");
+  }
+  function withPersona(row){
+    var ps = personaSummary();
+    if(ps) row.roleInstruction += "\n\nThe person you are talking to is {{user}} (" + ps + "). Stay aware of who {{user}} is and respond to them accordingly.";
+    return row;
+  }
+  function sceneSummary(){
+    var s = (val("scenarioOut").trim() || val("scenarioNotes").trim()).replace(/\s+/g, " ").trim();
+    var w = s.split(" ");
+    return (w.length > 30) ? w.slice(0, 30).join(" ") : s;
+  }
+  function openingImagePrompt(){
+    var pre = (val("prefixOut").trim() || DEFAULT_PREFIX);
+    if(pre && !/[,\s]$/.test(pre)) pre += ", ";
+    return pre + "establishing wide shot of the setting, " + sceneSummary() + styleSuffix();
+  }
+  function openingSystemMessage(cast){
+    var scene = sceneSummary();
+    var names = cast.filter(function(o){ return !o.p; }).map(function(o){ return o.c.name; });
+    var persona = null; cast.forEach(function(o){ if(o.p) persona = o; });
+    var txt = "Scene context for all characters - stay consistent with this, but do not quote it back:\n" + scene;
+    if(names.length) txt += "\nCharacters present in this scene: " + names.join(", ") + ".";
+    if(persona) txt += " The user plays " + persona.c.name + ".";
+    txt += "\nKeep each character's distinct voice, appearance, and relationships. Every reply should be at least two paragraphs using *italic narration* and \"quoted dialogue\".";
+    return { author: "system", content: txt };
+  }
+  function parseOpening(raw){
+    var msgs = [], cur = null;
+    (raw || "").split("\n").forEach(function(line){
+      var m = line.match(/^\s*\[([^\]]+)\]\s*:?\s*(.*)$/);
+      if(m){
+        if(cur) msgs.push(cur);
+        var tag = m[1].trim();
+        if(/^system$/i.test(tag)) cur = { author:"system", content:m[2] };
+        else if(/^user$/i.test(tag)) cur = { author:"user", content:m[2], _skip:true };
+        else cur = { author:"ai", name:tag, content:m[2] };
+      } else if(cur){ cur.content += (cur.content ? "\n" : "") + line; }
+    });
+    if(cur) msgs.push(cur);
+    return msgs.filter(function(x){ return !x._skip; }).map(function(x){ x.content = (x.content||"").trim(); return x; }).filter(function(x){ return x.content; });
+  }
+  function withOpeningScene(row, isMain, cast){
+    if(!isMain) return row;
+    var msgs = [];
+    var stored = parseOpening(val("openingOut"));
+    if(stored.length){
+      msgs = stored.slice();
+      var idx = 0;
+      for(var k=0; k<msgs.length; k++){ if(msgs[k].author === "system"){ idx = k + 1; break; } }
+      if(sceneSummary()) msgs.splice(idx, 0, { author:"ai", name:"Narrator", content:"<image>" + openingImagePrompt() + "</image>" });
+    } else {
+      msgs.push(openingSystemMessage(cast));
+      if(sceneSummary()) msgs.push({ author:"ai", name:"Narrator", content:"<image>" + openingImagePrompt() + "</image>" });
+      cast.filter(function(o){ return !o.p; }).forEach(function(o){ if(o.c.firstMessage) msgs.push({ author:"ai", name:o.c.name, content:o.c.firstMessage }); });
+    }
+    if(msgs.length) row.initialMessages = msgs;
+    return row;
+  }
+  function castList(){
+    var list = [];
+    var m = val("mainOut").trim(); if(m) list.push({ c: parseChar(m), p: false });
+    var p = val("personaOut").trim(); if(p) list.push({ c: parseChar(p), p: true });
+    syncExtrasFromDOM();
+    extras.forEach(function(ex){ if((ex.out||"").trim()) list.push({ c: parseChar(ex.out), p: false }); });
+    return list;
+  }
+  function downloadFile(name, text){
+    var blob = new Blob([text], { type:"application/json" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = name.replace(/[^a-z0-9_\-]+/gi, "_") + ".json";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(a.href); }, 100);
+  }
+
+  if(typeof window.learned === "undefined") window.learned = null;
+
+  function parseExport(str){
+    var obj = JSON.parse(str);
+    var d = (obj && obj.data) ? obj.data : obj;
+    var blocks = (d && d.data) || [];
+    var tableList = (d && d.tables) ? d.tables.map(function(t){ return { name:t.name, schema:t.schema }; }) : [];
+    var charBlock = null;
+    blocks.forEach(function(b){ if(b && b.tableName === "characters") charBlock = b; });
+    return { databaseVersion: d && d.databaseVersion, tables: tableList, characters: charBlock ? (charBlock.rows||[]) : [] };
+  }
+  function builderSnapshot(){
+    syncExtrasFromDOM();
+    return { scenarioNotes:val("scenarioNotes"), scenarioOut:val("scenarioOut"), mainNotes:val("mainNotes"), mainOut:val("mainOut"),
+      personaNotes:val("personaNotes"), personaOut:val("personaOut"), loreOut:val("loreOut"), loreNotes:val("loreNotes"),
+      openingOut:val("openingOut"), openingAdj:val("openingAdj"),
+      styleMain:styleMain, styleSubs:styleSubs, styleNotes:val("styleNotes"), prefixOut:val("prefixOut"), suffixOut:val("suffixOut"),
+      imgVariety:(el("imgVariety")?el("imgVariety").checked:true), extras:extras, rels:rels };
+  }
+  function restoreSnapshot(snap){
+    setVal("scenarioNotes", snap.scenarioNotes); setVal("scenarioOut", snap.scenarioOut);
+    setVal("mainNotes", snap.mainNotes); setVal("mainOut", snap.mainOut);
+    setVal("personaNotes", snap.personaNotes); setVal("personaOut", snap.personaOut);
+    setVal("loreOut", snap.loreOut); setVal("loreNotes", snap.loreNotes || "");
+    setVal("openingOut", snap.openingOut || ""); setVal("openingAdj", snap.openingAdj || "");
+    styleMain = snap.styleMain || "";
+    styleSubs = (snap.styleSubs && typeof snap.styleSubs === "object") ? snap.styleSubs : {};
+    setVal("styleNotes", snap.styleNotes); setVal("prefixOut", snap.prefixOut); setVal("suffixOut", snap.suffixOut);
+    if(el("imgVariety")) el("imgVariety").checked = (snap.imgVariety !== false);
+    extras = Array.isArray(snap.extras) ? snap.extras.filter(function(x){ return x && typeof x === "object"; }) : [];
+    rels = Array.isArray(snap.rels) ? snap.rels.filter(function(x){ return x && typeof x === "object"; }) : [];
+    renderExtras(); renderStyleMains(); renderStyleSubs(); save(); updateStatus();
+  }
+  function rowToSections(r){
+    var fm = (r.initialMessages && r.initialMessages[0] && r.initialMessages[0].content) || "";
+    var trig = (r.imagePromptTriggers || "").split("\n")[0] || "";
+    var app = trig.indexOf(":") >= 0 ? trig.slice(trig.indexOf(":")+1).trim() : "";
+    var s = "=== NAME ===\n" + (r.name || "Character") + "\n";
+    if(r.metaDescription) s += "=== TAGLINE ===\n" + r.metaDescription + "\n";
+    s += "=== ROLE INSTRUCTION ===\n" + (r.roleInstruction || "") + "\n";
+    if(r.reminderMessage) s += "=== REMINDER ===\n" + r.reminderMessage + "\n";
+    if(fm) s += "=== FIRST MESSAGE ===\n" + fm + "\n";
+    if(app) s += "=== APPEARANCE ===\n" + app + "\n";
+    if(r.imagePromptTriggers) s += "=== IMAGE TRIGGERS ===\n" + r.imagePromptTriggers + "\n";
+    if(r.generalWritingInstructions) s += "=== WRITING INSTRUCTION ===\n" + r.generalWritingInstructions + "\n";
+    return s.trim();
+  }
+  function reconstructFromRows(rows){
+    var main = null, persona = null, ex = [];
+    rows.forEach(function(r){
+      if(r.customData && r.customData.isPersona) persona = r;
+      else if(!main) main = r;
+      else ex.push(r);
+    });
+    setVal("mainOut", main ? rowToSections(main) : "");
+    setVal("personaOut", persona ? rowToSections(persona) : "");
+    extras = ex.map(function(r){ return { notes:"", out: rowToSections(r) }; });
+    rels = [];
+    renderExtras(); save(); updateStatus();
+  }
+  window.importBack = function(){
+    var str = val("importJson").trim();
+    if(!str){ alert("Paste an exported .json first."); return; }
+    var parsed; try { parsed = parseExport(str); } catch(e){ el("importStatus").textContent = "Could not parse JSON: " + e.message; return; }
+    var chars = parsed.characters || [];
+    if(!chars.length){ el("importStatus").textContent = "No characters found in that file."; return; }
+    var src = null;
+    chars.forEach(function(r){ if(!src && r && r.customData && r.customData.builderSource) src = r.customData.builderSource; });
+    if(src){
+      try { restoreSnapshot(typeof src === "string" ? JSON.parse(src) : src); el("importStatus").textContent = "Loaded builder session (" + chars.length + " characters)."; }
+      catch(e){ el("importStatus").textContent = "Found a builder session but could not read it: " + e.message; }
+      return;
+    }
+    reconstructFromRows(chars);
+    el("importStatus").textContent = "Loaded " + chars.length + " character(s), reconstructed - some detail may be approximate.";
+  };
+  window.learnSchema = function(){
+    var str = val("importJson").trim();
+    if(!str){ alert("Paste an exported .json first."); return; }
+    var parsed; try { parsed = parseExport(str); } catch(e){ el("importStatus").textContent = "Could not parse JSON: " + e.message; return; }
+    var template = (parsed.characters || [])[0] || null;
+    var learned = { databaseVersion: parsed.databaseVersion, tables: parsed.tables, template: template };
+    try { localStorage.setItem("accSchemaV1", JSON.stringify(learned)); } catch(e){}
+    window.learned = learned;
+    el("importStatus").textContent = "Learned: db version " + parsed.databaseVersion + ", " + (parsed.tables ? parsed.tables.length : 0) + " tables" + (template ? ", character template captured" : ", NO character in file") + ". Exports now use these real values.";
+  };
+
+  function crc32(bytes){
+    if(!crc32.t){ crc32.t = []; for(var n=0;n<256;n++){ var c=n; for(var k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); crc32.t[n]=c>>>0; } }
+    var crc = 0xFFFFFFFF;
+    for(var i=0;i<bytes.length;i++) crc = crc32.t[(crc ^ bytes[i]) & 0xFF] ^ (crc >>> 8);
+    return (crc ^ 0xFFFFFFFF) >>> 0;
+  }
+  function u32(n){ return [(n>>>24)&255,(n>>>16)&255,(n>>>8)&255,n&255]; }
+  function pngChunk(type, dataBytes){
+    var td = []; for(var i=0;i<4;i++) td.push(type.charCodeAt(i));
+    for(var j=0;j<dataBytes.length;j++) td.push(dataBytes[j]);
+    var crc = crc32(new Uint8Array(td));
+    return new Uint8Array([].concat(u32(dataBytes.length), td, u32(crc)));
+  }
+  function textData(keyword, text){
+    var a = []; var i;
+    for(i=0;i<keyword.length;i++) a.push(keyword.charCodeAt(i)&255);
+    a.push(0);
+    for(i=0;i<text.length;i++) a.push(text.charCodeAt(i)&255);
+    return a;
+  }
+  function pngInsertText(png, keyword, text){
+    var chunk = pngChunk("tEXt", textData(keyword, text));
+    var off = 8;
+    while(off < png.length){
+      var len = ((png[off]<<24)|(png[off+1]<<16)|(png[off+2]<<8)|png[off+3]) >>> 0;
+      var type = String.fromCharCode(png[off+4],png[off+5],png[off+6],png[off+7]);
+      if(type === "IEND"){
+        var out = new Uint8Array(off + chunk.length + (png.length - off));
+        out.set(png.subarray(0, off), 0);
+        out.set(chunk, off);
+        out.set(png.subarray(off), off + chunk.length);
+        return out;
+      }
+      off += 12 + len;
+    }
+    return png;
+  }
+  function makeBasePng(name, cb){
+    var cv = document.createElement("canvas"); cv.width = 512; cv.height = 768;
+    var g = cv.getContext("2d");
+    g.fillStyle = "#3a3f4b"; g.fillRect(0,0,512,768);
+    g.fillStyle = "#cdd3df"; g.font = "bold 34px sans-serif"; g.textAlign = "center";
+    g.fillText((name || "Character").slice(0,24), 256, 384);
+    var b64 = cv.toDataURL("image/png").split(",")[1];
+    var bin = atob(b64); var bytes = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    cb(bytes);
+  }
+  function canvasToBytes(cv){
+    var b64 = cv.toDataURL("image/png").split(",")[1];
+    var bin = atob(b64); var bytes = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+  function makeCardFromImage(url, name, cb){
+    if(!url){ makeBasePng(name, cb); return; }
+    var img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = function(){
+      try{
+        var cv = document.createElement("canvas"); cv.width = 512; cv.height = 768;
+        var g = cv.getContext("2d");
+        var car = 512/768, ar = img.width / img.height, sw, sh, sx, sy;
+        if(ar > car){ sh = img.height; sw = sh * car; sx = (img.width - sw)/2; sy = 0; }
+        else { sw = img.width; sh = sw / car; sx = 0; sy = (img.height - sh)/2; }
+        g.drawImage(img, sx, sy, sw, sh, 0, 0, 512, 768);
+        cb(canvasToBytes(cv));
+      } catch(e){ makeBasePng(name, cb); }
+    };
+    img.onerror = function(){ makeBasePng(name, cb); };
+    img.src = url;
+  }
+  function cardPrompt(c){
+    var look = (c.appearance || "").trim();
+    var outfit = (c.outfit || "").trim();
+    var body = (c.name || "character") + ", " + look + (outfit ? (", wearing " + outfit) : "") + ", solo character portrait, upper body, looking at viewer, simple background";
+    return styleOnly() + body + styleSuffix();
+  }
+  function exampleLines(role){
+    var lines = (role || "").split("\n").filter(function(l){ var t = l.trim(); return t.indexOf("{{char}}:") === 0 || t.indexOf("{{user}}:") === 0; });
+    return lines.length ? ("<START>\n" + lines.join("\n")) : "";
+  }
+  function buildCharacterBook(){
+    var entries = parseLore();
+    if(!entries.length) return undefined;
+    return {
+      name: "World facts", description: "", scan_depth: 4, token_budget: 512, recursive_scanning: false, extensions: {},
+      entries: entries.map(function(e, i){
+        return { keys: e.keys, content: e.content, enabled: true, insertion_order: i, case_sensitive: false, priority: 10, id: i, comment: "", selective: false, secondary_keys: [], constant: false, position: "before_char", extensions: {} };
+      })
+    };
+  }
+  function tavernCard(name, description, tagline, scenario, firstMes, reminder){
+    var sys = "Stay in character as {{char}} in a cute, wholesome, slice-of-life roleplay with {{user}}. Write at least two paragraphs each reply, with *narration and actions in italics* and \"dialogue in quotes\". Keep a warm, friendly tone.";
+    var data = { name:name, description:description, personality:(tagline||""), scenario:(scenario||""), first_mes:(firstMes||""),
+      mes_example: exampleLines(description), creator_notes:"Built with AI Character Set Builder", system_prompt:sys, post_history_instructions:(reminder||""),
+      alternate_greetings:[], tags:["slice-of-life","wholesome"], creator:"AI Character Set Builder", character_version:"1.0", extensions:{} };
+    var book = buildCharacterBook(); if(book) data.character_book = book;
+    var card = { spec:"chara_card_v2", spec_version:"2.0", data:data };
+    card.name=data.name; card.description=data.description; card.personality=data.personality;
+    card.scenario=data.scenario; card.first_mes=data.first_mes; card.mes_example=data.mes_example;
+    return card;
+  }
+  function b64utf8(obj){ return btoa(unescape(encodeURIComponent(JSON.stringify(obj)))); }
+  function downloadPngCard(name, png, card, i){
+    var out = pngInsertText(png, "chara", b64utf8(card));
+    var blob = new Blob([out], { type:"image/png" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob);
+    a.download = (name || ("character"+(i+1))).replace(/[^a-z0-9_\-]+/gi,"_") + ".png";
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(a.href); }, 100);
+  }
+  window.exportTavern = async function(){
+    var cast = castList();
+    if(!cast.length){ alert("No characters generated yet."); return; }
+    var problems = validateCast(); if(problems.length){ alert("Fix before exporting:\n\n" + problems.join("\n")); return; }
+    var scen = val("scenarioOut").trim() || val("scenarioNotes").trim();
+    var chars = cast.filter(function(o){ return !o.p; });
+    for(var i=0; i<chars.length; i++){
+      var o = chars[i];
+      var row = { name:o.c.name, roleInstruction:o.c.roleInstruction };
+      withLore(row, i === 0); withRels(row); withPersona(row);
+      el("busyHint").textContent = "generating portrait for " + o.c.name + " (" + (i+1) + "/" + chars.length + ")...";
+      var url = "";
+      try { if(typeof genCharacterImage === "function") url = await genCharacterImage(cardPrompt(o.c), IMG_NEG); } catch(e){ url = ""; }
+      var card = tavernCard(o.c.name, row.roleInstruction, o.c.tagline, scen, o.c.firstMessage, o.c.reminder);
+      await new Promise(function(res){
+        makeCardFromImage(url, o.c.name, function(png){ downloadPngCard(o.c.name, png, card, i); res(); });
+      });
+    }
+    el("busyHint").textContent = "";
+  };
+
+  window.exportCombined = function(){
+    var cast = castList();
+    if(!cast.length){ alert("No characters generated yet."); return; }
+    var problems = validateCast();
+    if(problems.length){ alert("Fix before exporting:\n\n" + problems.join("\n")); return; }
+    var code = buildSceneCode(wardrobeMap(cast));
+    var rows = cast.map(function(o,i){ var r = withRels(withLore(characterRow(o.c, i+1, o.p, code), i===0)); r = o.p ? r : withPersona(r); return withOpeningScene(r, i===0 && !o.p, cast); });
+    if(rows[0]){ rows[0].customData = rows[0].customData || {}; rows[0].customData.builderSource = builderSnapshot(); }
+    downloadFile("character-set", buildDexie(rows));
+  };
+  window.exportSeparate = function(){
+    var cast = castList();
+    if(!cast.length){ alert("No characters generated yet."); return; }
+    var problems = validateCast();
+    if(problems.length){ alert("Fix before exporting:\n\n" + problems.join("\n")); return; }
+    var code = buildSceneCode(wardrobeMap(cast));
+    cast.forEach(function(o,i){
+      var row = withRels(withLore(characterRow(o.c, i+1, o.p, code), i===0));
+      if(!o.p) row = withPersona(row);
+      row = withOpeningScene(row, i===0 && !o.p, cast);
+      row.customData = row.customData || {}; row.customData.builderSource = builderSnapshot();
+      setTimeout(function(){ downloadFile(o.c.name || ("character"+(i+1)), buildDexie([row])); }, i*500);
+    });
+  };
+
+  window.showTab = function(which){
+    var b = el("tab-builder"), im = el("tab-image");
+    if(b) b.style.display = (which === "image") ? "none" : "";
+    if(im) im.style.display = (which === "image") ? "" : "none";
+    if(el("tabBtnBuilder")) el("tabBtnBuilder").className = "tabbtn" + (which === "image" ? "" : " active");
+    if(el("tabBtnImage")) el("tabBtnImage").className = "tabbtn" + (which === "image" ? " active" : "");
+  };
+  window.igGenerate = async function(){
+    var p = val("igPrompt").trim();
+    if(!p){ alert("Describe the image first."); return; }
+    var choice = val("igStyle"), pre = "", suf = "";
+    if(choice === "default"){ pre = DEFAULT_PREFIX; suf = DEFAULT_SUFFIX; }
+    else if(choice === "built"){ pre = (val("prefixOut").trim() || DEFAULT_PREFIX); if(pre && !/[,\s]$/.test(pre)) pre += ", "; suf = styleSuffix(); }
+    var prompt = pre + p + suf;
+    var neg = val("igNeg").trim() || IMG_NEG;
+    var shape = val("igShape") || "512x768";
+    var count = parseInt(val("igCount"), 10) || 1;
+    var results = el("igResults");
+    el("igBusy").textContent = "generating...";
+    for(var i=0; i<count; i++){
+      var url = "";
+      try { if(typeof genCharacterImage === "function") url = await genCharacterImage(prompt, neg, shape); } catch(e){ url = ""; }
+      if(url){
+        var img = document.createElement("img"); img.src = url; img.className = "igimg"; img.loading = "lazy";
+        results.insertBefore(img, results.firstChild);
+      } else {
+        el("igBusy").textContent = "image generation unavailable (check the DATA panel import)";
+      }
+    }
+    if(el("igBusy").textContent === "generating...") el("igBusy").textContent = "";
+  };
+
+  load();
+</script>
+
+<style>
+  .tabbar { width:95%; max-width:720px; margin:0 auto 0.75rem; display:flex; gap:0.5rem; }
+  .tabbtn { flex:1; padding:0.6rem 1rem; cursor:pointer; border-radius:8px 8px 0 0; font-size:95%; }
+  .tabbtn.active { font-weight:bold; outline:2px solid currentColor; }
+  .igresults { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.75rem; }
+  .igimg { width:160px; height:auto; border-radius:8px; }
+  .wrap { width:95%; max-width:720px; margin:0 auto; }
+  .bar { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
+  .card { background: var(--box-color, #f0f0f0); padding:1rem; border-radius:8px; margin-bottom:1rem; }
+  .card h3 { margin:0 0 0.25rem 0; }
+  .subcard { background: rgba(127,127,127,0.12); padding:0.75rem; border-radius:6px; margin-bottom:0.75rem; }
+  .hint { font-size:85%; opacity:0.8; margin:0.25rem 0; }
+  .notes { width:100%; height:80px; padding:0.5rem; }
+  .out { width:100%; height:220px; padding:0.5rem; font-family:monospace; margin-top:0.5rem; }
+  .out2 { width:100%; height:54px; padding:0.5rem; font-family:monospace; margin:0.25rem 0; }
+  .btns { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem; }
+  .styleBtn { padding:0.4rem 0.8rem; cursor:pointer; border-radius:6px; }
+  .styleBtn.active { outline:2px solid currentColor; font-weight:bold; }
+  .adj { width:100%; padding:0.5rem; margin-top:0.5rem; }
+  .row { margin-top:0.5rem; display:flex; flex-wrap:wrap; gap:0.5rem; }
+  .row button, .row select { font-size:95%; padding:0.5rem 1rem; cursor:pointer; }
+</style>
