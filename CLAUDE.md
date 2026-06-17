@@ -57,19 +57,20 @@ escaping rules entirely (see `char-info` §1).
 
 ## File naming and duplicates — important
 
-Filenames carry a **version suffix** (`-1`, `-6`, `-7`, `-8`); the higher number
-is newer. Several files are byte-identical snapshots kept under different names,
-and the differences between near-versions are the real signal — diff before
-assuming. Current state at time of writing:
+Filenames carry a **version suffix** (`-1`, `-6`, `-7`, `-8`, `-9`); the higher
+number is newer. Several files are byte-identical snapshots kept under different
+names, and the differences between near-versions are the real signal — diff
+before assuming. Current state at time of writing:
 
 - `char-info` == `perchance-character-creation-3.md` (identical).
-- `char-wiz-html` == `wizard-html-panel-7.txt` == `wizard-html-panel-8.txt`.
-- `wizard-data-panel-6.txt` == `wizard-data-panel-7.txt`, and both differ from
-  the older `char-wiz-dat` (newer ones have a more defensive `genCharacterImage`
-  with fallbacks for the image plugin's varied return shapes).
+- **Wizard current build:** `char-wiz-html` == `wizard-html-panel-9.txt`
+  (canonical HTML) and `char-wiz-dat` == `wizard-data-panel-8.txt` (canonical
+  data). These are the newest and the ones to edit. Older `wizard-html-panel-7/8`
+  and `wizard-data-panel-6/7` are historical snapshots — do not edit them.
 
-When editing, update the **highest-numbered** version of a file and keep
-the duplicate set consistent (or consolidate, if asked).
+When editing, update the canonical pair (`char-wiz-html` / `char-wiz-dat`),
+mirror the result to a new highest-numbered `wizard-html-panel-N.txt` /
+`wizard-data-panel-N.txt`, and leave older snapshots untouched.
 
 ## Conventions any new or edited tool must follow
 
