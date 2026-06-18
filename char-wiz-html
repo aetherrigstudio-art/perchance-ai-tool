@@ -1,3 +1,7 @@
+<div id="buildBanner" style="background:#16a34a; color:#fff; padding:10px 14px; border-radius:10px; margin-bottom:12px; font-weight:700; text-align:center; font-size:15px; line-height:1.4;">
+  LOADER TEST - build pushed 2026-06-18 17:00 UTC. If you can read this green bar, the GitHub-to-Perchance auto-update is working - push to the branch, reload, and the latest build appears with no copy-paste.
+</div>
+
 <h1>AI Character Set Builder</h1>
 
 <div class="tabbar">
