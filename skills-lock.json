@@ -1,0 +1,125 @@
+{
+  "version": 1,
+  "skills": {
+    "Accessibility Engineer": {
+      "source": "daffy0208/ai-dev-standards",
+      "sourceType": "github",
+      "skillPath": "skills/accessibility-engineer/SKILL.md",
+      "computedHash": "f14b0dcd1bf73f7bce06e9d85cda8c2873f67f6366ed47efaf702d8b4f26c121"
+    },
+    "agent-orchestrator-task": {
+      "source": "ruvnet/ruflo",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/agent-orchestrator-task/SKILL.md",
+      "computedHash": "f0c2445a8bca4f2d7f5b624022152ba55bf0d42c970234cd357b2a9f62ab6eae"
+    },
+    "aria-live-regions": {
+      "source": "mgifford/accessibility-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aria-live-regions/SKILL.md",
+      "computedHash": "2e28131039d6dc27e31ea1eda1e17434343329cc13e3f6c010f480574b433f02"
+    },
+    "browser-tools": {
+      "source": "badlogic/pi-skills",
+      "sourceType": "github",
+      "skillPath": "browser-tools/SKILL.md",
+      "computedHash": "84d66f8bfdd5cfdb0b6f448b61f192c504e4ffa9e4943969c1d394e5eed0daee"
+    },
+    "code-review-quality": {
+      "source": "proffesor-for-testing/agentic-qe",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/code-review-quality/SKILL.md",
+      "computedHash": "2b1c2c4ba6cfa06d17e4dd4d67f2133736e2d3a5612d79514287bbe252370e3b"
+    },
+    "configure-web-session": {
+      "source": "laurigates/claude-plugins",
+      "sourceType": "github",
+      "skillPath": "configure-plugin/skills/configure-web-session/SKILL.md",
+      "computedHash": "7f0684bbec319c5eb90034654e99546d0cb540292165d0367129278d2de9c71e"
+    },
+    "find-skills": {
+      "source": "vercel-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/find-skills/SKILL.md",
+      "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
+    },
+    "llm-prompt-optimizer": {
+      "source": "sickn33/antigravity-awesome-skills",
+      "sourceType": "github",
+      "skillPath": "skills/llm-prompt-optimizer/SKILL.md",
+      "computedHash": "eef460bc1c02545bc7754e0b8f113e662a3294fad1ea2bfd92f0385efb2c42d4"
+    },
+    "openless-voice-input": {
+      "source": "aradotso/trending-skills",
+      "sourceType": "github",
+      "skillPath": "skills/openless-voice-input/SKILL.md",
+      "computedHash": "6d7cc4b82d2b323f646b4cf84bdf58a9fadda6a6bc3243db72945f48a907f2a7"
+    },
+    "parallel-agents": {
+      "source": "parcadei/continuous-claude-v3",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/parallel-agents/SKILL.md",
+      "computedHash": "43d406f2716cff0ec9acb4319768615c51708abb9571b1f3a4cfeb6a470a204e"
+    },
+    "session-start-hook": {
+      "source": "camacho/ai-skills",
+      "sourceType": "github",
+      "skillPath": "skills/session-start-hook/SKILL.md",
+      "computedHash": "cd1e85d931a5b5419f0cbbc2b6f730e5fe7f5392dc4e371a877256479d8c9a71"
+    },
+    "smoke-test": {
+      "source": "tobihagemann/turbo",
+      "sourceType": "github",
+      "skillPath": "claude/skills/smoke-test/SKILL.md",
+      "computedHash": "f4239c14d2876d216bc1eebc9e03f2aaaa8808a924bb6f1ba302cb90449b9223"
+    },
+    "subagent-task-execution": {
+      "source": "davidkiss/smart-ai-skills",
+      "sourceType": "github",
+      "skillPath": "skills/subagent-task-execution/SKILL.md",
+      "computedHash": "518b84b845c126c2b833968db242168b9af7c58bef28ff56dd5698d61cc5c3cd"
+    },
+    "token-efficiency": {
+      "source": "nickcrew/claude-ctx-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/token-efficiency/SKILL.md",
+      "computedHash": "8fbee231049b8c08504b2c1478b76db91eafb31cc577550ec43583aab0ea99e9"
+    },
+    "vanilla-web": {
+      "source": "janjaszczak/cursor",
+      "sourceType": "github",
+      "skillPath": "skills/vanilla-web/SKILL.md",
+      "computedHash": "71d55c038df13f897175218b6040de5d3a7749f15b4117a25ca9598c3cf77233"
+    },
+    "debugger": {
+      "source": "shubhamsaboo/awesome-llm-apps",
+      "sourceType": "github",
+      "skillPath": "awesome_agent_skills/debugger/SKILL.md",
+      "computedHash": "609b0b6d79fe21bcb5eb8a01b38f5571b8ae05be826936a312bc04d9c5400193"
+    },
+    "error-analysis": {
+      "source": "hamelsmu/evals-skills",
+      "sourceType": "github",
+      "skillPath": "skills/error-analysis/SKILL.md",
+      "computedHash": "64840896ab089c9315fc69764e5ebba7d4c3468dabf69b04423c19e8d9c23c87"
+    },
+    "product-capability": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "skillPath": "skills/product-capability/SKILL.md",
+      "computedHash": "126569a04b17b0f86c41f9566fc397c6c9ab3bd5895875165a5ff4bbc896a125"
+    },
+    "self-reflecting-chain": {
+      "source": "kimasplund/claude_cognitive_reasoning",
+      "sourceType": "github",
+      "skillPath": "cognitive-skills/self-reflecting-chain/SKILL.md",
+      "computedHash": "fc030371b2688c621f134c8d70b9aff94715b47eb03b18bbc1b252a1de36ffd3"
+    },
+    "thought-based-reasoning": {
+      "source": "guia-matthieu/clawfu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/thinking/thought-based-reasoning/SKILL.md",
+      "computedHash": "15358ade86da843b9abec50fb0500b00e7dd34f9b9554134c0cc2b984d59b653"
+    }
+  }
+}
