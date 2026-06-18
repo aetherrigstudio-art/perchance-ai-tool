@@ -20,6 +20,14 @@
     </select>
   </div>
 
+  <div class="bar" style="margin-top:0;">
+    <label class="hint" style="margin:0;">Build mode:</label>
+    <select id="buildMode" style="padding:0.4rem;">
+      <option value="cast">Full cast (scenario, main, persona, side characters, lore, opening)</option>
+      <option value="single">Single character (one character + optional persona, lore &amp; style)</option>
+    </select>
+  </div>
+
   <div class="card">
     <h3>Scenario</h3>
     <p class="hint">Describe the world / situation. Everything else builds from this.</p>
@@ -2279,6 +2287,9 @@
 </script>
 
 <style>
+  :root {
+    --subcard-bg: rgba(127,127,127,0.12); /* translucent surface for nested cards */
+  }
   .tabbar { width:95%; max-width:720px; margin:0 auto 0.75rem; display:flex; gap:0.5rem; }
   .tabbtn { flex:1; padding:0.6rem 1rem; cursor:pointer; border-radius:8px 8px 0 0; font-size:95%; }
   .tabbtn.active { font-weight:bold; outline:2px solid currentColor; }
@@ -2288,7 +2299,7 @@
   .bar { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
   .card { background: var(--box-color, #f0f0f0); padding:1rem; border-radius:8px; margin-bottom:1rem; }
   .card h3 { margin:0 0 0.25rem 0; }
-  .subcard { background: rgba(127,127,127,0.12); padding:0.75rem; border-radius:6px; margin-bottom:0.75rem; }
+  .subcard { background: var(--subcard-bg); padding:0.75rem; border-radius:6px; margin-bottom:0.75rem; }
   .hint { font-size:85%; opacity:0.8; margin:0.25rem 0; }
   .notes { width:100%; height:80px; padding:0.5rem; }
   .out { width:100%; height:220px; padding:0.5rem; font-family:monospace; margin-top:0.5rem; }
