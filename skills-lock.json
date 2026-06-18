@@ -104,6 +104,12 @@
       "skillPath": "skills/product-capability/SKILL.md",
       "computedHash": "126569a04b17b0f86c41f9566fc397c6c9ab3bd5895875165a5ff4bbc896a125"
     },
+    "reflect": {
+      "source": "camacho/ai-skills",
+      "skill": "reflect",
+      "installs": 610,
+      "security": "Safe"
+    },
     "security-best-practices": {
       "source": "openai/skills",
       "skillPath": ".agents/skills/security-best-practices"
