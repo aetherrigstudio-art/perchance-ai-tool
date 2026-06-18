@@ -135,9 +135,13 @@ unverified. **Action = controlled in-app experiment first, not blind population.
 ### 13. `vitalWritingInstructions` / `vitalRoleInstructions` · `""`
 - Same as above — likely "always-injected" variants; confirm.
 
-### 14. `contextInfo` / `contextInfoPrompt` / `contextInfoToggle` / `detailedContextInfo*` · `""` / `"no"`
-- Possibly a structured-context / RAG channel. Confirm how ACC populates and
-  uses these (and the toggles) before wiring.
+### 14. `contextInfo` / `contextInfoPrompt` / `contextInfoToggle` / `detailedContextInfo` / `detailedContextInfoPrompt` / `detailedContextInfoToggle` · `""` / `"no"`
+- Possibly a structured-context / RAG channel (a `*Prompt` describing what to
+  extract, a `*Toggle` enabling it, and the extracted `contextInfo` text).
+- **Lead (unconfirmed):** community reports a Perchance "2026 update" adding
+  structured **Lore / World / NPC / Instruction** boxes for long-term
+  consistency — these may surface in-app as the `contextInfo` / `detailedContextInfo`
+  pair. Confirm against a real export before wiring.
 
 ### 15. `stopSequences` · (unset)
 - Settable via the `oc` API and the text plugin. Expose only if a concrete need
@@ -165,3 +169,18 @@ unverified. **Action = controlled in-app experiment first, not blind population.
   unchanged.
 - Tier 3 requires a real ACC export/in-app check first — capture findings back
   into `char-info` when confirmed.
+
+## Research status
+
+**Field catalog: complete.** All 51 character-row fields in the wizard's
+`defaultTemplate()` are accounted for here — populated (listed above) or on the
+roadmap. Verified vs. unverified follows `char-info` and cited Perchance docs.
+
+**Tier-3 semantics: web research exhausted.** `roleplay1/2Instructions`,
+`vital*`, and the `contextInfo`/`detailedContextInfo` family are **undocumented
+internal fields** — absent from Perchance's docs, community guides, Lemmy/Reddit,
+and search indexes (multiple targeted searches returned nothing). They cannot be
+resolved remotely (perchance.org 403s automated fetch). To settle them, do ONE
+of: (a) inspect a **real ACC `.json` export** that has these populated; (b) read
+the **character-editor UI source** on perchance.org; or (c) **A/B test** in-app
+(set a value, observe reply changes). Until then they stay "leave default."
