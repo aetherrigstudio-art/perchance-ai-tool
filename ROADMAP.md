@@ -196,3 +196,59 @@ resolved remotely (perchance.org 403s automated fetch). To settle them, do ONE
 of: (a) inspect a **real ACC `.json` export** that has these populated; (b) read
 the **character-editor UI source** on perchance.org; or (c) **A/B test** in-app
 (set a value, observe reply changes). Until then they stay "leave default."
+
+---
+
+## Generation-quality enhancements (shipped — not fields)
+
+Beyond character-row fields, these prompt/quality features are now live in the
+wizard (HTML), with smoke regressions in `test/smoke.mjs`:
+
+- **Richer `{a|b|c}` variety pools** (tone/trait/speech/vibe/lore + sensory/verb/
+  pacing) expanded via `roll()`.
+- **`VOCAB` directive** (strong nouns, vivid verbs, sensory adjectives, varied
+  rhythm) woven into generation prompts AND baked into exported
+  `generalWritingInstructions` (improves in-chat prose too).
+- **4-hour pool rotation** — each pool keeps a rotating ~60% active subset that
+  swaps every 4h, derived deterministically from the clock (`rotatePool` /
+  `fourHourBucket`). No infra, no agent, no commits.
+- **Perchance word-bank integration** — data panel imports
+  `{adjective|noun|verb}` and exposes `wordBank()`; HTML pulls a few fresh words
+  **cached per 4h bucket** and offers them as optional "use only if it fits"
+  flavour. Fully optional / self-healing.
+
+**Future:** optional Claude/CI job to introduce genuinely *new* words over time
+(deferred — the in-tool rotation covers freshness without the cost/dependency).
+
+## Interoperability with petrafied-acc / ACC
+
+Where the user chats: **petrafied-acc** (Petra's fork of Perchance AI Character
+Chat). It reads the same `chatbot-ui-v1` Dexie import format the wizard exports,
+and supports `?data=Name~uuid.gz` share-link loading. Sources:
+[petrafied-acc](https://perchance.org/petrafied-acc),
+[share-link example](https://perchance.org/petrafied-acc?data=Emry~f4c47deac8860e27def76f03f2fc231d.gz),
+[same-origin policy](https://perchance.org/perchance-faq).
+
+**Shipped / works today**
+- **JSON import** — wizard combined/separate export → petrafied-acc import button.
+- **Schema-learning** (`learnSchema()`) — paste a real petrafied-acc export into
+  "read real schema from this file" → exports become byte-compatible with the
+  user's exact build (incl. Petra's custom fields). The strongest connector.
+- **Round-trip editing** (`importBack()` / `customData.builderSource`).
+- **Lorebooks by URL** (`loreBookUrls`), **in-chat `customCode`** (immersion),
+  and the Petra-aware schema (`petraCustom*` fields already present).
+
+**To build (tighter connection)**
+1. **One-click share link** — replicate petrafied-acc's `~uuid.gz` upload
+   (`user.uploads.dev`) + share JSON format so the wizard emits a direct
+   `perchance.org/petrafied-acc?data=…` link (loads into chat, no file step).
+   Feasibility unverified — needs reverse-engineering the upload/format.
+2. **Confirm TavernAI PNG import** support in petrafied-acc (we already export
+   the cards).
+3. **Populate `petraCustom*` fields** once their semantics are confirmed (Tier 3).
+
+**Hard limit (not possible)**
+- No live shared-database link: the wizard and petrafied-acc run on separate
+  Perchance subdomains/origins, so same-origin policy blocks direct writes into
+  petrafied-acc's IndexedDB. Seamless-no-file would require the builder to live
+  *inside* the petrafied-acc generator (needs control of its code).
