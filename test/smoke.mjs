@@ -78,6 +78,7 @@ script += `
 ;globalThis.__scenarioSeed = function(){ return scenarioSeed(); };
 ;globalThis.__rotatePool = function(p, b){ return rotatePool(p, b); };
 ;globalThis.__seedTone = SEED.tone;
+;globalThis.__inspirationLine = function(){ return inspirationLine(); };
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -240,6 +241,17 @@ check("rotation active subset differs between 4h windows", win1.join("|") !== wi
 check("rotation is deterministic for the same window", globalThis.__rotatePool(globalThis.__seedTone, 1000).replace(/[{}]/g, "") === win1.join("|"));
 check("rotated subset uses only real pool members (no invented words)", win1.every((w) => fullTone.includes(w)));
 check("small pools (<=4 options) are left fully active", globalThis.__rotatePool("{a|b|c}", 5) === "{a|b|c}");
+
+// Perchance word-bank integration: optional + cached per 4h window.
+check("word-bank line is empty when the data-panel bank is unavailable (graceful)", globalThis.__inspirationLine() === "");
+let _ls = {};
+globalThis.localStorage = { getItem: (k) => (k in _ls ? _ls[k] : null), setItem: (k, v) => { _ls[k] = String(v); }, removeItem: (k) => { delete _ls[k]; } };
+let _calls = 0;
+globalThis.wordBank = (type, count) => Array.from({ length: count || 3 }, () => type + "_" + (_calls++)).join("|");
+let insp1 = globalThis.__inspirationLine();
+let insp2 = globalThis.__inspirationLine();
+check("word-bank words appear as optional flavor when available", /fresh words/i.test(insp1) && /adjective_/.test(insp1));
+check("word-bank words are cached per 4h window (stable within the window)", insp1 === insp2);
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);

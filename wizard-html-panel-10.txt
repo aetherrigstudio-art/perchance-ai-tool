@@ -357,8 +357,28 @@
   // generation prompts (HTML) and baked into the exported character so the
   // in-chat AI writes well too.
   var VOCAB = "Write with rich, precise, varied vocabulary: choose strong specific nouns and vivid active verbs over generic ones, add concrete sensory adjectives and the occasional well-placed adverb, and vary sentence length and rhythm. Avoid repeating the same words, weak intensifiers (very, really, suddenly, somewhat), and filler; show through specific detail instead of telling.";
-  function charSeed(){ return roll("Creative direction (use loosely; do NOT mention these words or list them): lean toward a " + rotatePool(SEED.tone) + " tone, give them " + rotatePool(SEED.trait) + ", and a " + rotatePool(SEED.speech) + " way of speaking. Let " + rotatePool(SEED.sensory) + " " + rotatePool(SEED.verb) + " the scene.\n\n" + VOCAB); }
-  function scenarioSeed(){ return roll("Creative direction (do NOT mention this): lean toward a " + rotatePool(SEED.vibe) + " atmosphere with " + rotatePool(SEED.pacing) + " pacing; ground it in " + rotatePool(SEED.sensory) + ".\n\n" + VOCAB); }
+  // Fresh real words pulled from Perchance's shared word banks (data panel's
+  // wordBank, backed by {import:adjective|noun|verb}), CACHED per 4-hour bucket
+  // so they swap on the same 4h cadence as the pool rotation — not every gen.
+  // Fully optional: if the import/function is unavailable it silently returns [].
+  function freshWords(type, count){
+    try {
+      if(typeof wordBank !== "function") return [];
+      var key = "accWB_" + type, bucket = fourHourBucket(), cached = null;
+      try { cached = JSON.parse(localStorage.getItem(key) || "null"); } catch(e){}
+      if(cached && cached.b === bucket && typeof cached.w === "string"){ return cached.w ? cached.w.split("|").filter(Boolean) : []; }
+      var w = ""; try { w = wordBank(type, count || 3) || ""; } catch(e){ w = ""; }
+      try { localStorage.setItem(key, JSON.stringify({ b: bucket, w: w })); } catch(e){}
+      return w ? w.split("|").filter(Boolean) : [];
+    } catch(e){ return []; }
+  }
+  function inspirationLine(){
+    var words = freshWords("adjective", 3).concat(freshWords("verb", 2)).filter(Boolean).slice(0, 5);
+    if(!words.length) return "";
+    return " You MAY draw on these fresh words for flavour if any fit naturally - ignore the ones that don't, and never list them: " + words.join(", ") + ".";
+  }
+  function charSeed(){ return roll("Creative direction (use loosely; do NOT mention these words or list them): lean toward a " + rotatePool(SEED.tone) + " tone, give them " + rotatePool(SEED.trait) + ", and a " + rotatePool(SEED.speech) + " way of speaking. Let " + rotatePool(SEED.sensory) + " " + rotatePool(SEED.verb) + " the scene.\n\n" + VOCAB) + inspirationLine(); }
+  function scenarioSeed(){ return roll("Creative direction (do NOT mention this): lean toward a " + rotatePool(SEED.vibe) + " atmosphere with " + rotatePool(SEED.pacing) + " pacing; ground it in " + rotatePool(SEED.sensory) + ".\n\n" + VOCAB) + inspirationLine(); }
   function loreSeed(){ return roll("Lean the facts toward " + rotatePool(SEED.loreFocus) + "."); }
 
   function getSection(label, text){
