@@ -67,7 +67,8 @@ def main() -> int:
             )
 
     if "buildDexie" in text:
-        missing = [t for t in REQUIRED_TABLES if f'"{t}"' not in text]
+        # Match either quote style — single-quoted table names are valid JS too.
+        missing = [t for t in REQUIRED_TABLES if f'"{t}"' not in text and f"'{t}'" not in text]
         if missing:
             problems.append(
                 f"{base} defines a buildDexie exporter but is missing Dexie table(s): "

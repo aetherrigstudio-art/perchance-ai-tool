@@ -11,8 +11,10 @@
 set -euo pipefail
 
 node_ok="missing"; python_ok="missing"
-command -v node    >/dev/null 2>&1 && node_ok="$(node --version 2>/dev/null)"
-command -v python3 >/dev/null 2>&1 && python_ok="$(python3 --version 2>/dev/null)"
+# `if` (not `&&`) so a nonzero `--version` can't trip `set -e` and abort before
+# the context JSON is emitted; `|| echo present` keeps the value non-empty.
+if command -v node    >/dev/null 2>&1; then node_ok="$(node --version 2>/dev/null || echo present)"; fi
+if command -v python3 >/dev/null 2>&1; then python_ok="$(python3 --version 2>/dev/null || echo present)"; fi
 
 read -r -d '' CONTEXT <<EOF || true
 [perchance-ai-tool] No build/test/lint toolchain — this repo is Perchance generator
