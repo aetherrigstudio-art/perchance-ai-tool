@@ -798,3 +798,71 @@ sit on different Perchance subdomains (origins), so the browser same-origin
 policy blocks writing directly into petrafied-acc's IndexedDB. File import and
 share links are the connection; a seamless no-file handoff would require the
 builder to live *inside* the target generator.
+
+---
+
+## §15 — September 2025 ACC Updates (research-sourced, not yet live-verified)
+
+> **Source:** Deep web research 2026-06-18 against `perchance.org/ai-character-chat-docs`
+> and community tools. Direct page fetch blocked by Cloudflare; findings from
+> community reports and the Python `eeemoon/perchance` library source.
+> **Verification status:** Unverified live — treat as "likely accurate, confirm in-app."
+
+### New UI features (user-visible; may affect exported character behavior)
+
+**Main Prompt Template editor**
+Users can now edit the system prompt wrapper that ACC injects around character
+definitions. This means `roleInstruction + reminderMessage + generalWritingInstructions`
+may be interpreted in a custom wrapper rather than the default one. We have no
+control over this from the builder side — just be aware that exported characters
+may behave differently for users who have customized their template.
+
+**Creativity slider**
+Maps to `temperature`. Users can override the `temperature: 0.8` the wizard
+exports on every character. If a user's slider is at maximum, the builder's
+carefully-tuned temperature is irrelevant. No action needed on export side.
+
+**Emdash fix**
+The model no longer auto-inserts em-dashes. This is a prose quality improvement;
+no change needed in the builder.
+
+**Improved summarization**
+`fitMessagesInContextMethod: "summarizeOld"` now works better. We already export
+this value; the improvement is automatic.
+
+### Expanded `customCode` capabilities
+
+The character editor now supports custom code blocks with:
+- **Internet access** (outbound HTTP from customCode)
+- **3D/VR avatar** support
+- **Voice** controls beyond speechSynthesis
+- **JavaScript and Python execution**
+
+This makes the immersion pack's `customCode` more powerful than described in §10.
+The existing `customCode` format (serialized via `IMMERSION_FN.toString()`) still
+works; the new capabilities are available if the code uses them. The browser API
+calls in the current immersion block remain valid.
+
+### API layer clarification (corrects §1 / §13 assumptions)
+
+**The "Perchance 403s automation" claim is partially wrong:**
+- The HTML/visual editor layer 403s browser automation — confirmed.
+- The **API layer is publicly accessible:**
+  - `/api/downloadGenerator` — returns a generator's raw data-panel source text.
+    Has a backwards-compatibility guarantee. Callable via curl/Node.js/Python.
+  - Image generation endpoint — independently callable (confirmed by
+    `aein00/perchance-image-generator` CLI tool).
+  - Python library `eeemoon/perchance` (`pip install perchance`) provides
+    `TextGenerator` and `ImageGenerator` async clients.
+
+**Practical implications for the builder:**
+- CI verification of char-wiz-dat (plugin imports, syntax) is now viable without
+  a browser — fetch via `/api/downloadGenerator`, run `getGeneratorsAndDependencies`.
+- End-to-end generation tests are possible via `TextGenerator` in Python.
+- The runtime-loader deploy path (§13) remains correct for the HTML panel.
+
+### `stopSequences` — upgrade from Tier 3 to actionable
+
+The `ai-text-plugin` `settings` block accepts `stopSequences: ["=== END ==="]`.
+This gives deterministic output termination without relying on token-count
+inference in prompt wording. Recommended for all generation calls in char-wiz-dat.

@@ -7,6 +7,11 @@
       "skillPath": "skills/accessibility-engineer/SKILL.md",
       "computedHash": "f14b0dcd1bf73f7bce06e9d85cda8c2873f67f6366ed47efaf702d8b4f26c121"
     },
+    "agent-issue-tracker": {
+      "source": "ruvnet/ruflo",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/agent-issue-tracker/SKILL.md"
+    },
     "agent-orchestration": {
       "source": "yonatangross/orchestkit",
       "skillPath": ".agents/skills/agent-orchestration",
@@ -35,6 +40,11 @@
       "skill": "caveman",
       "installs": 259800,
       "security": "Safe"
+    },
+    "changelog-writer": {
+      "source": "patricio0312rev/skills",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/changelog-writer/SKILL.md"
     },
     "code-review-quality": {
       "source": "proffesor-for-testing/agentic-qe",
@@ -161,6 +171,11 @@
       "skillPath": "skills/token-efficiency/SKILL.md",
       "computedHash": "8fbee231049b8c08504b2c1478b76db91eafb31cc577550ec43583aab0ea99e9"
     },
+    "track-management": {
+      "source": "wshobson/agents",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/track-management/SKILL.md"
+    },
     "vanilla-web": {
       "source": "janjaszczak/cursor",
       "sourceType": "github",
@@ -174,6 +189,11 @@
     "websearch-deep": {
       "source": "thomasholknielsen/claude-code-config",
       "skillPath": ".agents/skills/websearch-deep"
+    },
+    "knowledge-base-manager": {
+      "source": "daffy0208/ai-dev-standards",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/knowledge-base-manager/SKILL.md"
     }
   }
 }

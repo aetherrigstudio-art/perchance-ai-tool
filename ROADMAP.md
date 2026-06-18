@@ -165,8 +165,13 @@ unverified. **Action = controlled in-app experiment first, not blind population.
   pair. Confirm against a real export before wiring.
 
 ### 15. `stopSequences` · (unset)
-- Settable via the `oc` API and the text plugin. Expose only if a concrete need
-  arises (e.g. preventing the model from writing the user's lines).
+- **Research update (2026-06-18):** The `ai-text-plugin` accepts a `stopSequences`
+  array in the data panel's `settings` block. Setting `["=== END ==="]` gives
+  deterministic output termination, eliminating the length-control hacks in our
+  current prompts. This is a safe, low-risk improvement.
+- Also settable on the exported character row (ACC-side); worth testing whether
+  in-chat model stops cleanly vs. the data-panel-side sequence.
+- **Priority upgraded to Medium** — implement in data panel alongside the CI work.
 
 ### 16. Low-priority / mostly leave-default
 - `writingFormat` · `""` — investigate.
@@ -197,14 +202,33 @@ unverified. **Action = controlled in-app experiment first, not blind population.
 `defaultTemplate()` are accounted for here — populated (listed above) or on the
 roadmap. Verified vs. unverified follows `char-info` and cited Perchance docs.
 
-**Tier-3 semantics: web research exhausted.** `roleplay1/2Instructions`,
-`vital*`, and the `contextInfo`/`detailedContextInfo` family are **undocumented
-internal fields** — absent from Perchance's docs, community guides, Lemmy/Reddit,
-and search indexes (multiple targeted searches returned nothing). They cannot be
-resolved remotely (perchance.org 403s automated fetch). To settle them, do ONE
-of: (a) inspect a **real ACC `.json` export** that has these populated; (b) read
-the **character-editor UI source** on perchance.org; or (c) **A/B test** in-app
-(set a value, observe reply changes). Until then they stay "leave default."
+**Tier-3 semantics: web research exhausted (for undocumented fields).** Many
+fields are now confirmed from real exports (see Tier-3 section below). Remaining
+unknowns (`vitalWritingInstructions`, `vitalRoleInstructions`, `writingFormat`)
+cannot be resolved remotely — confirm via in-app A/B test or inspecting a real
+export that populates them.
+
+**Perchance API correction (2026-06-18):** The statement "perchance.org 403s
+automated fetch" is **wrong for the API layer** — `/api/downloadGenerator` is
+stable and callable without a browser. See `ai-workspace/perchance-api-research.md`.
+This opens CI verification of the data panel without a browser.
+
+**September 2025 ACC updates** (confirmed via research — not yet in char-info):
+- **Main Prompt Template editor** — users can customize the system prompt wrapper
+  around character definitions. Our `roleInstruction + reminderMessage +
+  generalWritingInstructions` triple may interact differently with custom templates.
+- **Creativity slider** — maps to temperature; users can override the
+  `temperature: 0.8` we export.
+- **Emdash fix** — model no longer auto-inserts em-dashes.
+- **Improved summarization** — `fitMessagesInContextMethod: "summarizeOld"` now
+  works better; no change needed on our end.
+- **`customCode` expanded** — now supports internet access, 3D/VR avatar, voice,
+  JavaScript and Python execution. The immersion `customCode` block is more
+  powerful than char-info describes.
+- **Source:** `perchance.org/ai-character-chat-docs` (confirmed 2026-06-18 via
+  deep research; direct fetch blocked by Cloudflare).
+These updates are not yet reflected in `perchance-character-creation-3.md`
+(char-info). A web-search update pass against the docs page is the correct fix.
 
 ---
 
