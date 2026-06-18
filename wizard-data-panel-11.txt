@@ -20,8 +20,7 @@ settings
   startWith = [ "" ]
   hideStartWith = [ false ]
   outputTo = [responseEl]
-  stopSequences() =>
-    return (window.WIZ_STOP_SEQUENCES || ["=== END ==="]);
+  stopSequences = ["=== END ==="]
   onStart() =>
     responseEl.value = "";
   onChunk() =>

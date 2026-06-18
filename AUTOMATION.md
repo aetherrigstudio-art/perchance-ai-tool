@@ -124,9 +124,29 @@ Exit codes: **0** = in sync, **1** = drift detected, **2** = API/network unreach
 | Full pre-release check | `./scripts/deploy.sh --check-dat` | Run locally |
 | GitHub Actions (push hook) | `./scripts/ci-verify.sh html` | Safe in cloud — no perchance.org call |
 
-### Why the data panel can't be auto-deployed
+### The data panel: why it rarely needs re-pasting (and why it's not zero)
 
-Perchance exposes `/api/downloadGenerator` for **reads** but no equivalent
-upload/write endpoint. Pushing `char-wiz-dat` still requires a manual paste into
-the generator's data editor at `perchance.org/q83iy9tti5#edit`. This is expected
-to be rare — the data panel changes far less often than the HTML panel.
+Perchance exposes `/api/downloadGenerator` for **reads** but no upload/write
+endpoint, so the *source* of `char-wiz-dat` can only be saved by pasting into the
+data editor at `perchance.org/q83iy9tti5#edit`. That sounds like the data panel
+can't be auto-deployed — but most of it effectively *is*, because of how Perchance
+executes generators (verified 2026-06-18; see the deep-research note in
+`ai-workspace/memory/`):
+
+- The data editor is **full JavaScript** and shares one `window` global scope with
+  the HTML editor's classic `<script>` (which the loader fetches from GitHub). HTML
+  `<script>`s run *before* the data editor's functions, so data-editor code can call
+  `window.*` defined by the loaded HTML. [verified: perchance.org/advanced-tutorial]
+- Function-valued `settings` properties (`instruction`, `startWith`, `stopSequences`)
+  are **re-evaluated per generation**, so even a settings value can read live state
+  from the HTML panel. [verified: perchance.org/ai-text-plugin]
+
+So `char-wiz-dat` is kept as a **thin bridge**: the six `{import:plugin}` lines and
+the bare `settings`/function declarations must stay (Perchance load-time constructs),
+but every mutable *body* delegates to a `window.*` function in `char-wiz-html` (which
+the loader auto-deploys). Net: the data panel only needs re-pasting when you add or
+remove a plugin import or change the settings structure — not for logic changes.
+
+A literal GitHub-fetch-and-`eval` loader for the data panel is *plausible but
+unverified* (the imports can't be eval'd anyway, so it offers nothing over the
+delegation approach). Don't pursue it without a live Perchance test.
