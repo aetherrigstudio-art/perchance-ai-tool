@@ -104,6 +104,12 @@
       "source": "onewave-ai/claude-skills",
       "skillPath": ".agents/skills/performance-profiler/SKILL.md"
     },
+    "plan-mode": {
+      "source": "vercel-labs/open-agents",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/plan-mode/SKILL.md",
+      "computedHash": "f7743059909b3aee70b6d87b39741e3cbe01f9aeb08cda13e2076be2e46ef169"
+    },
     "plugin-settings": {
       "source": "anthropics/claude-code",
       "sourceType": "github",
