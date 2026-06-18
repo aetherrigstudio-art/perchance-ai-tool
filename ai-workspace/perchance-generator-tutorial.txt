@@ -1,0 +1,1001 @@
+## 📚 Perchance Tutorial
+ 
+
+ 
+
+ Perchance is all about lists. You simply create lists of different things and then reference the lists from one another. For example, we could create a list of animals, and a list of sentences, and then use the animals list within the sentences list like so:
+
+ 
+animal
+ pig
+ cow
+ zebra
+
+sentence
+ That \[animal\] is very sneaky.
+ I befriended a wild \[animal\] yesterday.
+ 
+
+ Pretty easy, right? In each sentence, \[animal\] gets replaced by a random item from the animal list. As you can see, list items are indented from the list name. You must use one tab or two spaces to indent your list items. Here's a link to a Perchance generator based on the above example. Try adding some items and playing around with it.
+
+ 
+ Note that visual aspect of a Perchance generator is completely customisable, and there are many templates (like this one , for example) which you can use to make a nice-looking generator, fast.
+
+ We could easily add another list to our previous example called "adjective" and then use \[adjective\] within our sentences to make them more random and complex:
+
+ 
+...
+
+adjective
+ sneaky
+ happy
+ furry
+ 
+sentence
+ That \[animal\] is very \[adjective\].
+ I befriended a very \[adjective\] \[animal\] yesterday.
+ 
+
+ We could also create another list called "paragraph" like so:
+
+ 
+paragraph
+ \[sentence\] \[sentence\] \[sentence\]
+ 
+
+ Here we've made a list called "paragraph" that has a single item. That item is made of 3 sentences separated by spaces. We could have different sentence types, and arrange them in different ways and thus have multiple items in our paragraph list, but for our simple demonstration we only need one item - and this item will always be chosen when \[paragraph\] is used. Perchance actually has a nice shortcut for single-item lists:
+
+ 
+paragraph = \[sentence\] \[sentence\] \[sentence\]
+ 
+
+ There's no need to use this short-hand method now, but as we build more complex generators you'll see that it can come in handy to neaten up our code. There are also some important differences between these two different ways of creating a "single-item list", and you'll learn about them further along in this tutorial.
+
+ 
+ Side Note (click me) 
+ If you want to put a space before or after an item, you need to use a special character pair, \\s , at the start and/or end of your item. For example:
+
+ 
+my_list
+ \\s this item has some space on either side \\s
+ \\s this one just has some space at the start
+ this one just has some space on the end \\s
+ 
+
+ When the engine outputs this text, the \\s bits will be replaced with a space. If you wanted an item called "My Item Text" with just one space on either side you would write \\sMy Item Text\\s . The reason we need to use \\s for spaces on either side of items is because Perchance "takes indentation seriously". If you put spaces at the start of your item, Perchance will think you're trying to indent the item further. As you'll learn soon, Perchance allows you to use multiple levels/tiers of indentation (you can create a hierarchy of lists within lists), which means we need strict indentation rules. Regarding normal spaces at the end of items, Perchance will trim them off (ignore them) during initialization.
+
+ If you'd like to put a "tab" character in your items, you can use \\t . As you can see, backslash is a special character in Perchance. If you want to use an actual backslash, then you need to write a double backslash like this: \\\\ . Similarly, if you want to use a literal square bracket or equals sign, then you need to put a backslash before them like this: \\\[ and this: \\\= . That way the Perchance engine will just treat it like a normal text character. The backslash is a magical character that you'll use quite often in your random-generator-building career.
+
+ 
+
+## Probability
+
+ So you can see that Perchance is all about lists of items, and random selections of those items. But what if we want certain items in a list to be more likely than others? Let's imagine we're building a "random meal generator". Here's a basic version of how it might look:
+
+ 
+description
+ It's a \[adjective\] dish with \[type\] \[main\].
+ The \[adjective\] \[main\] is paired with a \[size\] serving of \[condiment\]-covered \[side\].
+ A \[main\] with a bit of \[condiment\] and some \[adjective\] \[side\] on the side.
+
+adjective
+ vegan
+ Indonesian
+ Italian
+ delicious
+
+main
+ risotto
+ pie
+ stir-fry
+ curry
+
+side
+ bowl of rice
+ salad
+ fries
+ fried mushrooms
+ pumpkin soup
+ 
+type
+ a \[size\] serving of
+ well-cooked
+ unusually fresh
+ roasted
+
+size
+ small
+ large
+ tiny
+
+condiment
+ pepper
+ salt
+ chilli flakes
+ oregano
+ 
+
+ This generator would probably produce nonsense, but that's okay - it's just to demonstrate some concepts. Now, how do we make some items more common than others? For example, what if we wanted "pepper" to be twice as likely as the other condiments? Here's how you'd do that:
+
+ 
+condiment
+ pepper ^2
+ salt
+ chilli flakes
+ oregano
+ 
+
+ This "up arrow" character (above number 6 on your keyboard) allows you to change the likelihood that an item will be selected. ^2 makes it twice as likely, ^100 makes it 100 times more likely compared to the others. All items have a default odds of 1 - you can imagine that each item has ^1 after it by default. You can also make an item less likely:
+
+ 
+condiment
+ pepper ^2
+ salt
+ chilli flakes ^0.1
+ oregano
+ 
+
+ This makes "chilli flakes" quite unlikely, especially compared to pepper. In this example pepper is 20 times more likely than chilli flakes. And salt is 10 times more likely than chilli flakes. Makes sense? The number after the ^ is the item's "odds" or "weight" during the random selection process. You can use fractions like ^1/10 instead of ^0.1 if that's easier for you.
+
+ That's a brief overview of the probability notation in Perchance. There's much more to explore in this area but we'll get to that later in the tutorial.
+
+## Shorthand Lists
+
+ Sometimes you'll just want to randomly choose between a few items, and creating a whole list just for that isn't desirable. In this case we can use some "curly bracket" shorthand notation:
+
+ 
+sentence
+ That's a \{very|extremely\} \{tiny|small\} \[animal\]!
+ I \{think|believe\} that you are a \{liar|thief\}.
+ I'd be so \{rich|poor\} if not for that person.
+ 
+
+ See how that works? Inside the curly brackets, you separate items with a vertical bar (or "pipe") character, which you can find near the curly brackets keys on most keyboards. When the Perchance engine "evaluates" the text it replaces the "curly block" with a randomly selected item from within that block. It's essentially a way to embed "mini lists" within an item.
+
+ 
+ 
+ What does "evaluate" mean? (click me) 
+ Throughout this tutorial I use the words "evaluate", "resolve", and "execute" in sentences like these:
+
+ 
+ - Perchance evaluates \{dog|cat\} , replacing it with either 'dog' or 'cat'.
+
+ - The Perchance engine resolves \[plant\] , replacing it with a random item from the plant list.
+
+ - Perchance executes the square block, \[food\] , which outputs a random food item.
+
+ 
+ All three of these words are basically interchangable - they mean the same thing. When I write "evaluate", "resolve" or "execute", I'm referring to Perchance converting text with square and curly brackets into "plain" text (i.e. text without any curly/square brackets) by randomly selecting items from lists and short-hand (within curly brackets) lists according to the odds that you have specified. So whenever you see "evaluate", "resolve" or "execute", just mentally replace that with "convert into plain text by making the appropriate random selections".
+
+ Here are a few more examples of their usage in case it's helpful:
+
+ 
+ - \{dog|cat\} resolves into 'dog' or 'cat'.
+
+ - If we evaluate \[flower\] , then we'll get something like "tulip".
+
+ - Execution of square blocks happens in the order in which they appear in your text.
+
+ 
+ 
+
+ Just as we can change the likelihood of normal list items, so we can change the likelihood of shorthand "curly" list items. Given the curly block: \{big|large|massive\} , we can make "large" 3 times as likely by writing: \{big|large^3|massive\} .
+
+ You might have guessed already, but we can do stuff like this too:
+
+ The country is known to contain many species of \{\[animal\]|\[plant\]\} 
+ Here we've put square blocks inside a curly block, so half the time it'll choose a random animal, and the other half of the time it'll choose a random plant.
+
+ Note that spaces matter in curly blocks , so \{hi|hello\} is different to \{ hi | hello \} . In square blocks, spaces are ignored. So \[animal\] is the same as \[ animal \] - they output exactly the same thing, despite the extra spaces inside the brackets.
+
+ Curly blocks are used for all sorts of other fancy tricks in Perchance. Take this sentence, for example: I'm a \[animal\] . If the result of \[animal\] happens to start with a vowel, then the grammar won't be right: I'm a antelope - it should be I'm an antelope . We could manually fix this by having two separate lists of animals (ones that need "a" and ones that need "an"), but that'd be a pain. Instead we can just do this: I'm \{a\} \[animal\] . By using the \{a\} curly block, the correct article (a/an) will be chosen based on what is appropriate for the next word.
+
+ Here's another curly block: \{s\} . What does it do? Let's see with an example. Take the following sentence: I have \{1|2|3\} bananas . You can see the problem here: "I have 2 bananas." makes sense, but "I have 1 bananas." doesn't. You can see that we need a way to intelligently decide whether a word should be pluralised. Here's how we do it: I have \{1|2|3\} banana\{s\} , and there you have it!
+
+ Instead of writing \{1|2|3\} , we can write \{1-3\} . This is especially handy for much larger number ranges like \{1-500\} . You can also choose a random letter with the same notation. \{a-z\} chooses a random lower case letter. \{a-f\} chooses a random lower case letter between "a" and "f". This also works for upper case letters: \{A-Z\} .
+
+## Properties
+
+ As we've learned, a square bracket "block" like \[animal\] chooses a random item from the "animal" list. But square blocks have more tricks up their sleeves. Consider the following example:
+
+ 
+animal
+ pig
+ zebra
+ cow
+
+sentence
+ There are so many \[animal\] here.
+ I've befriended this \[animal\].
+ \[animal\] are very agile.
+ 
+
+ In this example, \[sentence\] would evaluate to something like: "There are so many cow here." - which obviously isn't correct. It should be "There are so many cows here." So, what do we do? Change our "animal" list so they're all plurals? But then the second sentence wouldn't work - it needs singular words. Luckily we can convert items to plural form easily: \[animal.pluralForm\] . Yep, it's that easy. Just put a period (a dot) and then "pluralForm" after the name of the list. So our new "sentences" list becomes:
+
+ 
+sentence
+ There are so many \[animal.pluralForm\] here.
+ I've befriended this \[animal\].
+ \[animal.pluralForm\] are very agile.
+ 
+
+ So now our pluralisation problem is fixed - but we're not quite done. The last item in our list has the "animal" block at the start and so ideally it'd be capitalised. Here's how we do that: \[animal.pluralForm.titleCase\] . Notice that we can string together multiple "properties" by joining them with a period (dot) character. Here are some more properties to try out:
+
+ 
+ - singularForm
+
+ - pastTense
+
+ - presentTense
+
+ - futureTense
+
+ - upperCase
+
+ - lowerCase
+
+ - sentenceCase
+
+ - titleCase
+
+ 
+
+ There are more properties, but these simple ones should suffice for basic generators. We'll learn about more powerful and interesting properties further on in this tutorial. Also, please note that the singularForm , pluralForm , pastTense , presentTense and futureTense properties may not work properly for all words (especially rare ones). In cases where 100% accuracy is required, it's best to create separate lists for the plural/past-tense/etc. variations.
+
+ 
+ 
+ What about infinitive and gerund tenses? (click me) 
+ You can use the conjugate-plugin for less common tenses like gerund, actor and infinitive. You might also like the plural-plugin , which allows you to add custom plurals, and the be-plugin , which automatically chooses is/are/was/were based on the preceding pronoun.
+
+ 
+
+## The Editor
+
+ At this point you've got enough knowledge about Perchance to start building basic text generators. There's much more to learn about the language, but let's stop here for a second to learn about the Perchance generator editor. The editor is where you'll be actually be building your generator. It includes 4 panels. The layout of the panels in the editor is as follows:
+
+ 
+ 
+ Lists Preview 
+
+ Tester HTML 
+
+ 
+ 
+ 
+
+ Let's explain each panel briefly:
+
+ 
+ - Lists: You'll spend the majority of your time in this panel writing lists like the examples that you've seen so far. Note that you can also add "comments" in the code panel by writing two forward slashes like this: "// this is a comment" and any text after those two slashes on that line will be ignored by the engine. Comments are just a way for you to leave notes for yourself or others within the code of your generator and they won't affect your generator's output. Pro tip: You can highlight multiple lines and indent (i.e. add two spaces before) all those lines at once by pressing the Tab to indent and Shift+Tab to un-indent.
+
+ - Tester: This is a helpful little panel that allows you to test out your lists, and general Perchance expressions. If you've just made a list of animals called "animal" then you can type the silly \[animal\] into the tester and it'll evaluate it to "the silly worm" or "the silly mouse", etc.
+
+ - HTML: You'll probably want to share your generator with others, so it needs to have a webpage. Webpages are written in a language called "HTML", but don't worry! You don't need to learn HTML or even worry about the HTML panel at all because there are pre-built templates which you can use. If you'd like to learn HTML so you can customize your generator's appearance a bit more, then Khan Academy and Code Academy both have great online courses that are free and will get you up and running with HTML in no time at all. You can also use the layout maker plugin to help you design your generator more intuitively, and there's an AI helper in the editor which can create or adjust the HTML for you.
+
+ - Preview: Here's where you get to actually see and test your generator for real. It live-updates as you type so you can test it as you go. You can also disable auto-update and reload your preview manually (there's a checkbox next to the reload button in this panel). There's also a "fullscreen" button in the bottom-left of this panel which will take you to your translator's actual webpage so you can copy the link and share it with your pals.
+
+ 
+
+ If you haven't already, have a play around in the editor for a bit and see what you can make. You can edit and play around with generators but if you'd like to save them you'll be promted to signup/login. You'll need a valid email, but you can always use a service like temp mail if you just want to play around. In any case, Perchance only emails you for verification and password resets (you'll need a real email address to recover your account if you forget the password).
+
+ You can save your generator by pressing Ctrl+s (Cmd+s on Mac) or by clicking the "save" button at the top of the screen. When you're logged in you'll see a few extra buttons at the top of the editor: a "settings" button which allows you to change the url of your generator (after you've saved it), and an "account" button which allows you to see a list of all your generators and change your password/email.
+
+ Also note the "community" button at the top of the editor - this leads to lemmy.world/c/perchance which acts as the community forum for Perchance. Feel free to ask questions and share your generator over there (you'll need to login/signup to lemmy.world).
+
+## Storing Text
+
+ This section is about a fundamental feature of the Perchance engine. It may seem a little strange or confusing, but rest assured that it'll make more sense as we progress. Pay attention for this one! :) Let's start with a very simple example, as usual:
+
+ 
+flower
+ rose
+ lily
+ tulip
+ 
+sentence
+ Oh you've got me a \[flower\]! Thank you, I love \[flower.pluralForm\].
+ 
+
+ The problem with the above example is that a different flower would likely be selected each time. It'd output something like "Oh, you've got me a lily! Thank you, I love roses!". We'd like to use the same flower choice twice so that our sentence makes sense. Here's how we'd do that:
+
+ 
+ 
+sentence
+ Oh you've got me a \[f = flower.selectOne\]! Thank you, I love \[f.pluralForm\].
+ 
+
+ What we're doing here is selecting one item from \[flower\] (e.g. "tulip" or "rose" or "lily") and putting it inside "f" which is like a list with just one item. That's what the equals sign does inside square brackets - it allows you to "store things" under a unique identifier. We didn't need to specifically use the letter "f" as our identifier - we can use any name so long as it only has letters and numbers, and doesn't start with a number. Don't worry if this is a little confusing - more examples are coming! And remember that you can always ask questions on the community .
+
+ Notice that we're putting flower.selectOne into the f identifier but we're also outputting the selected item at the same time . First the engine puts one item from \[flower\] into the \[f\] list, then it outputs that selected item into our sentence. In programming lingo we would generally call f a "variable" and we'd say that we "assigned" one item from the flower list to the f variable.
+
+ Important note: Imagine that the above flower list contained items like \{red|pink\} rose instead of just rose . In that case you should write \[f = flower.selectOne.evaluateItem\] , or simply \[f = flower.evaluateItem\] , since evaluateItem automatically executes selectOne behind-the-scenes. We need to use evaluateItem because we want to store something like pink rose in f rather than an "unevaluated" item like \{red|pink\} rose . So we make sure we "evaluate" all the random parts like \{red|pink\} before storing the selected item in f .
+
+ 
+ Here's another example:
+
+ 
+name
+ Addison
+ Alex
+ Alexis
+ 
+lastName
+ Smith
+ Johnson
+ Williams
+
+sentence
+ Her name was \[n = name.selectOne\]. \[n.titleCase\] \[lastName.titleCase\], if I recall correctly.
+ 
+
+ Remember, spaces are ignored inside square blocks. So \[ v = verb.selectOne \] is the same as \[v=verb.selectOne\] and \[v\] is the same as \[ v \] .
+
+ You might be wondering why we can't simply write \[f=flower\] . This is because that would cause f to be a reference to the actual list called "flower", rather than to one randomly selected item of \[flower\] . Just remember: we want to store an item of the list, not the list itself. If you actually did write \[f=flower\] , then \[f\] would just be an alias (another name for) \[flower\] , and so \[f\] would return a new random flower each time (this may be a handy thing to know in case you want to shorten a list name that you're using lots).
+
+ 
+ You can change the thing that's stored inside a variable by just assigning it a different value:
+
+ 
+ 
+sentence
+ I think her name was \[n = name.selectOne.titleCase\]? \[n\] \[l = lastName.titleCase\]? Wait, no, it was \[n = name.selectOne\]. Yeah, that's right, \[n\] \[l\].
+ 
+
+ Caution: Square brackets should not be used inside square brackets:
+
+ 
+ - This is correct : \[n = name.selectOne\] 
+
+ - This is incorrect : \[n = \[name\].selectOne\] 
+
+ 
+ 
+ Both are actually "legal" Perchance code, but the latter isn't doing what you intended, because square brackets have a different meaning when they're used within other square brackets. So for now, just remember: when you're inside square brackets, refer to list names directly - don't wrap them in square brackets.
+
+ 
+
+## Repeating Things
+
+ In the last section you learned about the selectOne property. That might have got you thinking: Can I select more than one item? Yes! You can select as many as you like.
+
+ 
+character = \{\{a-z\}|\{A-Z\}|\{0-9\}\}
+tenCharacters = \[character.selectMany(10)\]
+ 
+
+ What's going on here? Well, first, we've nested a bunch of curly blocks to choose a random alphanumeric character. But now we do something new. The selectMany property is like the others we've seen so far except for one glaring difference: It must always be followed by a pair of parentheses (normal backets) that have a number inside them. That number specifies how many times we want to pull an item from the \[character\] "list". Here we've chosen to make 10 selections. So now if we evaluate \[tenCharacters\] , it'll result in something like: "j63iJY90qm".
+
+ Without the selectMany property, we'd need to do something like this:
+
+ 
+tenCharacters = \{\{a-z\}|\{A-Z\}|\{0-9\}\}\{\{a-z\}|\{A-Z\}|\{0-9\}\}\{\{a-z\}|\{A-Z\}|\{0-9\}\}.........
+ 
+
+ And that wouldn't be fun. You can also select a random number of items as follows: \[character.selectMany(3,10)\] . That'll select a random number of characters between 3 and 10 (inclusive). See how that works? Inside the parentheses we put 2 numbers, separated by a comma - the minimum, then the maximum.
+
+ 
+ Side Note (click me) 
+ A quick side note: In the above example, if you wanted each alphanumeric character to have an equal likelihood of being selected, then you would need to weight each sub-block according to the number of items it has: \{\{a-z\}^26|\{A-Z\}^26|\{0-9\}^10\} . If that doesn't make sense to you, don't worry - just remember that you can change the odds of each part of the curly block to suit your needs.
+
+ 
+
+ What if you want to join your selected items with a comma? For example, you might have a \[fruit\] list and you'd like to produce a sentence like: "My favourite fruits are: oranges, mangos, bananas, pears, apples, blueberries and grapes." Here's where we need the joinItems property:
+
+ 
+sentence
+ My favourite fruits are: \[fruit.selectMany(5).joinItems(", ")\] and \[fruit\].
+ 
+
+ The joinItems property also requires an input via the use of parentheses. Unlike number-based inputs, text-based inputs must be wrapped in quotation marks. So all .joinItems(", ") does is put , (comma+space) in between each of the 5 items.
+
+ 
+ Advanced Tip (click me) 
+ We use quotation marks around text that we give to the joinItems property, but what if you'd like to use quotation marks within that text? In that case you need to put a backslash character before them. For example:
+
+ 
+sentence = My favourite fruits are: "\[fruit.selectMany(2).joinItems(" \", \" ")\]" and "\[fruit\]".
+ 
+ I've colored text inside the quotes to try to make it less visually confusing. All it's doing is putting ", " (quotes included ) in-between each of our 3 randomly selected fruits, so it'd result in something like: My favourite fruits are: "grapes", "bananas" and "plums".
+
+ Quotes are a special character inside square blocks, and so we need to put a backslash before them whenever we want to use them in their "literal"/textual sense.
+
+ 
+
+ We could also select a random number of items like this:
+
+ 
+num = \{3-6\}
+sentence
+ My favourite fruits are: \[fruit.selectMany(num).joinItems(", ")\] and \[fruit\].
+ 
+
+ Pretty cool, hey? In case you missed it, we're defining \[num\] as a random number between 3 and 6, and then we're using that random number as the input to the selectMany property. Note that there are not any square brackets around num . That's because we're already inside square brackets , so we can reference lists by their plain old names . Note also that we cannot put curly bracket blocks directly inside square blocks unless they are enclosed in quotation marks . If you stick around for the advanced tutorial you can learn why (hint: curly brackets have a different meaning when they're inside square brackets). Worth repeating yet again: When inside square brackets you should reference lists directly by their name, rather than putting square brackets around their name.
+
+ A reminder: You should name your lists only with letters, numbers and underscores. Your list names shouldn't contain spaces, and shouldn't start with a number. Also, list names are case-sensitive. Your list items , on the other hand, can contain any text at all.
+
+ Pro tip: If you want to join all the items in your list together (in the order you've defined them), you can just do this: \[fruit.joinItems(", ")\] . This can come in handy sometimes for defining "multi-line items".
+
+ This "fruits" example is a good illustration of where we'd really like each selected item to be different to the others. We don't want something like: "My favourite fruits are: grapes, grapes, pears, …" So how do we prevent this sort of thing from occuring? This is where selectUnique comes in handy. selectUnique is just like selectMany , except that it never selects the same item twice:
+
+ 
+sentence
+ My favourite fruits are \[fruit.selectUnique(3).joinItems(", ")\].
+ 
+
+ Simple, right? But notice that \[sentence\] will result in something like "My favourite fruits are grapes, blueberries, watermelon." when ideally we'd like it to be more gramatically correct: "My favourite fruits are grapes, blueberries and watermelon." It's evident that we'll often need a more powerful approach to selecting unique items from a list, and that's exactly what the next section is about.
+
+## Unique Selections
+
+ As we saw in the last section, we sometimes want random selections that aren't the same as previous selections. The selectUnique function is just like selectMany , except that it won't choose the same item from the list twice. \[animal.selectUnique(5)\] will select 5 unique items from the list called "animal". \[animal.selectUnique(3,20)\] will select a random number of animals between 3 and 20.
+
+ 
+ But sometimes the selectUnique function is a little too simplistic. What if we want to spread our unique selections throughout a paragraph of text, rather than just selecting a big list of them all at once? This is where a "consumable list" comes in handy. When you randomly select an item from a consumable list, that item disappears from the list and cannot be chosen again - the item is "consumed". Creating a consumable list is pretty easy. We just take a normal list that we've made, and add the "consumableList" command: \[cl = animal.consumableList\] . We've now created \[cl\] , which is a consumable list of animals. It's a completely separate (consumable) copy of the original. Whenever \[cl\] is evaluated, it outputs an animal, and removes that animal from the "cl" list so that next time \[cl\] is evaluated it definitely wont output that animal again. Let's look at an example:
+
+ 
+topic
+ trans rights
+ animal rights
+ science
+ mathematics
+ ...
+
+sentence
+ She mostly writes about \[t = topic.consumableList\] and \[t\].
+ 
+
+ So far we've seen properties like selectOne (which grabs a random item from the list) and pluralForm (which grabs a random item from the list and pluralizes it). The consumableList property actually creates an exact copy of the whole list, but alters this new list so that when we select items from it, those items are removed and cannot be chosen again. So \[t = topic.consumableList\] copies the whole \[topic\] list, makes it "consumable", and then makes it accessible via \[t\] .
+
+ 
+ As well as creating a consumable list called t , the code \[t = topic.consumableList\] also outputs (and consequently "consumes") the first item from that t list. So in the above example \[sentence\] would output something like: "She mostly writes about science and trans rights." What if you want to create a consumable list, but not yet output the first item? That's explained in the " Commas In Square Blocks " section below (spoiler: you'd just write \[t = topic.consumableList, ""\] ).
+
+ Here's a more complex example for you to think about. We want to select two random non-duplicate things she writes about, and then re-use the second one in a follow-on sentence.
+
+ 
+sentence
+ She mostly writes about \[t = topic.consumableList\] and \[a = t.selectOne\]. Her last post was about \[a\].
+ 
+
+ Can you see what's happening there? We make a consumable list called t and output the first item at the same time, then we get the second item and put it in a 1-item list called a , and output that item at the same time. Then we use a again for the third selection. So we end up with a sentence like "She mostly writes about mathematics and animal rights. Her last post was about animal rights." The last two topics are the same and they're different to the first one.
+
+ 
+ 
+ Side note (click me) 
+ You might be wondering why we need to write \[a = t.selectOne\] instead of just \[a = t\] ? The answer is that \[a = t\] would make a a direct reference to the whole t list, rather than a specific, randomly-chosen item from t . So \[a = t\] would mean that writing \[a\] would then be the same as writing \[t\] - they'd be the same thing. We write \[a = t.selectOne\] to select a random item from t and put it in a so we can use it again later.
+
+ But then, when you write \[t\] , why doesn't it output the whole list? The answer is that Perchance "sneakily" does a behind-the-scenes selectOne on the output of square blocks so that Perchance code is "neater" to write. I.e. so you can write \[t\] instead of \[t.selectOne\] . This, unfortunately, can lead to the above confusion. But hopefully this explanation clears things up!
+
+ 
+
+ This is a lot to take in, so don't worry if you don't understand it perfectly. Just keep playing around with generators and looking at the source code of other peoples' text generators and you'll soon start to pick up these more advanced techniques.
+
+## Commas In Square Blocks
+
+ Commas have a special meaning within square blocks . They allow you to execute multiple actions at once:
+
+ \[a=animal.selectOne, b=a.pastTense, c=a.futureTense\] 
+ Only the last item gets actually displayed, but the first two get executed "behind the scenes".
+
+ If you'd like to execute a list of actions and output nothing , then just make the last item in the list a pair of empty quotes: 
+ \[a=animal.selectOne, ""\] 
+ You can put text inside those quotes if you'd like to output something specific:
+
+ \[a=animal.selectOne, "blah blah blah"\] 
+ and that's just the same as writing this:
+
+ \[a=animal.selectOne, ""\]blah blah blah 
+
+ 
+ 
+
+## Bolding, Underlining, Etc.
+
+ 
+ In the example below, we're making the word "compassion" bold:
+
+ 
+ Kindness and <b>compassion</b> are underrated. 
+ 
+ That looks like this:
+
+ 
+ Kindness and compassion are underrated.
+
+ 
+ So to make some text bold , just put <b> at the start, and </b> at the end of it.
+
+ And to make some text italic , put <i> at the start, and </i> at the end of it.
+
+ And to underline some text, put <u> at the start, and </u> at the end of it.
+
+ And to strike through some text, put <s> at the start, and </s> at the end of it.
+
+ By the way, these things (that start with <something> and end with </something> ) are called HTML "tags". So you've just learned some of the basics of the HTML language. All the web pages on the internet are built using HTML. The other two languages used by web pages are CSS and JavaScript.
+
+ 
+ If you want to add a new line (break some text into a second line), just add <br> wherever you want to br eak the text, like so:
+
+ Kindness and compassion<br>are underrated. 
+ Kindness and compassion are underrated.
+
+ 
+ You can add multiple <br> tags to break your text up into paragraphs, like so:
+
+ My first paragraph.<br><br>My second paragraph. 
+ My first paragraph. My second paragraph.
+
+ Not too difficult, right? There's lots more to learn about HTML over at the (completely free) Khan Academy HTML+CSS course . If you want to learn more about how to customize your generator, I highly recommend it!
+
+ Tip: Let's say one your lists has a single item that is really long, like this:
+
+ 
+ 
+listWithOneLongItem
+ This is a really long line. This is the second sentence of the really long line. And this is the third sentence. And this is the fourth sentence. And this is the fifth sentence.
+ 
+ 
+ To make it easier to read and edit, you either click the "wrap" button in the top-right of the editor, or you can separate your single item into several items and then add $output = \[this.joinItems(" ")\] as the first item of this list, like this:
+
+ 
+ 
+listWithOneLongItem
+ $output = \[this.joinItems(" ")\]
+ This is a really long line.
+ This is the second sentence of the really long line.
+ And this is the third sentence.
+ And this is the fourth sentence.
+ And this is the fifth sentence.
+ 
+
+ Adding that special $output = ... item to the list causes \[listWithOneLongItem\] to output all the items joined together instead of a random item.
+
+ If you want each sentence to be displayed on its own line, then just change this part: joinItems(" ") to this: joinItems("<br>") . So we join the items together with line br eaks instead of spaces.
+
+ 
+ 
+ Bonus: Adding links to other web pages (click me) 
+ You can create a link to another generator, or to a completely different website like this:
+ 
+ Hi there, <a href="https://example.com"> click here </a> to visit my blog! 
+ and that will display like this:
+
+ Hi there, click here to visit my blog!
+
+ If you want to make it so clicking the link opens a new tab, rather than going directly to the new page in the current tab, you just need to add the target="_blank" attribute to your <a> tag, like this:
+ 
+ Hi there, <a href="https://example.com" target="_blank"> click here </a> to visit my blog! 
+ 
+ 
+ 
+ Bonus: Adding multiple spaces in a row (click me) 
+ HTML is a bit weird in some aspects: If you add multiple spaces between words, it ignores the extra spaces by default. So if you write this:
+
+ 
+ Kindness and compassion are underrated. 
+ then by default it'll come out like this:
+
+ Kindness and compassion are underrated.
+
+ 
+ So what do you do if you want multiple spaces? Well, you need to use this weird bunch of characters: &nbsp; (which stands for "non-breaking space"), like this:
+
+ Kindness and compassion &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; are underrated. 
+ Kindness and compassion are underrated.
+
+ I know, it's weird. I'm sorry about that! One alternative is to wrap your output (in the HTML panel - the bottom-right editor) in a <p> tag with a special style attribute like this:
+
+ <p style="white-space:pre-wrap;">\[output\]</p> 
+ And now you can use multiple spaces like normal - no need for the &nbsp; stuff.
+
+ If your \[output\] is currently wrapped in a <p> tag that has an existing style "attribute", like this, for example:
+
+ <p style="margin:1em auto; padding:0 1em; max-width:700px;">\[output\]</p> 
+ Then you can just add the white-space:pre-wrap; at the end of the style attribute like this:
+
+ <p style="margin:1em auto; padding:0 1em; max-width:700px; white-space:pre-wrap;">\[output\]</p> 
+ 
+ 
+
+## Hierarchical Lists
+
+ Perchance allows you to create "lists of lists" by indenting your items appropriately. This may seem unusual at first, but as you explore Perchance's more advanced features you'll see that it can sometimes be useful. Here's an example of a multi-level list called "animal":
+
+ 
+animal
+ mammal
+ kangaroo
+ pig
+ human
+ reptile
+ lizard
+ crocodile
+ turtle
+ insect
+ spider
+ beetle
+ ant
+ 
+
+ The result of \[animal\] will be "mammal", "reptile" or "insect" with equal likelihood (since we haven't added any likelihood indicators on those items). The result of \[animal.mammal\] will be either "kangaroo", "pig" or "human", with equal likelihood.
+
+ 
+ What do you think \[animal.selectOne\] will result in? Remember that animal is a list ... of lists - so when we selectOne item from animal we get a random list . So when we write \[animal.selectOne\] , it'll essentially give us either \[animal.mammal\] , \[animal.reptile\] or \[animal.insect\] , all with equal probability.
+
+ 
+ Thus, both these lines are equivalent:
+
+ 
+ 
+\[animal.selectOne\]
+\{\[animal.mammal\]|\[animal.reptile\]|\[animal.insect\]\}
+ 
+ 
+ That can be a bit confusing since it may initially seem like \[animal.selectOne\] would simply result in "mammal" or "reptile" or "insect" - but that's not the case, since those items are themselves lists , and so selectOne gives us the whole sublist , which then resolves to a single item from that sublist. So the result of \[animal.selectOne\] would be either kangaroo, pig, human, lizard, crocodile, turtle, spider, beetle, or ant - all with equal likelihood, since we haven't altered the odds of the sublists and they all have the have the same number of items.
+
+ 
+ Perchance allows you to nest items to an arbitrary depth. You could, for example, have a nested list which has many levels: \[planet.country.town.house.room\] .
+
+ You can also use hierarchical lists for stuff like this:
+
+ 
+ 
+race
+ dwarf
+ height = \{7-15\}0cm
+ name = Dwarf
+ type
+ Mountain Dwarf
+ Aleithian Dwarf
+ elf
+ height = \{12-20\}0cm
+ name = Elf
+ type
+ High Elf
+ Night Elf
+ ...
+
+output
+ Yes, a \[r = race.selectOne, r.name\] of that description passed through here several months ago. \{A\} \[r.type\] if I recall correctly. About \[r.height\] tall.
+ 
+ 
+ And if for some reason we specifically wanted a random dwarf height then we could write \[race.dwarf.height\] .
+
+ 
+ If you're a bit confused by all this hierarchical stuff, don't worry about it - for the vast majority of generators top-level lists will be completely fine. It's only if you're building somewhat complicated generators that nesting will start to become useful to help organize and compartmentalize our code. Remember that you can always ask questions in our friendly community .
+
+ 
+ If you'd like to learn more about hierarchical stuff check out the advanced tutorial and the examples page.
+
+ 
+
+ 
+
+## Importing and Exporting
+
+ I'm glad you've made it this far! In this section we're going to learn how you can use Perchance generators that you or others have made inside your generators. If you use Perchance long enough, you'll probably find that there are certain lists which you use quite often. These lists can be separated into their own generators and "imported" with a simple statement when needed.
+
+ Each generator on Perchance has a unique name that you can see in the url: "perchance.org/ name " You can import other generators using their name. Let's import the perchance.org/noun generator:
+
+ 
+sentence = The \{import:noun\} is sitting on my \{import:noun\}.
+ 
+
+ That'd result in something silly like "The brick is sitting on my cloud." There are pre-existing generators for a huge variety of topics. You can check out the useful generators list and also the Perchance community . If you create any generators that you think would be useful to others, please share them on on the community page! Sharing is caring :)
+
+ In the example above, what if you want to get the pluralForm of an imported noun? In that case you can do this:
+
+ 
+noun = \{import:noun\}
+sentence = The \[noun.pluralForm\] are sitting on my \[noun\].
+ 
+
+ We've put the imported noun generator into its own \[noun\] list which we can then treat like any other list. You can use these curly import blocks wherever you use text. Here we've made a list out of a bunch of import statements:
+
+ 
+livingThing
+ \{import:animal\}
+ \{import:plant\}
+ \{import:bacteria\}
+ 
+
+ Often you'll want to import a specific list from within another generator. Let's imagine there's a generator called animal-lists with this code:
+
+ 
+mammal
+ kangaroo
+ pig
+ human
+ 
+reptile
+ lizard
+ crocodile
+ turtle
+ 
+insect
+ spider
+ beetle
+ ant
+ 
+ If you write \{import:animal-lists\} then you'll get "mammal" or "reptile" or "insect" as the output. That's probably not what we wanted. We want to be able to grab a random reptile, or a random insect - not a random animal "type". Here's how we do this:
+
+ 
+animalLists = \{import:animal-lists\}
+sentence
+ That's definitely not \{a\} \[animalLists.mammal\]. It's \{a\} \[animalLists.reptile\].
+ \{A\} \[animalLists.insect\] is much smaller than a \{a\} \[animalLists.mammal\].
+ 
+
+ Makes sense? We're just treating \[animalLists\] as if it's a list that we've defined in our code; we can access sub-lists, use pluralForm , consumableList , and any other properties that we desire.
+
+ In the above example, what if you were the owner of the animal-lists generator and you wanted to make it so that if people write \{import:animal-lists\} , then they get a random animal instead of a random animal type? To do that, we need to add a special $output list:
+
+ 
+ 
+$output
+ \[mammal\]
+ \[reptile\]
+ \[insect\]
+ 
+ 
+ So now when they write \{import:animal-lists\} , the output will be a random item from whatever we've put in this $output list.
+
+ 
+ When sharing your generator, it's a good idea to give it a nice name. You can change your generator's name by clicking the "settings" button in the bar at the top of the editor.
+
+ Here's another example of how to use the special $output list:
+
+ 
+$output = \[description\]
+
+adjective
+ narrow
+ sturdy
+ ...
+ 
+thing
+ chest
+ cloak
+ ...
+
+description
+ It's \{a\} \[adjective\] \[thing\] that looks about \{10-70\} years old.
+ ...
+ 
+ 
+ Since we added the $output property, when people import our generator they'll get a random \[description\] . If we don't include an $output property, then the importer would get "adjective", "thing" or "description" - i.e. the name of one of our top-level lists. That's because the list names in your generator are actually themselves items within the "root" list. If that's confusing, don't worry, it's not super important, but the above "Hierarchical Lists" section gives some more info on why this is the case. The main thing to understand is that you should make a top-level $output property that equals the list that you want importers to get when they import your generator. If you want to export all your lists, then you don't need to add a top-level $output property - Perchance assumes that by default.
+
+ 
+ 
+ 
+ 
+
+## The "or" Operator
+
+ 
+ Have a look at this simple generator and see if you can work out what's happening:
+
+ 
+ 
+output
+ \{A\} \[a = animal.selectOne\] is covered in \[a.body || "fur"\].
+
+animal
+ bird
+ body = feathers
+ lizard
+ body = scales
+ dog
+ cat
+ moose
+ ...
+ 
+ 
+ Notice this new || thing? That means or . So writing a.body || "fur" is like saying "Output a.body , or if it doesn't exist , then "fur" ". So if a.body doesn't exist (like it wouldn't if a was dog , cat or moose ), then "fur" is returned as a backup. But why do we need quotation marks around "fur"? That's because we're telling Perchance that we're referring to the literal characters "fur" and not a list or variable called fur .
+
+ What's the purpose of all this? Well, if our animal list is quite long, and most of them have fur covering their bodies, then it'd be neater if we could specify a "default" value for the a.body property. The || operator is great for situations like this where we want there to be a default or backup value.
+
+ 
+ Instead of using "fur" as a backup, we could use a variable or list:
+
+ 
+ 
+defaultBody = fur
+output
+ \{A\} \[a = animal.selectOne\] is covered in \[a.body || defaultBody\].
+...
+ 
+ 
+ And you can chain together multiple defaults like this: \[a || b || c || ...\] , and the first one that exists will be output.
+
+ 
+
+## The Equals Sign
+
+ 
+ At the start of the tutorial, I said that you can use the "equals" sign as a way to make single-item lists easier to write:
+
+ 
+ 
+veg1 = \{celery|spinach\}
+veg2
+ \{celery|spinach\}
+ 
+
+ It's easier and neater to have things like this in one line, like we've done with veg1 . But it's time to talk about some important differences between these two ways of writing a "single-item list".
+
+ 
+ Firstly, what happens when we write \[v = veg2.selectOne\] ? What gets stored in v ? What gets output by the square block? Well, remember that selectOne is just a special command that selects one item from the list. And we can see that veg2 only has one item: \{celery|spinach\} , so veg2.selectOne will always result in \{celery|spinach\} . That's what will get stored in v . So whenever we write \[v\] , we'll get either "celery" or "spinach" with a 50% probability each.
+
+ 
+ All good so far? This is just the normal behavior of selectOne when we apply it to a list. A common rookie mistake here is to think that either "celery" or "spinach" would be stored in v , but that's not how selectOne works. It just selects a random item from your list - it doesn't "evaluate" that item to produce "plain" text like "celery" or "spinach". That's why \[v\] randomly outputs either "celery" or "spinach" each time, instead of always outputting the same one.
+
+ 
+ Now, remember, when we assign a value to a variable in a square block (like so: \[v = veg2.selectOne\] ), that value will also be outputted by the block. So the block will output \{celery|spinach\} (the value we stored in v ). Before displaying the output of a square block on the page, Perchance always fully evaluates it so that it's just plain text (no square or curly brackets). So the block outputs \{celery|spinach\} , and then Perchance randomly evaluates it into either "celery" or "spinach" before displaying it on the page. So we know that our block, \[v = veg2.selectOne\] , will output either "celery" or "spinach", and that we've stored \{celery|spinach\} in v .
+
+ 
+ Okay, now let's look at veg1 and how it differs. veg1 is actually a direct reference to \{celery|spinach\} . It's not a list. So when we write veg1.selectOne , we're applying selectOne directly to \{celery|spinach\} , which is an inline list. So veg1.selectOne will result in either "celery" or "spinach", each with equal likelihood. So if you write \[v = veg1.selectOne\] , then v contains either "celery" or "spinach".
+
+ 
+ So, in the example below, can you predict what output1 and output2 will look like?
+
+ 
+ 
+veg1 = \{celery|spinach\}
+veg2
+ \{celery|spinach\}
+ 
+output1
+ \[v = veg1.selectOne\] \[v\] \[v\] \[v\]
+output2
+ \[v = veg2.selectOne\] \[v\] \[v\] \[v\]
+ 
+ 
+ The answer is that output1 will be either "celery celery celery celery" or "spinach spinach spinach spinach", whereas output2 will be something like "celery spinach spinach celery" or "spinach spinach celery spinach" - i.e. v in output2 contains \{celery|spinach\} so it'll be random each time, whereas in output1 , v either contains "celery" or "spinach".
+
+ 
+ The key understanding here is that veg1 isn't actually a list at all. It's a direct reference to \{celery|spinach\} . So in this case veg1 is basically equivalent to veg2.selectOne since they both refer to \{celery|spinach\} 
+
+ 
+ You don't need to worry about the difference between these two cases if you're not using selectOne and assigning the result to a variable (like v in the above examples. That's because Perchance will always fully evaluate \[veg1\] and \[veg2\] into either "celery" or "spinach" if you just write them in a square block like that.
+
+ 
+ What if you had a list like veg2 but you wanted to store either "celery" or "spinach" in v instead of storing \{celery|spinach\} ? In that case you can just write \[v = veg2.selectOne.selectOne\] .
+
+ 
+ 
+ 
+ 
+
+## The evaluateItem Command
+
+ 
+ Let's say you had this code:
+
+ 
+ 
+output
+ \[f = fruit.selectOne\]?! \[f\] is way too many!
+
+fruit
+ \{10-20\} apples
+ \{30-70\} pears
+ 
+ 
+ You want it to output a sentence like " 50 pears?! 50 pears is way too many! ", but instead this generator will output something like " 13 apples?! 16 apples is way too many! ". That's because fruit.selectOne will result in either \{10-20\} apples or \{30-70\} pears with equal likelihood, so one of those will get stored in f . So let's say \{10-20\} apples was selected and stored in f . When \{10-20\} apples gets "evaluated", we get a specific bit of text like "12 apples" or "15 apples".
+
+ 
+ But of course, we want f to always output the same thing - so how do we store a specific evaluated version of the item, instead of the actual item itself? This is where the evaluateItem command comes in handy:
+
+ 
+ 
+output
+ \[f = fruit.selectOne.evaluateItem\]?! \[f\] is way too many!
+ 
+ 
+ See what's happening there? First we select one item from the fruit list, then we evaluate the selected item, then we store the result in f . So now the result of \[output\] will be something like " 50 pears?! 50 pears is way too many! " - just like we wanted.
+
+ 
+ 
+
+## A Taste of Dynamic Odds
+
+ You've seen how to change the probability of items in a list, and you've seen how to store your random selections in a variable (so you can use them again later) - now we're going to see how to combine those two features. This is a fairly deep topic, and it's important for building complex generators, but I'm only giving you a small taste here. Don't worry if you don't fully understand what's going. To get a full explanation, head over to the "Dynamic Odds" section on the examples page.
+
+ Okay, so what if you wanted to change the probability of an item in one list based on an item that we've previously selected from another list? To do that, we need to use "dynamic odds" - they're "dynamic" because these odds can change depending on what we've stored in variables.
+
+ Here's a simple example where we are randomly selecting a score (a number between 1 and 4), and then we're choosing an adjective based on the score that we selected:
+
+ 
+score = \{1-4\}
+
+output
+ Your score is \[s = score.selectOne\] which is \[adjective\]!
+ 
+adjective
+ not great ^\[s == 1\]
+ good ^\[s == 2\]
+ great ^\[s > 2\]
+ 
+ The square brackets around our odds values means that they're dynamic. That is, they're re-computed every time we select an item from the adjective list. The odds of each item is based on the value that's currently stored in s . The == part means "is equal to", so ^\[s == 1\] means "only allow this item to be selected if s is equal to 1". The > symbol means "is greater than". There are lots of other symbols that you can learn in the "Dynamic Odds" section on the examples page.
+
+ Here's another example. Let's say we first want to select a color, and then select a more specific version of that original color. We want the output to be something like "The dragon's scales were blue. More specifically, navy blue." Here's how we could do that:
+
+ 
+output
+ The dragon's scales were \[c = color.selectOne\]. More specifically, \[shade.selectOne\].
+
+color
+ blue
+ red
+ green
+ yellow
+
+shade
+ blue ^\[c == "blue"\]
+ cyan
+ navy blue
+ teal
+ turquoise
+ red ^\[c == "red"\]
+ maroon
+ cherry
+ ...
+ 
+ See what's happening there? We're first randomly selecting an item from the color list. Then \[shade.selectOne\] would normally return a random sub-list (e.g. the red sub-list). But now we're using "dynamic odds" to restrict which sub-list gets chosen, and if c is equal to "blue", then the blue sub-list will get chosen (because ^\[c == "blue"\] is true and ^\[c == "red"\] is false), and so we'll get an output like "teal" or "navy blue".
+
+ 
+ Note also that we need quotes around "blue" in ^\[c == "blue"\] . The previous example didn't have quotes because we were dealing with numbers rather than text. Text always needs quotes around it when you're writing it inside square brackets. If we wrote ^\[c == blue\] , then the Perchance engine would look for a variable or list called blue and check if it is equal to c . The quotes tell Perchance that we're talking about the literal text "blue" rather than a variable or list with that name.
+
+ 
+ Again, this is only a small taste to get you curious. If you'd like to learn more, check out the "Dynamic Odds" section on the examples page - and while you're there, check out the "Dynamic Sub-list Selection" for an easier way to write the above example. You might also like to check out the section called "if/else Statements", which are related to dynamic odds.
+
+## Cool!
+
+ That's the end of the basic tutorial, but there's a lot more to learn! If you'd like to learn more, check out the examples , templates and the advanced tutorial . You'll learn more about multi-level lists, special properties like "$output", changing fonts, using external APIs, procedurally generated images, dynamic random worlds, procedural story generators and tips for building extremely complex generators. You might also like to see what others are currently building on Perchance over at the generators page. If you've got any questions or suggestions about how this tutorial could be improved, please post a message on the Perchance Lemmy community 👍
+
+## P.S.
+
+ Here are a couple of things that are worth knowing, but aren't essential to get started using Perchance:
+
+ 
+ - If you share your generator's link with someone, they will be able to click the "edit" button and see your code, but if they save the edits, it won't affect your generator - it'll create a copy of your generator with a new URL.
+
+ - By default your generator is publicly-listed on the perchance.org/generators . You can remove your generator from all public lists by clicking the settings button in the top-right of the page, and clicking "make private".
+
+ - Perchance is a very "sharing-is-caring" community. We encourage you to share your creations with others, knowing they they can click the edit button to check out your code, and maybe create a remixed version. If you do use someone else's code, it's nice to credit them by linking back to the original generator :)
+
+ - You can change the URL of your generator by clicking the settings button in the top-right of the page.
+
+ - There's also a "download" button in the settings menu so you can download your generator and use it offline. Use the download-button-plugin to add a button to your generator so others can download it too.
+
+ - There are lots of plugins that you can use to extend the functionality of Perchance.
+
+ - There's also a templates page that you can use to find a design that you like.
+
+ - If you want an easier alternative to writing HTML, you might like to check out the markdown plugin . Markdown isn't anywhere near as customizable as HTML, but it's much easier to get started with. You might also like to check out the layout-maker-plugin , which makes it easy to create complex layouts that would be hard to produce with basic HTML knowledge.
+
+ - The examples page teaches you how to create generators that take in user input - e.g. drop-down menus, and stuff like that.
+
+ - There are a bunch of keyboard shortcuts for Perchance listed here 
+
+ - If you mess up and accidentally delete one of your lists (and you've tried Ctrl+Z to undo but it doesn't go back far enough), then you can click the "revisions" button to download previous versions of your generator.
+
+ - Everything inside square brackets is actually just JavaScript (with some added Perchance magic like selectOne/pluralForm/etc), so if you know some JavaScript you can do all sorts of fancy stuff. Plugins are also coded in JavaScript. If you don't know JavaScript, but would like to learn, Khan Academy has a great JavaScript course. It also teaches you HTML and CSS so you can design a nice-looking generator.
+
+ - If you have a blog or a website, you can embed your generator in your posts/pages like this (note that the domain is null.perchance.org rather than perchance.org ):
+
+ 
+ 
+<iframe src="https://null.perchance.org/my-generator-name"></iframe>
+ 
+
+ 
+ 
+ ⚄&#xFE0E; 
+
+ 
+
+ 
+
+ 
+ 
+ Contents
