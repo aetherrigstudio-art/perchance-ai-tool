@@ -29,8 +29,11 @@ and clicking generate.
 
 ## 2. Current state (update this when it changes)
 
-- **Branch:** `claude/char-wiz-ia-regroup-review-q5815o` — develop here, never
-  push elsewhere without explicit permission.
+- **Branch: work directly on `main`.** It is the single source of truth — all
+  prior feature branches were consolidated into it. **Do not spawn new feature
+  branches**; commit + push to `main`. (If your session was auto-assigned a
+  `claude/*` branch, fast-forward `main` to your work and push `main` instead, so
+  the next agent isn't on a different page.)
 - **Canonical files:** `char-wiz-html` (== `wizard-html-panel-20.txt`) and
   `char-wiz-dat`. Edit the canonical pair, then mirror to a new highest-numbered
   `wizard-html-panel-N.txt`. Don't touch older snapshots.
@@ -166,9 +169,9 @@ operator is away** — leave the repo and memory in a clean, resumable state:
    next step. Mirror the one-line state into §2 of this README and, if the task
    shifted, the SESSION STATE note. Chat context does NOT survive; committed
    files + notes do.
-4. **Push only at a clean stopping point or when told** — `git push -u origin
-   claude/char-wiz-ia-regroup-review-q5815o` (retry on network error: 2s/4s/8s/16s).
-   After pushing, ensure a **draft** PR exists for the branch.
+4. **Push only at a clean stopping point or when told** — `git push origin main`
+   (retry on network error: 2s/4s/8s/16s). Work lives on `main`; no PR needed
+   unless you deliberately opened a feature branch for review.
 5. **Hand off, don't trail off** — end with a 1-paragraph status: branch, what's
    committed/pushed, the next concrete step. If a step failed, say so with the
    output; if something was skipped, say that. State done-and-verified plainly.
