@@ -13,6 +13,12 @@
       "skillPath": "skills/aria-live-regions/SKILL.md",
       "computedHash": "2e28131039d6dc27e31ea1eda1e17434343329cc13e3f6c010f480574b433f02"
     },
+    "browser-tools": {
+      "source": "badlogic/pi-skills",
+      "sourceType": "github",
+      "skillPath": "browser-tools/SKILL.md",
+      "computedHash": "84d66f8bfdd5cfdb0b6f448b61f192c504e4ffa9e4943969c1d394e5eed0daee"
+    },
     "code-review-quality": {
       "source": "proffesor-for-testing/agentic-qe",
       "sourceType": "github",
@@ -48,6 +54,12 @@
       "sourceType": "github",
       "skillPath": "claude/skills/smoke-test/SKILL.md",
       "computedHash": "f4239c14d2876d216bc1eebc9e03f2aaaa8808a924bb6f1ba302cb90449b9223"
+    },
+    "vanilla-web": {
+      "source": "janjaszczak/cursor",
+      "sourceType": "github",
+      "skillPath": "skills/vanilla-web/SKILL.md",
+      "computedHash": "71d55c038df13f897175218b6040de5d3a7749f15b4117a25ca9598c3cf77233"
     }
   }
 }
