@@ -9,14 +9,15 @@ See `AUTOMATION.md` for the **loader** deploy path: `wizard-loader-html.txt` is
 pasted into the Perchance HTML editor once, then fetches `char-wiz-html` from
 GitHub at runtime — so editing the repo deploys, with no re-paste.
 
-**Perchance API — corrected:** Perchance 403s the *HTML/browser layer* but the
-underlying API endpoints are publicly accessible and have backwards-compatibility
-guarantees. `/api/downloadGenerator` returns a generator's raw source text and
-works from curl/Node.js/Python with no browser. `pip install perchance` installs
-a working async client (`eeemoon/perchance`). The runtime-fetch loader is still
-the right deploy path for the HTML panel — but CI testing and data fetching are
-now viable without browser automation. See
-`ai-workspace/perchance-api-research.md` for the full research.
+**Perchance API — status (verified 2026-06-18):** `/api/downloadGenerator` is
+reachable without a browser but now returns the **rendered HTML page**, not raw
+source. `/api/getGeneratorsAndDependencies` returns HTTP 400 without a browser
+session. Direct API automation is not currently viable. The runtime-fetch loader
+(`wizard-loader-html.txt` → fetches `char-wiz-html` from GitHub at runtime) is
+still the correct deploy path. `pip install perchance` (`eeemoon/perchance`) and
+client scripts in `scripts/` exist but are blocked by the session requirement.
+See `ai-workspace/perchance-api-research.md` + `scripts/perchance-api.mjs` for
+details.
 
 ## What this repository is
 
