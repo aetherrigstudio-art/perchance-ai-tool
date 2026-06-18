@@ -116,11 +116,13 @@ names, and the differences between near-versions are the real signal — diff
 before assuming. Current state at time of writing:
 
 - `char-info` == `perchance-character-creation-3.md` (identical).
-- **Wizard current build (v2):** `char-wiz-html` == `wizard-html-panel-19.txt`
+- **Wizard current build (v2):** `char-wiz-html` == `wizard-html-panel-20.txt`
   (canonical HTML) and `char-wiz-dat` == `wizard-data-panel-14.txt` (canonical,
   minimal v2 data stub). These are the newest and the ones to edit. Lower-numbered
   `wizard-html-panel-*` / `wizard-data-panel-*` are historical snapshots — do not
-  edit them.
+  edit them. (`-20` fixed a triplicated `<select id="buildMode">`; an in-progress
+  4-phase IA regroup + post-generation "second pass / review & refine" phase is the
+  current active task — see the basic-memory "SESSION STATE 2026-06-18" handoff note.)
 
 When editing, update the canonical pair (`char-wiz-html` / `char-wiz-dat`),
 mirror the result to a new highest-numbered `wizard-html-panel-N.txt` /
@@ -205,3 +207,17 @@ is the shared cross-session/cross-agent memory. **At session start, consult it**
 decisions** with `write_note` before ending a task. A SessionStart hook injects this
 rule each session. The git-tracked markdown is the source of truth; the `.bm/` index is
 local and rebuildable.
+
+## Other MCP / tooling
+
+- **Context7 MCP** (`@upstash/context7-mcp`, declared in `.mcp.json`, enabled in
+  `.claude/settings.json` `enabledMcpjsonServers`) provides up-to-date library/API docs
+  via `resolve-library-id` / `get-library-docs`. Loads at session start (no API key).
+- **Audit reports** live in `ai-workspace/audit/` (a11y+mobile, correctness+export,
+  security+content) with matching basic-memory notes — open findings to work through.
+- **Screenshots work here** despite the run-perchance-ai-tool SKILL.md warning: the
+  Chromium download is reachable in this container. Install with
+  `PLAYWRIGHT_BROWSERS_PATH=$HOME/.cache/ms-playwright npx -y playwright@1.56.1 install chromium`,
+  then render `char-wiz-html` headless (setContent) and screenshot. Render the panel
+  directly, not the loader (the loader's GitHub fetch hits an `ERR_CERT_AUTHORITY_INVALID`
+  sandbox TLS-proxy quirk, not a real bug).
