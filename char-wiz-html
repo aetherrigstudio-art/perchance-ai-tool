@@ -190,6 +190,38 @@
     </div>
   </div>
 
+  <div class="card" id="cardAdvanced">
+    <h3>Character presentation (optional)</h3>
+    <p class="hint">Global defaults applied to every character on export: avatar shape/size, a static portrait, and a default chat background/music. All optional; off by default.</p>
+    <label class="hint" style="display:block;"><input type="checkbox" id="advEnabled"> Enable presentation defaults</label>
+    <div id="advBody" style="display:none; margin-top:0.5rem;">
+      <div class="subcard">
+        <div class="row">
+          <label class="hint">Avatar shape:
+            <select id="advAvatarShape" style="padding:0.3rem;"><option value="square">square</option><option value="circle">circle</option></select>
+          </label>
+          <label class="hint">Avatar size:
+            <input id="advAvatarSize" type="number" min="0.5" max="2" step="0.1" value="1" style="width:64px; padding:0.3rem;">
+          </label>
+        </div>
+      </div>
+      <div class="subcard">
+        <label class="hint" style="display:block; font-weight:bold;">Static portraits</label>
+        <p class="hint">Generates one portrait per character and sets it as their avatar, so exports have a real avatar even without the immersion pack.</p>
+        <div class="row"><button onclick="genPortraits();">generate a portrait for each character</button><span class="hint" id="advPortraitBusy"></span></div>
+        <div id="advPortraitThumbs" class="igresults"></div>
+      </div>
+      <div class="subcard">
+        <label class="hint" style="display:block; font-weight:bold;">Default background &amp; music</label>
+        <p class="hint">Type a location to generate a default chat background, and/or paste a direct audio URL for ambient music (free, no signup).</p>
+        <input id="advBgPrompt" class="adj" placeholder="Background location (e.g. seaside cafe at golden hour)">
+        <div class="row"><button onclick="genDefaultBg();">generate background</button><span class="hint" id="advBgBusy"></span></div>
+        <div id="advBgThumb" class="igresults"></div>
+        <input id="advMusicUrl" class="adj" placeholder="Default music URL (e.g. https://example.org/ambient.mp3)">
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <h3>Export</h3>
     <p class="hint" style="margin-top:0;">Per-message scene images:</p>
@@ -263,6 +295,9 @@
   var styleSubs = {};
   var immersion = { enabled:false, tts:false, avatars:false, backgrounds:false, musicOn:false, memory:false,
     memMax:8, memEvery:8, avatarSet:{}, bgSet:{}, musicMap:{}, voices:{}, bgLabels:"" };
+  // Advanced presentation (Tier 1, global defaults): avatar shape/size, static
+  // portraits per character, default scene background + music.
+  var advanced = { enabled:false, avatarShape:"square", avatarSize:1, portraits:{}, bgPrompt:"", bgUrl:"", musicUrl:"" };
   var SCENE_DIRECTIVE = "At the end of EVERY reply, on its own final line, append exactly one image tag describing the FULL current scene: the location, every character present with their established appearance AND the clothing they are currently wearing (everyone is always clothed), their actions and expressions, and the lighting and mood. Format it exactly as <image>a detailed scene description</image>. Keep each character's permanent features consistent with their description and never blend features between characters.";
   function loreMode(){ return el("loreMode") ? el("loreMode").value : "inline"; }
   function sceneMode(){ return el("sceneMode") ? el("sceneMode").value : "both"; }
@@ -576,6 +611,7 @@
   function save(){
     syncExtrasFromDOM();
     if(typeof imSync === "function") imSync();
+    if(typeof advSync === "function") advSync();
     var snap = {
       scenarioNotes: val("scenarioNotes"), scenarioOut: val("scenarioOut"),
       mainNotes: val("mainNotes"), mainOut: val("mainOut"),
@@ -589,6 +625,7 @@
       loreMode: loreMode(), lorebookUrl: val("lorebookUrl"),
       sceneMode: sceneMode(),
       immersion: immersion,
+      advanced: advanced,
       extras: extras, rels: rels
     };
     try { localStorage.setItem(STORE_KEY, JSON.stringify(snap)); } catch(e){}
@@ -629,6 +666,14 @@
         immersion.bgLabels = im.bgLabels || "";
         if(el("imMusic")) setVal("imMusic", Object.keys(immersion.musicMap).map(function(k){ return k + " | " + immersion.musicMap[k]; }).join("\n"));
       }
+      if(snap.advanced && typeof snap.advanced === "object"){
+        var ad = snap.advanced;
+        advanced.enabled = !!ad.enabled;
+        advanced.avatarShape = (ad.avatarShape === "circle") ? "circle" : "square";
+        advanced.avatarSize = (typeof ad.avatarSize === "number" && ad.avatarSize > 0) ? ad.avatarSize : 1;
+        advanced.portraits = (ad.portraits && typeof ad.portraits === "object") ? ad.portraits : {};
+        advanced.bgPrompt = ad.bgPrompt || ""; advanced.bgUrl = ad.bgUrl || ""; advanced.musicUrl = ad.musicUrl || "";
+      }
       extras = Array.isArray(snap.extras) ? snap.extras.filter(function(x){ return x && typeof x === "object"; }) : [];
       rels = Array.isArray(snap.rels) ? snap.rels.filter(function(x){ return x && typeof x === "object"; }) : [];
     } else { extras = []; rels = []; styleMain = ""; styleSubs = {}; buildMode = "cast"; }
@@ -647,10 +692,13 @@
     ["imMemMax","imBgLabels","imMusic"].forEach(function(id){
       if(el(id)) el(id).oninput = function(){ imSync(); save(); updateStatus(); };
     });
+    if(el("advEnabled")) el("advEnabled").onchange = function(){ advSync(); applyAdvancedUI(); save(); updateStatus(); };
+    ["advAvatarShape","advAvatarSize"].forEach(function(id){ if(el(id)) el(id).onchange = function(){ advSync(); save(); updateStatus(); }; });
+    ["advBgPrompt","advMusicUrl"].forEach(function(id){ if(el(id)) el(id).oninput = function(){ advSync(); save(); updateStatus(); }; });
     if(window.speechSynthesis){ try { window.speechSynthesis.onvoiceschanged = function(){ renderVoiceList(); }; } catch(e){} setTimeout(renderVoiceList, 300); }
     renderStyleMains(); renderStyleSubs();
     if(el("igNeg") && !val("igNeg").trim()) setVal("igNeg", IMG_NEG);
-    applyBuildMode(); applyLoreMode(); renderImmersion();
+    applyBuildMode(); applyLoreMode(); renderImmersion(); renderAdvanced();
     updateStatus();
     refreshRelSelects(); renderRels();
     try { window.learned = JSON.parse(localStorage.getItem("accSchemaV1")); } catch(e){ window.learned = null; }
@@ -669,13 +717,16 @@
     localStorage.removeItem(STORE_KEY); OLD_KEYS.forEach(function(k){ try { localStorage.removeItem(k); } catch(e){} });
     extras = []; rels = []; styleMain = ""; styleSubs = {}; buildMode = "cast";
     immersion = { enabled:false, tts:false, avatars:false, backgrounds:false, musicOn:false, memory:false, memMax:8, memEvery:8, avatarSet:{}, bgSet:{}, musicMap:{}, voices:{}, bgLabels:"" };
-    ["scenarioNotes","scenarioOut","mainNotes","mainOut","personaNotes","personaOut","loreOut","loreNotes","openingOut","openingAdj","styleNotes","prefixOut","suffixOut","lorebookUrl","imBgLabels","imMusic"].forEach(function(id){ setVal(id,""); });
+    advanced = { enabled:false, avatarShape:"square", avatarSize:1, portraits:{}, bgPrompt:"", bgUrl:"", musicUrl:"" };
+    ["scenarioNotes","scenarioOut","mainNotes","mainOut","personaNotes","personaOut","loreOut","loreNotes","openingOut","openingAdj","styleNotes","prefixOut","suffixOut","lorebookUrl","imBgLabels","imMusic","advBgPrompt","advMusicUrl"].forEach(function(id){ setVal(id,""); });
     if(el("imgVariety")) el("imgVariety").checked = true;
     if(el("buildMode")) el("buildMode").value = "cast";
     if(el("loreMode")) el("loreMode").value = "inline";
     if(el("sceneMode")) el("sceneMode").value = "both";
     if(el("imMemMax")) el("imMemMax").value = 8;
-    renderExtras(); renderStyleMains(); renderStyleSubs(); applyBuildMode(); applyLoreMode(); renderImmersion(); updateStatus(); refreshRelSelects(); renderRels();
+    if(el("advAvatarShape")) el("advAvatarShape").value = "square";
+    if(el("advAvatarSize")) el("advAvatarSize").value = 1;
+    renderExtras(); renderStyleMains(); renderStyleSubs(); applyBuildMode(); applyLoreMode(); renderImmersion(); renderAdvanced(); updateStatus(); refreshRelSelects(); renderRels();
   };
   function updateBudget(){
     var parts = [], total = 0, warn = false;
@@ -728,7 +779,8 @@
       "  -  lore: " + loreDesc +
       "  -  scene images: " + (sceneNames[sceneMode()] || sceneMode()) +
       "  -  mode: " + (buildMode === "single" ? "single character" : "full cast") +
-      (immersion.enabled ? ("  -  immersion: " + (imParts.length ? imParts.join(", ") : "on")) : "");
+      (immersion.enabled ? ("  -  immersion: " + (imParts.length ? imParts.join(", ") : "on")) : "") +
+      (advanced.enabled ? ("  -  presentation: " + advanced.avatarShape + " avatar" + (Object.keys(advanced.portraits||{}).length ? ", portraits" : "") + (advanced.bgUrl ? ", bg" : "") + (advanced.musicUrl ? ", music" : "")) : "");
   }
 
   // Side characters that count toward the export. Single mode ships only the
@@ -1240,6 +1292,58 @@
     applyImmersionUI(); renderVoiceList(); renderAvatarThumbs(); renderBgThumbs();
   }
 
+  // ---- Advanced presentation UI ----
+  function advSync(){
+    if(el("advEnabled")) advanced.enabled = el("advEnabled").checked;
+    if(el("advAvatarShape")) advanced.avatarShape = el("advAvatarShape").value;
+    if(el("advAvatarSize")){ var s = parseFloat(val("advAvatarSize")); advanced.avatarSize = (s > 0) ? s : 1; }
+    if(el("advBgPrompt")) advanced.bgPrompt = val("advBgPrompt");
+    if(el("advMusicUrl")) advanced.musicUrl = val("advMusicUrl").trim();
+  }
+  function applyAdvancedUI(){ var on = el("advEnabled") && el("advEnabled").checked; if(el("advBody")) el("advBody").style.display = on ? "" : "none"; }
+  function renderAdvanced(){
+    if(el("advEnabled")) el("advEnabled").checked = !!advanced.enabled;
+    if(el("advAvatarShape")) el("advAvatarShape").value = advanced.avatarShape || "square";
+    if(el("advAvatarSize")) el("advAvatarSize").value = advanced.avatarSize || 1;
+    setVal("advBgPrompt", advanced.bgPrompt || "");
+    setVal("advMusicUrl", advanced.musicUrl || "");
+    applyAdvancedUI(); renderPortraitThumbs(); renderAdvBgThumb();
+  }
+  window.genPortraits = async function(){
+    if(typeof genCharacterImage !== "function"){ alert("Image generation unavailable - check the DATA panel import."); return; }
+    var cast = castList();
+    if(!cast.length){ alert("Generate characters first."); return; }
+    var ok = 0;
+    for(var i=0;i<cast.length;i++){
+      var c = cast[i].c;
+      el("advPortraitBusy").textContent = "generating " + (c.name||"character") + " (" + (i+1) + "/" + cast.length + ")...";
+      var url = ""; try { url = await genCharacterImage(cardPrompt(c), IMG_NEG, "512x512"); } catch(e){ url = ""; }
+      if(url){ advanced.portraits[(c.name||"").toLowerCase().trim()] = url; ok++; renderPortraitThumbs(); save(); }
+    }
+    el("advPortraitBusy").textContent = ok ? ("done - " + ok + "/" + cast.length + " generated.") : "No images generated - check the DATA panel image plugin.";
+  };
+  function renderPortraitThumbs(){
+    var c = el("advPortraitThumbs"); if(!c) return; c.innerHTML = "";
+    Object.keys(advanced.portraits||{}).forEach(function(name){
+      var u = advanced.portraits[name]; if(!u) return;
+      var w = document.createElement("div"); w.style.textAlign = "center";
+      w.innerHTML = "<img src='" + u.replace(/'/g,"&#39;") + "' class='igimg' style='width:90px;'><div class='hint'>" + name.replace(/</g,"&lt;") + "</div>";
+      c.appendChild(w);
+    });
+  }
+  window.genDefaultBg = async function(){
+    if(typeof genCharacterImage !== "function"){ alert("Image generation unavailable - check the DATA panel import."); return; }
+    var loc = val("advBgPrompt").trim(); if(!loc){ alert("Describe the background location first."); return; }
+    el("advBgBusy").textContent = "generating...";
+    var url = ""; try { url = await genCharacterImage(styleOnly() + "establishing background scene of " + loc + ", scenery, no people, empty location" + styleSuffix(), IMG_NEG, "768x512"); } catch(e){ url = ""; }
+    if(url){ advanced.bgUrl = url; renderAdvBgThumb(); save(); el("advBgBusy").textContent = "done."; }
+    else el("advBgBusy").textContent = "No image generated - check the DATA panel image plugin.";
+  };
+  function renderAdvBgThumb(){
+    var c = el("advBgThumb"); if(!c) return; c.innerHTML = "";
+    if(advanced.bgUrl){ var w = document.createElement("div"); w.innerHTML = "<img src='" + advanced.bgUrl.replace(/'/g,"&#39;") + "' class='igimg' style='width:160px;'>"; c.appendChild(w); }
+  }
+
   function wardrobeMap(cast){
     var map = {};
     cast.forEach(function(o){
@@ -1366,6 +1470,22 @@
     base.metaTitle = c.name || ""; base.metaDescription = c.tagline || "";
     if(!base.customData || typeof base.customData !== "object") base.customData = {};
     base.customData.isPersona = !!isPersona;
+    // Advanced presentation (global defaults, opt-in): avatar shape/size, a static
+    // portrait per character, and a default scene background/music.
+    if(advanced.enabled){
+      if(!base.avatar || typeof base.avatar !== "object") base.avatar = { url:"", size:1, shape:"square" };
+      base.avatar.shape = (advanced.avatarShape === "circle") ? "circle" : "square";
+      base.avatar.size = (typeof advanced.avatarSize === "number" && advanced.avatarSize > 0) ? advanced.avatarSize : 1;
+      var port = advanced.portraits && advanced.portraits[(c.name || "").toLowerCase().trim()];
+      if(port) base.avatar.url = port;
+      if(advanced.bgUrl || advanced.musicUrl){
+        if(!base.scene || typeof base.scene !== "object") base.scene = { background:{ url:"" }, music:{ url:"" } };
+        if(!base.scene.background) base.scene.background = { url:"" };
+        if(!base.scene.music) base.scene.music = { url:"" };
+        if(advanced.bgUrl) base.scene.background.url = advanced.bgUrl;
+        if(advanced.musicUrl) base.scene.music.url = advanced.musicUrl;
+      }
+    }
     base.uuid = uniqueUuid(); base.id = uniqueId(seed);
     base.creationTime = now; base.lastMessageTime = now;
     if(base.folderPath == null) base.folderPath = "";
@@ -1538,7 +1658,7 @@
       styleMain:styleMain, styleSubs:styleSubs, styleNotes:val("styleNotes"), prefixOut:val("prefixOut"), suffixOut:val("suffixOut"),
       imgVariety:(el("imgVariety")?el("imgVariety").checked:true),
       buildMode:buildMode, loreMode:loreMode(), lorebookUrl:val("lorebookUrl"), sceneMode:sceneMode(),
-      immersion:immersion,
+      immersion:immersion, advanced:advanced,
       extras:extras, rels:rels };
   }
   function restoreSnapshot(snap){
@@ -1557,9 +1677,10 @@
     setVal("lorebookUrl", snap.lorebookUrl || "");
     if(el("sceneMode")) el("sceneMode").value = snap.sceneMode || "both";
     if(snap.immersion && typeof snap.immersion === "object"){ immersion = snap.immersion; if(!immersion.voices) immersion.voices = {}; if(!immersion.avatarSet) immersion.avatarSet = {}; if(!immersion.bgSet) immersion.bgSet = {}; if(!immersion.musicMap) immersion.musicMap = {}; if(el("imMusic")) setVal("imMusic", Object.keys(immersion.musicMap).map(function(k){ return k + " | " + immersion.musicMap[k]; }).join("\n")); }
+    if(snap.advanced && typeof snap.advanced === "object"){ advanced = snap.advanced; if(!advanced.portraits) advanced.portraits = {}; if(advanced.avatarShape !== "circle") advanced.avatarShape = "square"; if(!(advanced.avatarSize > 0)) advanced.avatarSize = 1; }
     extras = Array.isArray(snap.extras) ? snap.extras.filter(function(x){ return x && typeof x === "object"; }) : [];
     rels = Array.isArray(snap.rels) ? snap.rels.filter(function(x){ return x && typeof x === "object"; }) : [];
-    renderExtras(); renderStyleMains(); renderStyleSubs(); applyBuildMode(); applyLoreMode(); renderImmersion(); save(); updateStatus();
+    renderExtras(); renderStyleMains(); renderStyleSubs(); applyBuildMode(); applyLoreMode(); renderImmersion(); renderAdvanced(); save(); updateStatus();
   }
   function rowToSections(r){
     var fm = (r.initialMessages && r.initialMessages[0] && r.initialMessages[0].content) || "";

@@ -73,6 +73,7 @@ script += `
 ;globalThis.__addExtra = function(out){ var i = extras.length; extras.push({ notes: "", out: out }); document.getElementById("exOut_" + i).value = out; };
 ;globalThis.__clearExtras = function(){ extras.length = 0; };
 ;globalThis.__validateCast = function(){ return validateCast(); };
+;globalThis.__adv = advanced;
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -183,6 +184,24 @@ globalThis.genCharacterImage = globalThis.window.genCharacterImage;
 await globalThis.window.genExpressionAvatars();
 check("#5 failed avatar generation reports an error, not 'done.'",
   /No images generated/i.test(elements["imAvatarBusy"].textContent));
+
+// ---- Batch A: Character presentation (avatar shape/size, portrait, bg/music) ----
+globalThis.__I.enabled = false;
+// default: presentation off -> avatar stays default, scene empty.
+let aOff = charsOf(globalThis.__export())[0];
+check("Batch A off: avatar shape default square", aOff.avatar.shape === "square" && aOff.avatar.size === 1);
+check("Batch A off: no static avatar url / scene background", !aOff.avatar.url && !aOff.scene.background.url);
+// on: globals applied to every character.
+const A = globalThis.__adv;
+A.enabled = true; A.avatarShape = "circle"; A.avatarSize = 1.5;
+A.portraits = { nina: "https://x/nina-portrait.png" };
+A.bgUrl = "https://x/cafe-bg.png"; A.musicUrl = "https://x/ambient.mp3";
+let aOn = charsOf(globalThis.__export());
+check("Batch A on: avatar shape/size applied to all", aOn.every((r) => r.avatar.shape === "circle" && r.avatar.size === 1.5));
+check("Batch A on: portrait set as the named character's avatar.url", aOn.find((r) => r.name === "Nina").avatar.url === "https://x/nina-portrait.png");
+check("Batch A on: default background + music applied", aOn[0].scene.background.url === "https://x/cafe-bg.png" && aOn[0].scene.music.url === "https://x/ambient.mp3");
+check("Batch A on: character without a portrait keeps empty avatar.url", aOn.find((r) => r.customData.isPersona).avatar.url === "");
+A.enabled = false;
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);

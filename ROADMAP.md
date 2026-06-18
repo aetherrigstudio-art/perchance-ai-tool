@@ -32,6 +32,13 @@ UI + `save`/`load`/`builderSnapshot`/`resetAll` state pattern (all in
 
 ## Tier 1 — High value, verified, safe to populate (build first)
 
+> **Batch A shipped** (PR #1): items **2** (`avatar.shape`/`avatar.size`),
+> **3** (default `scene.background.url`/`scene.music.url`), and **4** (static
+> `avatar.url` from a generated portrait) are implemented as the opt-in,
+> global-default **"Character presentation"** card (`advanced` state →
+> `characterRow()`), with smoke-test regressions. Remaining Tier-1: Batch B
+> (model/memory tuning #5–#6) and Batch C (`shortcutButtons` #1, `messageWrapperStyle` #7).
+
 ### 1. `shortcutButtons` · `[]`
 - **What:** Buttons rendered above the reply box for common actions.
 - **Source:** Verified (docs). Schema: `{ name, message, autoSend,
