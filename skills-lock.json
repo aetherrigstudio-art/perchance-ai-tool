@@ -60,6 +60,10 @@
       "skillPath": "skills/find-skills/SKILL.md",
       "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
     },
+    "literature-search-arxiv": {
+      "source": "google-deepmind/science-skills",
+      "skillPath": ".agents/skills/literature-search-arxiv"
+    },
     "llm-prompt-optimizer": {
       "source": "sickn33/antigravity-awesome-skills",
       "sourceType": "github",
@@ -125,6 +129,10 @@
       "sourceType": "github",
       "skillPath": "skills/vanilla-web/SKILL.md",
       "computedHash": "71d55c038df13f897175218b6040de5d3a7749f15b4117a25ca9598c3cf77233"
+    },
+    "web-search": {
+      "source": "qu-skills/skills",
+      "skillPath": ".agents/skills/web-search"
     }
   }
 }
