@@ -501,7 +501,7 @@
     return "You are a character designer for AI roleplay chat. Create a " + role + ", consistent with the scenario and the existing characters. Refer to the character as {{char}} and the human as {{user}}. Show personality through concrete detail and dialogue.\n\n" +
       "SCENARIO:\n" + ctx.scenario + "\n\nSTORY SO FAR:\n" + ctx.bible + "\n\nUSER'S NOTES:\n" + notes + "\n\n" +
       "Write ALL sections in full, then stop. Output exactly these sections and nothing else:\n" +
-      "=== NAME ===\nThe name on one line.\n" +
+      "=== NAME ===\nThe name on one line. If the user's notes give a name, use that exact name.\n" +
       "=== TAGLINE ===\nA single short sentence describing {{char}} at a glance.\n" +
       "=== ROLE INSTRUCTION ===\nAbout 150 to 220 words: who {{char}} is, personality, quirks, appearance, speaking style, and how they fit the scenario with {{user}}. End with two example lines prefixed {{char}}: and {{user}}:.\n" +
       "=== REMINDER ===\nOne or two sentences restating {{char}}'s core identity and behaviour, phrased as an ongoing reminder to stay in character.\n" +
@@ -513,9 +513,9 @@
       "=== WRITING INSTRUCTION ===\nTwo or three sentences on how to write {{char}}: point of view, tone, pacing, content rules.";
   }
   function personaPromptCtx(notes, ctx){
-    return "You are a character designer for AI roleplay chat. Create the USER'S PERSONA - the character the human plays as, referred to as {{user}}. Keep it consistent with the scenario and existing characters.\n\n" +
+    return "You are a character designer for AI roleplay chat. Create the USER'S PERSONA - the character the human plays as, referred to as {{user}}. Base it DIRECTLY on the user's notes: if they give a name, role (e.g. a DJ), or personality, use them exactly and do NOT invent a different person. Keep it consistent with the scenario and existing characters.\n\n" +
       "SCENARIO:\n" + ctx.scenario + "\n\nSTORY SO FAR:\n" + ctx.bible + "\n\nUSER'S NOTES:\n" + notes + "\n\n" +
-      "Output exactly these sections and nothing else:\n=== NAME ===\nThe persona's name.\n=== TAGLINE ===\nA single short sentence describing {{user}} at a glance.\n=== ROLE INSTRUCTION ===\nAbout 100 to 160 words describing who {{user}} is, personality and appearance, so the AI knows who it talks to.\n=== APPEARANCE ===\nA short comma-separated list of PERMANENT physical features only - no clothing, no background, no art style.\n=== DEFAULT OUTFIT ===\nA short comma-separated default outfit, used only as a fallback.\n=== IMAGE TRIGGERS ===\nOne line: the persona's exact name, then a colon, then their permanent features plus default outfit as plain image tags (no art-style words, no lighting).\n=== WRITING INSTRUCTION ===\nOne or two sentences on how the AI should treat {{user}} in scenes.";
+      "Output exactly these sections and nothing else:\n=== NAME ===\nThe persona's name - use the exact name from the user's notes if they give one.\n=== TAGLINE ===\nA single short sentence describing {{user}} at a glance.\n=== ROLE INSTRUCTION ===\nAbout 100 to 160 words describing who {{user}} is, personality and appearance, so the AI knows who it talks to.\n=== APPEARANCE ===\nA short comma-separated list of PERMANENT physical features only - no clothing, no background, no art style.\n=== DEFAULT OUTFIT ===\nA short comma-separated default outfit, used only as a fallback.\n=== IMAGE TRIGGERS ===\nOne line: the persona's exact name, then a colon, then their permanent features plus default outfit as plain image tags (no art-style words, no lighting).\n=== WRITING INSTRUCTION ===\nOne or two sentences on how the AI should treat {{user}} in scenes.";
   }
   function refineWrap(prompt, current, adj, fmt){
     return prompt + "\n\nCURRENT VERSION (improve this, do not start from scratch):\n" + current +
@@ -527,7 +527,7 @@
   // reads the seed last and drifts into freeform prose instead of the labelled
   // === SECTION === blocks (refine already ends with a format reminder).
   function sectionTail(what){
-    return "Now write the " + what + " using ONLY the sections specified above - begin each section with its exact === LABEL === header, in the same order, and output nothing else. Do not repeat, list, or mention the creative direction or any word lists, and add no preamble or commentary before the first === header.";
+    return "MOST IMPORTANT - follow the USER'S NOTES above exactly: if they give a name, identity, role, relationship, pace, or tone, honor them precisely and never rename, replace, or reinvent the " + what + ". The creative direction is only a loose fallback and must never override the notes or the scenario. Now write the " + what + " using ONLY the sections specified above - begin each section with its exact === LABEL === header, in the same order, and output nothing else. Do not repeat, list, or mention the creative direction or any word lists, and add no preamble or commentary before the first === header.";
   }
 
   window.buildWizardPrompt = function(){
@@ -555,12 +555,12 @@
       var mo = val("mainOut").trim(); if(mo){ var mc = parseChar(mo); dumpO += "[" + mc.name + "] (main): " + short(mc.roleInstruction) + "\n"; }
       syncExtrasFromDOM();
       extras.forEach(function(ex){ if((ex.out||"").trim()){ var c = parseChar(ex.out); dumpO += "[" + c.name + "]: " + short(c.roleInstruction) + "\n"; } });
-      var po = "You are scripting the OPENING of a group roleplay chat that brings the WHOLE cast into one shared scene. " + personaName + " is the user and must NOT be scripted.\n\nSCENARIO:\n" + scenO + "\n\nCAST (every one of them must appear in the opening, interacting in the same place at the same time - not separate greetings):\n" + dumpO + "\nOutput the opening as a sequence of lines in EXACTLY this format and nothing else:\n[SYSTEM]: one or two sentences of hidden stage-setting context for the AI - the location, time, who is present - written as notes, not dialogue.\n[CharacterName]: that character's moment in the scene - one or two short paragraphs using *italic narration and actions* and \"quoted dialogue\". Use the character's exact name in the brackets.\n\nInclude every listed character at least once in a natural order, have them react to each other, and end on a beat that invites " + personaName + " to jump in. Do not write any line for " + personaName + ".";
+      var po = "You are scripting the OPENING of a group roleplay chat that brings the WHOLE cast into one shared scene. " + personaName + " is the user and must NOT be scripted.\n\nSCENARIO:\n" + scenO + "\n\nCAST - these are the ONLY characters that exist; script exactly these and invent NO others:\n" + dumpO + "\nOutput the opening as a sequence of lines in EXACTLY this format and nothing else:\n[SYSTEM]: one or two sentences of hidden stage-setting context for the AI - the location, time, who is present - written as notes, not dialogue.\n[CharacterName]: that character's moment in the scene - one or two short paragraphs using *italic narration and actions* and \"quoted dialogue\". Use the character's exact name in the brackets.\n\nInclude every listed cast member at least once in a natural order, have them react to each other, and end on a beat that invites " + personaName + " to jump in. Do NOT write a line for " + personaName + ". CRITICAL: do NOT introduce, name, or script any character who is not in the CAST list above - if the scenario implies a crowd, entourage, or background people, keep them unnamed with no dialogue lines of their own.";
       return refine ? refineWrap(po, val("openingOut"), val("openingAdj"), "Keep the same [SYSTEM]: and [CharacterName]: line format.") : po;
     }
     if(sec === "scenario"){
       var p = "You are a worldbuilding assistant for AI roleplay chat. Expand the user's idea into a vivid but concise SCENARIO (setting, situation, tone) of about 120 to 180 words. Address the user as {{user}}.\n\nUSER'S IDEA:\n" + val("scenarioNotes") + "\n\nOutput ONLY the scenario prose - no preamble, no headers.";
-      return refine ? refineWrap(p, val("scenarioOut"), val("scenarioAdj"), "Output ONLY the scenario prose.") : (p + "\n\n" + scenarioSeed());
+      return refine ? refineWrap(p, val("scenarioOut"), val("scenarioAdj"), "Output ONLY the scenario prose.") : (p + "\n\n" + scenarioSeed() + "\n\nMOST IMPORTANT: follow the USER'S IDEA above exactly, including any pace, tone, genre, or specific details they state - if they say \"fast paced\" the scenario must read fast and energetic, not slow or languid. The creative direction is loose flavour only and must never override or contradict the user's idea.");
     }
     if(sec === "main" || sec === "extra"){
       var key = sec === "main" ? "main" : ("extra" + window.activeExtraIndex);
