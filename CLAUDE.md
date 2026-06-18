@@ -9,6 +9,19 @@ See `AUTOMATION.md` for the **loader** deploy path: `wizard-loader-html.txt` is
 pasted into the Perchance HTML editor once, then fetches `char-wiz-html` from
 GitHub at runtime — so editing the repo deploys, with no re-paste.
 
+**v2 architecture (verified live 2026-06-18).** Both panels are now **paste-once**.
+The data panel was reduced to a minimal stub — only the load-time constructs
+Perchance requires (`{import:...}` plugin lines, the `settings` block, `$meta`).
+The former data-panel functions (`generate`, `genCharacterImage`, `wordBank`,
+`uploadShare`) now live in `char-wiz-html` as `window.*` functions; the loader
+**bridges the plugin imports** (`ai`, `imageGen`, `adjBank`, `nounBank`,
+`verbBank`, `uploader`, `settings`) onto `window` so the loader-fetched HTML can
+call them. Verified: calling the plugin imports from the HTML scope works on a
+live generator. So **all** ongoing changes — HTML and data-side logic — deploy
+via the loader from `main`; the data panel only changes if you add/remove a
+plugin import. See the basic-memory note "VERIFIED - minimal data panel + import
+bridge works on Perchance".
+
 **Perchance API — status (verified 2026-06-18):** `/api/downloadGenerator`
 is reachable via plain GET (no browser, no auth). It returns a rendered HTML
 page, but the generator source is **embedded as URL-encoded JSON** in
@@ -52,11 +65,14 @@ Every generator is delivered as **two separate blocks** that must never be
 merged:
 
 - **Data panel** (`*-data-panel-*.txt`, `char-wiz-dat`) → goes in Perchance's
-  **data/generator editor** (indentation-based plain text). Contains the
-  `{import:ai-text-plugin}` / `{import:text-to-image-plugin}` imports,
-  `settings`, the `generate()` function, and `$meta` (title/description).
+  **data/generator editor** (indentation-based plain text). **v2: minimal stub** —
+  only the `{import:...}` plugin lines, the `settings` block (whose hooks delegate
+  to `window.*`), and `$meta`. The functions `generate`/`genCharacterImage`/
+  `wordBank`/`uploadShare` are **no longer here** — they moved to the HTML panel.
 - **HTML panel** (`*-html-panel-*.txt`, `char-wiz-html`) → goes in Perchance's
-  **HTML editor**. Contains the UI, all real JavaScript logic, and `<style>`.
+  **HTML editor**. Contains the UI, **all** real JavaScript logic (now including
+  `window.generate`/`genCharacterImage`/`wordBank`/`uploadShare`, which use the
+  plugin imports the loader bridges onto `window`), and `<style>`.
 
 The two halves communicate by convention: the data panel's `instruction()`
 calls a `window.build*Prompt()` function defined in the HTML panel, and streams
@@ -100,10 +116,11 @@ names, and the differences between near-versions are the real signal — diff
 before assuming. Current state at time of writing:
 
 - `char-info` == `perchance-character-creation-3.md` (identical).
-- **Wizard current build:** `char-wiz-html` == `wizard-html-panel-11.txt`
-  (canonical HTML) and `char-wiz-dat` == `wizard-data-panel-10.txt` (canonical
-  data). These are the newest and the ones to edit. Older `wizard-html-panel-7..10`
-  and `wizard-data-panel-6..9` are historical snapshots — do not edit them.
+- **Wizard current build (v2):** `char-wiz-html` == `wizard-html-panel-19.txt`
+  (canonical HTML) and `char-wiz-dat` == `wizard-data-panel-14.txt` (canonical,
+  minimal v2 data stub). These are the newest and the ones to edit. Lower-numbered
+  `wizard-html-panel-*` / `wizard-data-panel-*` are historical snapshots — do not
+  edit them.
 
 When editing, update the canonical pair (`char-wiz-html` / `char-wiz-dat`),
 mirror the result to a new highest-numbered `wizard-html-panel-N.txt` /
@@ -137,11 +154,26 @@ import or corrupts user data:
 
 ## Verifying changes
 
-There is no automated test harness. To verify a tool actually works, paste its
-data block and HTML block into the two editors of a Perchance generator and
-exercise it; for the character/fixer tools, confirm the downloaded `.json`
-imports cleanly into ACC. Treat the "Minimal checklist" in `char-info` §11 as
-the acceptance checklist.
+Three layers, in order of cost:
+
+1. **`node test/smoke.mjs`** — drives the real export pipeline against a fake DOM
+   and asserts the Dexie export *shape* is import-safe (9 tables, persona flag,
+   high-entropy uuid, lore modes, immersion `customCode` parses). Run after any
+   `char-wiz-html` edit. Also `bash .claude/hooks/check-wizard.sh` (pipe it JSON)
+   for a `node --check` of the wizard `<script>`.
+2. **`node test/grade-generation.mjs`** — grades the *content quality* of an
+   actual generation (smoke only checks shape). Generation runs on Perchance, so
+   copy a character's `=== SECTION ===` output out of the field and feed it:
+   `node test/grade-generation.mjs out.txt` (or `… -` for stdin). It scores a
+   rubric — sections present, name-like NAME, role within ~500w budget,
+   in-character FIRST MESSAGE, visual APPEARANCE, image triggers reference the
+   name, **no leaked prompt text, no unfilled `[ ]`/`{ }` placeholders** — and
+   prints a letter grade (A–F). Run with no args to run its own good/bad
+   self-tests. Exit 0 = grade C+.
+3. **Live on Perchance** — paste the two blocks into a generator's two editors
+   (HTML = the loader, data = `char-wiz-dat`) and exercise it; confirm the
+   downloaded `.json` imports cleanly into ACC. Treat the "Minimal checklist" in
+   `char-info` §11 as the acceptance checklist.
 
 ## Skills, commands & tools — routing rules
 
