@@ -8,8 +8,8 @@
 > - **Source-verified field shapes + petra's actual prompts** ← Part 2.5, pulled
 >   live via `python3 scripts/perchance_api.py download petrafied-acc`
 > - **Petra's own prose guide** ← Part 2.6 + full extract in
->   `ai-workspace/petra-guide-prose.txt` (her 100-page notebook PDF, provided by the
->   repo owner — the Scribd doc that was CAPTCHA-walled to automation)
+>   `ai-workspace/petra-guide-prose.txt` (her complete 211-page notebook PDF, provided
+>   by the repo owner — the Scribd doc that was CAPTCHA-walled to automation)
 > - **Build reference** ← `perchance-generator-tutorial.txt` (the templating engine)
 
 ---
@@ -131,12 +131,12 @@ prompt-builder + grader, NOT for emission into a character):
    if we ever add RAG.
 4. Keep the fork/official split intact: **B is fork-only**; A is core ACC.
 
-## Part 2.6 — Petra's own words (her 100-page prose guide)
-The Scribd doc finally came through as a PDF (provided by the repo owner). Full
-text-layer extract: `ai-workspace/petra-guide-prose.txt`. It's a notebook covering
-external resources, image-gen tips, CSS themes, and a "Basics" walkthrough (ends at
-character creation — no advanced lorebook/memory chapter in this export). The bits
-that matter for **char-wiz**, in her framing:
+## Part 2.6 — Petra's own words (her full 211-page prose guide)
+The Scribd doc came through as a PDF (provided by the repo owner) — the **complete
+211-page** notebook. Full text-layer extract: `ai-workspace/petra-guide-prose.txt`
+(pp.1-100 Basics, 101-150 threads/prompting/lore/initial-messages, 151-211 memories/
+summary/CSS/multi-character/injection/hidden-system/hosting). The bits that matter
+for **char-wiz**, in her framing:
 
 **Her assessment of what the ACC AI is GOOD at** (use to justify our prompt design):
 - Takes **simple, direct personality instructions** and acts them out (actions,
@@ -178,6 +178,59 @@ shape "work well as AI Character Chat backgrounds." Bing/DALL-E caps prompts at
   shape as the source-verified `messageWrapperStyle` string in Part 2.5.
 - **Lorebook sync**: host the `.txt` on Dropbox and use a **`?dl=1`** direct link so
   edits sync without re-upload (matches the `loreBookUrls[]` Dropbox links in 2.5).
+
+**Lore good-practices (§2.2.2 — the single most char-wiz-actionable section).** When
+char-wiz generates lore entries it should follow petra's rules verbatim:
+- **Each entry self-contained.** The AI reads entries *in isolation* and retrieves
+  them individually, so **never cross-reference** ("He"/"the above") — repeat the
+  subject's proper name in every entry that's about it. Order does **not** matter.
+- **Don't over-split.** The AI often doesn't retrieve all entries on a subject, so a
+  subject fragmented across many entries yields incomplete info. **Merge related
+  facts** into one entry; ~120-200 words each is her sweet spot.
+- **Direct, clear, factual** prose — the AI adds flavor itself; repeat names rather
+  than be ambiguous.
+- **What belongs in lore:** world/geography/nations, trivia, artifacts/objects,
+  custom-race physiology, cultures, important events. **What does NOT:** *character*
+  details (use the character **description** — far more reliable than lore retrieval),
+  future/not-yet-known info, and far-away/irrelevant info (the AI may pull it in at
+  the wrong time). → char-wiz already routes character info to the role/persona, not
+  lore; this confirms that split.
+
+**Character description & reminder (§3.3).** Directly governs what char-wiz emits:
+- **Description** is the most reliable channel for character info; ~**1000 words** for
+  a major character works well in her experience; keep minor characters simple. Don't
+  overload it.
+- **Reminder note** is *heavily* prioritised and can get repetitive — so restrict it
+  to **only these four** kinds of content: (1) **conversational style**, (2) **quirks**
+  (always-followed habits), (3) **custom-race physical description**, (4) a **very
+  strong belief** the character should keep referencing. Blank is fine. → char-wiz's
+  `reminderMessage` generation should be constrained to these four; anything else
+  belongs in the description.
+
+**Initial / System messages (§2.3) — opening-scene design.** char-wiz's opening
+scene maps onto this:
+- The **first message of a thread does not search lore**, so a character with lore
+  should *always* have a starting message.
+- **System messages get higher priority** in ACC's code (the `/nar` Narrator is
+  System). Format: `[SYSTEM]:` / `[AI]:`; hide with `[SYSTEM; hiddenFrom=user]:`
+  (or `hiddenFrom=ai`, or both).
+- Her pattern: a **hidden System "lore dump"** (~5k chars / ~900 words) of the *core*
+  setting facts at thread start, kept out of the user's view — reliable setup without
+  depending on retrieval. Redundancy with the lorebook is fine.
+
+**Advanced techniques worth knowing (won't change char-wiz output, but context):**
+- **Multi-character threads:** `/ai @CharacterName#ID instruction`; **only the Main
+  AI character's lorebooks are used**; characters can read each other's *descriptions*
+  (another reason character info lives in the description, not lore).
+- **Hub character:** a custom narrator holding all lorebooks/shortcuts/JS/CSS so the
+  real characters stay minimal (name, avatar, description, +optional reminder/CSS).
+- **Character injection / hidden-system-message tricks:** post a hidden message *as*
+  a character (hidden from both) to inject their profile without them being in-scene
+  (lasts ~20 messages); inject a hidden System message mid-thread to refocus the AI
+  or surface a lore entry that isn't being retrieved.
+- **Memories vs Summary:** both auto-generated, thread-scoped, retrieved by the same
+  "3 questions"; memories = fact list, summary = plot-point blocks (overwritten over
+  time). Map to ACC `autoGenerateMemories` + `fitMessagesInContextMethod:"summarizeOld"`.
 
 ## Part 3 — Building generators (the engine behind all of this)
 From `perchance-generator-tutorial.txt` — the Perchance templating primitives the
