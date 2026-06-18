@@ -28,3 +28,36 @@ Update ROADMAP.md (Phase 8 preview) + CLAUDE.md skill-note correction (Phase 1),
 | check-skills (30 skills) | in sync |
 | smoke.mjs | PASS |
 | settings.json | valid JSON |
+
+---
+## ▶ NEXT SESSION — START HERE (resume the optimization initiative)
+
+**Read order:** CLAUDE.md → README.md → `task_plan.md` + `findings.md` + this file.
+The `/plan` skill (pi-planning-with-files) auto-loads `task_plan.md` on start.
+
+**Where we are:** Phase 0 ✅, Phase 1 🟡 (skills 38→30, parked→name-only done;
+dispatcher skills NOT built). **Resume at Phase 2.**
+
+**Phase 2 = the original task: 4-phase IA regroup + a11y fixes** (`task_plan.md`).
+Workflow to execute it:
+1. It's a coupled `char-wiz-html` markup reorg — do it **inline or in ONE git
+   worktree**, NEVER fan out across agents (CLAUDE.md). JS is all getElementById
+   so reordering `<div class="card">` is safe.
+2. Skills ready & ON: `accessibility-engineer`, `aria-live-regions`,
+   `mobile-responsiveness`, `vanilla-web` (a11y/UI guidance); `run-perchance-ai-tool`
+   (render+screenshot); `plan-mode`/`pi-planning-with-files` (the `/plan` chain).
+3. **Paste-safety (load-bearing):** no `[ ] { }` in markup (everything before the
+   first `<script>`); set any literal-bracket UI string from `<script>`.
+4. **Verify every change:** `node test/smoke.mjs` · pipe JSON to
+   `.claude/hooks/check-wizard.sh` · headless render 0 page errors + send operator
+   a screenshot (384px + 820px; render `char-wiz-html` directly — see README §4).
+5. **Mirror** the finished `char-wiz-html` → new `wizard-html-panel-21.txt`.
+6. Commit at the green gate; `git push origin main`; tick Phase 2 in `task_plan.md`
+   and log here.
+
+Then Phases 3–8 in `task_plan.md` (Part-2 review phase, correctness, security,
+CI+loader integrity, ROADMAP features, ship). Each has its own verification gate.
+
+**Open judgment call for the operator:** I kept ~11 skills the research brief
+wanted cut because they're actively used (orchestrator/subagent/research/UX/
+reasoning) — now `name-only`. Confirm or adjust before the dispatcher-skill build.

@@ -70,3 +70,16 @@ Details: README §3 + CLAUDE.md.
 - Run `/plan` before any non-trivial / multi-file task (CLAUDE.md workspace rule 7).
   A slash command is deterministic; auto-trigger descriptions are not.
 - [standard] non-trivial work starts with `/plan`; plan/progress files are committed so agents share state
+
+## Optimization initiative — RESUME POINTER (2026-06-18)
+A repo-optimization initiative is in flight, durable in `task_plan.md` /
+`findings.md` / `progress.md` at repo root. **Next session: resume at Phase 2**
+(the 4-phase IA regroup + a11y fixes) — see `progress.md` "NEXT SESSION — START HERE".
+- Phase 0 ✅ research+plan. Phase 1 🟡: skills 38→30 (pruned 8 dead), 18 parked
+  switched `user-invocable-only`→`name-only` (the real budget fix; user-invocable-only
+  does NOT free budget). Dispatcher-skill build still pending.
+- Phases 2–8 queued: regroup+a11y, Part-2 review phase, correctness, security,
+  CI+loader integrity, ROADMAP features (stopSequences→shortcutButtons), ship.
+- Phase-2 skills confirmed ON: accessibility-engineer, aria-live-regions,
+  mobile-responsiveness, vanilla-web, run-perchance-ai-tool, plan-mode, pi-planning-with-files.
+- [state] initiative durable in task_plan.md; resume at Phase 2; skill context prepared + verified ON
