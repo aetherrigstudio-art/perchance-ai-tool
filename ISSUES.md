@@ -47,6 +47,25 @@ These were addressed in Phase 2A/B/C (branch reconciliation 2026-06-18):
 
 ---
 
+## NEW — Content-authoring quality (research synthesis 2026-06-18)
+
+From `ai-workspace/research-synthesis-2026-06-18.md` (petra's prose §2.2.2 / §3.3 +
+Part 2.5-C, all `✓verified`). These change what char-wiz's prompts **emit**, not the
+schema — high quality-per-effort, no export-shape risk. Line refs are approximate
+against `wizard-html-panel-24` (re-confirm before editing).
+
+| Task | Effort | Where | Fix Summary |
+|---|---|---|---|
+| Lore entries not self-contained | S | lore-gen prompt in `buildWizardPrompt` / `withLore()` | Instruct: each entry stands alone, **repeat the subject's proper name** (no "he"/"the above" — AI retrieves entries in isolation), order-independent |
+| Lore over-split into fragments | S | lore-gen prompt | Instruct: **merge related facts**, ~120–200 words per entry; the AI often won't retrieve all entries on a subject |
+| Character info leaking into lore | XS | lore-gen prompt + grader | Keep character facts in the **description/role**, not lore (description is the reliable channel); grader flag if lore entries describe the main character |
+| `reminderMessage` unconstrained | S | reminder generation in `buildWizardPrompt` | Restrict generated reminder to **only four** kinds: conversational style, quirks, custom-race physiology, one very strong belief. Blank is allowed |
+| No explicit RP formatting directive | XS | prompt binding-rules (~419 `VOCAB`) | Add: "asterisks around actions, quotes around speech, typical roleplay style" (petra Part 2.5-C) |
+| `shortcutButtons` manual-entry only | S | "Quick reply buttons" card | Offer petra's verified defaults as one-click presets: `🖼️ Image → "/image --num=1"` (autoSend); `📜 Narrator → "/nar …"` (no autoSend) |
+| Image-Style tool ignores petra's prompt formula | S | `buildStylePrompt` (`image-style-builder-html-panel-8.txt`) | Offer her template `[style] drawing of [subject]. [build/expr]. [hair]. [clothing]. [eyes]. [background], [time], [weather].`; note Bing/DALL-E ~480-char cap |
+
+---
+
 ## CRITICAL
 
 | Issue | Effort | Line | Fix Summary |
