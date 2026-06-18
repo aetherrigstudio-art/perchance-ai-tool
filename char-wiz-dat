@@ -1,5 +1,9 @@
 ai = {import:ai-text-plugin}
 imageGen = {import:text-to-image-plugin}
+adjBank = {import:adjective}
+nounBank = {import:noun}
+verbBank = {import:verb}
+uploader = {import:upload-plugin}
 
 settings
   instruction() =>
@@ -28,10 +32,50 @@ async generate() =>
   await pendingObj.onFinishPromise;
   stopBtn.style.display = "none";
 
-async genCharacterImage(prompt) =>
-  let result = await imageGen.image({ prompt: prompt });
-  if(!result) return "";
-  return result.imageURL || result.imageUrl || result.url || "";
+async genCharacterImage(prompt, negativePrompt, resolution) =>
+  window.__imgErr = "";
+  let opts = { prompt: prompt, negativePrompt: (negativePrompt || ""), resolution: (resolution || "512x768") };
+  let result = null;
+  try { if(typeof imageGen === "function") result = await imageGen(opts); else if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else { window.__imgErr = "imageGen import not callable (type " + (typeof imageGen) + ")"; return ""; } }
+  catch(e) { try { if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else throw e; } catch(e2) { window.__imgErr = "imageGen error: " + (e2 && e2.message ? e2.message : e2); return ""; } }
+  if(!result) { window.__imgErr = "imageGen returned nothing"; return ""; }
+  if(typeof result === "string") return result;
+  if(result.imageURL) return result.imageURL;
+  if(result.imageUrl) return result.imageUrl;
+  if(result.url) return result.url;
+  if(result.src) return result.src;
+  if(result.imageElement && result.imageElement.src) return result.imageElement.src;
+  if(result.outputEl && result.outputEl.src) return result.outputEl.src;
+  if(typeof result.querySelector === "function") { let im = result.querySelector("img"); if(im) return im.src; }
+  try { window.__imgErr = "unrecognized result keys: " + Object.keys(result).join(","); } catch(e3) { window.__imgErr = "unrecognized result shape"; }
+  return "";
+
+// Fresh words from Perchance's shared word banks (adjective/noun/verb), used by
+// the HTML to rotate in real vocabulary every 4 hours. Fully defensive: any
+// import/selection failure returns "" so the generator keeps working.
+wordBank(type, count) =>
+  try {
+    let n = count || 3;
+    let list = (type == "noun") ? nounBank : ((type == "verb") ? verbBank : adjBank);
+    if(!list) return "";
+    let out = [];
+    for(let i = 0; i < n; i++) {
+      let w = (typeof list.selectOne === "function") ? list.selectOne() : list.selectOne;
+      if(w) out.push(("" + w).trim());
+    }
+    return out.join("|");
+  } catch(e) { return ""; }
+
+// Upload a Blob (the gzipped share file) to Perchance's file store and return
+// its URL, used by the HTML to build a one-click "open in chat" share link.
+// Defensive: any failure returns "" or "ERR:<reason>" so the UI can report it.
+async uploadShare(blob) =>
+  try {
+    let r = await uploader(blob);
+    if(!r) return "";
+    if(r.error) return "ERR:" + r.error;
+    return r.url || "";
+  } catch(e) { return "ERR:" + (e && e.message ? e.message : "upload failed"); }
 
 $meta
   title = AI Character Set Builder

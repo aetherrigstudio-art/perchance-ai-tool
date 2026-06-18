@@ -1,0 +1,39 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(node *)",
+      "Bash(cp *)",
+      "Bash(md5sum *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(wc *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\""
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-wizard.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}
