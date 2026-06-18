@@ -63,3 +63,70 @@ Because the real markup is injected by JavaScript, Perchance never *templates*
 it - so the `[ ] { }` bracket rules that break a direct paste stop applying to
 the loaded build. The smoke-test guard on markup brackets stays in place anyway
 for anyone who pastes `char-wiz-html` directly.
+
+---
+
+## Scripted deploy
+
+Two scripts in `scripts/` automate the most useful CI/deploy checks. Neither
+requires browser access or a Perchance account.
+
+### scripts/deploy.sh
+
+Checks whether the local files are in sync with the live deploy state and
+prints step-by-step instructions for anything that still requires a manual step.
+
+```bash
+# Check HTML panel sync (GitHub raw comparison only):
+./scripts/deploy.sh
+
+# Also check data panel against live Perchance (requires perchance.org to be
+# reachable — works locally, may 403 in cloud CI):
+./scripts/deploy.sh --check-dat
+```
+
+**What it checks:**
+
+| Check | How | Expected |
+|-------|-----|---------|
+| `char-wiz-html` uncommitted? | `git diff HEAD` | No local edits pending |
+| `char-wiz-html` pushed? | `git diff HEAD origin/branch` | Local = remote |
+| GitHub raw matches local? | `curl` + `diff` | Byte-identical |
+| `char-wiz-dat` matches Perchance? | `/api/downloadGenerator` | Byte-identical (local only) |
+
+Exit 0 = all in sync. Exit 1 = action required. Exit 2 = prereq/network missing.
+
+### scripts/ci-verify.sh
+
+Lightweight sync check designed for CI pipelines. Compares local source against
+the live endpoint without touching the Perchance editor.
+
+```bash
+# Check HTML panel only (default, CI-safe — uses GitHub raw):
+./scripts/ci-verify.sh
+./scripts/ci-verify.sh html
+
+# Check data panel only (uses /api/downloadGenerator, may 403 in cloud CI):
+./scripts/ci-verify.sh dat
+
+# Check both:
+./scripts/ci-verify.sh both
+```
+
+Exit codes: **0** = in sync, **1** = drift detected, **2** = API/network unreachable.
+
+### Which check to use where
+
+| Context | Command | Notes |
+|---------|---------|-------|
+| After a push, confirm HTML is live | `./scripts/ci-verify.sh html` | Uses GitHub raw — always reachable |
+| Before pasting dat panel | `./scripts/ci-verify.sh dat` | Run locally; perchance.org may 403 in CI |
+| Full pre-release check | `./scripts/deploy.sh --check-dat` | Run locally |
+| GitHub Actions (push hook) | `./scripts/ci-verify.sh html` | Safe in cloud — no perchance.org call |
+
+### Why the data panel can't be auto-deployed
+
+Perchance exposes `/api/downloadGenerator` for **reads** but no equivalent
+upload/write endpoint. Pushing `char-wiz-dat` still requires a manual paste into
+the generator's data editor at `perchance.org/q83iy9tti5#edit`. This is expected
+to be rare — the data panel changes far less often than the HTML panel.
