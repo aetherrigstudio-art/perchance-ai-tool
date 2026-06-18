@@ -1,0 +1,305 @@
+# Petra's Perchance ACC Resources — prose guide (text-layer extract)
+# Source: 100-page notebook PDF provided by the repo owner (Scribd doc 846120997).
+# Extracted 2026-06-18 via pdfjs-dist (text layer only; image-only pages show as captions).
+# This is the faithful raw extract; the actionable synthesis lives in petra-acc-guide-merged.md Part 2.6.
+# ---
+
+===== PAGE 1 =====
+Hello! Welcome to my AI resources notebook. This notebook is focused on providing guides and resources for the Perchance AI Character Chat ( https://perchance.org/ai - character - chat ). Feel free to use the menu on the left or the summary below to navigate. Tutorials Main guides : (START HERE IF YOU'RE NEW!) Main guide covering the basics and other usages of Perchance AI Character Chat. • Automatically sync Lorebooks after every change : How to use DropBox to sync lore txt files in your computer with Perchance so you don't need to re - upload after every change. • Hosting images on OneDrive or DropBox : Simple tutorial on how to generate image links for OneDrive or DropBox when you don't want to use Perchance File Uploader. • Resources Visual Resources: Microsoft Bing DALL - E : Very powerful and free image generator. Not as customizable like Perchance but can yield great character portraits and landscapes. Example prompts and results available . ○ Armoria : Coat of Arms generator. ○ Flag Machine : Flag generator. ○ • Perchance AI Character Chat resources: Perchance AI Character Chat - Google Docs : Google Docs guide with several guides and tutorials. ○ Visual Resources: CSS Templates : Some CSS templates for your character screen. ▪ Bigger avatar script : Make the character avatars bigger for a more RPG or Visual Novel feel. ▪ Background Image Rotator : Changes background images of the chat over time based on a list of images you want to rotate. ▪ ○ • Character Generation: Deorum | Fantasy characters gallery by Azgaar : Curated library with several characters that might give you ideas for your own. ○ Quest RPG Character Generator (With AI - Picture) (perchance.org) : Generates characters with a simple portrait, good for giving you ideas and a starting point. ○ AI Character Description Generator (free, no sign - up, unlimited) (perchance.org) : Generate an extensive description of your character. Very useful for making lorebook entries and giving you more ideas. You can also add your world - building information to give it more context. ○ Question This - an AI - based Questioning Tool ― Perchance Generator : Generates questions and possible answers based on information you provide. Great for fleshing out worlds, lore and characters. ○ • World Building Resources: Kanka - Online tabletop RPG campaign manager and worldbuilding tool : Website that allows you to build a wiki - like site for worlds you built. Features articles for characters, locations, events, timelines and more. You can then create connections and links between elements of your world so it's easier to navigate. ○ • Name Resources: Fantasy name generators. Names for all your fantasy characters : Name database with • Summary domingo, 8 de setembro de 2024 00:31 Index página 1
+
+===== PAGE 2 =====
+Fantasy name generators. Names for all your fantasy characters : Name database with several categories. ○ Tavern Crowd : Collection of name generators. ○ GeneratorFun - AI Generation of Random Names, Text, Jokes, and More : Collection of AI generators. ○ Name Generator - Powered by AI : Name generator with AI. ○ Browse Names - Behind the Name : List of many names from various cultures, make sure to check the user - submitted sections for more names. ○ Browse Surnames - Behind the Name : Same as above, but for surnames. ○ Character Resources: List of hybrid creatures in folklore - Wikipedia : List of many hybrid creatures you could try out as characters in Perchance ACC. Make sure to ask Chloe about these to see if the AI recognizes the creature properly. ○ NPC Generator : Generates NPCs with several characteristics; has plenty of options to choose from. ○ • Map Generation: Azgaar's Fantasy Map Generator : Extensive map generator that can generate sections or even an entire world map. Sync with DropBox available for you to save maps. ○ Fantasy City Generator : Generates a city with detailed population with jobs, spouses, descriptions of personalities and other details that can help give you some ideas. You can also customize aspects of the city and the races that make up the population of the city. ○ Vintage Star System generator by Arkimedz : Star system generator. ○ Watabou's Procgen Arcana : Realm generator : Includes a map generator for a region of a world. ▪ City generator : Generate a map for a city with various options. ▪ Village generator : Generate a village with various options. ▪ Cave/Glade generator : Generate a cave or glade with several options. ▪ Dungeon generator : Generate a dungeon using many options. ▪ Mansion generator : Generate a 3D mansion with several options. ▪ ○ AI Hierarchical World Generator (perchance.org) : Generate several related areas that make up a region. ○ • Other Resources: Ultimate Guide to Melee Weapons - Battle Blades : Extensive list of medieval melee weapons, good for giving you ideas of weapons your characters can use. Make sure to ask the Chloe AI about these to see if it the AI system knows the weapon. ○ Suno AI Music Generator : Generate music for your chars or stories. 5 free generations per day. ○ • Index página 2
+
+===== PAGE 3 =====
+IMPORTANT: This generator is not suitable for explicit / sexual images. DALL - E content policy is quite sensitive, so you might run into issues depending on your prompt. Microsoft Bing / Microsoft Designer uses DALL - E for image generation; DALL - E is usually not free, but Microsoft offers quite a lot of usages per day and in my experience, while not as customizable as Perchance's, it yields fantastic results with prompts. You have 15 boosts per day, but the boosts only mean you can generate faster (even without boosts it's quite fast to generate). The true daily limit seems to be around 100 - 150 generations per account . If you have multiple accounts on Microsoft, each will have its own limit. Each generation tries to make 4 images, but generations may yield less than 4 images if it gets blocked by DALL - E's content policy. The prompt does not use Perchance's customizable format, and each prompt seems limited to 480 characters, so you have to be creative with this character limit. https://www.bing.com/images/create Things to keep in mind: You can ask to regenerate your prompt in landscape format by opening one image and clicking on resize. I'm able to stack up to 3 generations like this; it's tedious that you have to do this for every image, but that's what it is. • You can only browse some of your latest prompts, not all. Bing's collection feature does not store the image forever, so make sure to save the images to your PC or a cloud storage. • Microsoft Bing DALL - E domingo, 8 de setembro de 2024 03:12 Microsoft Bing DALL - E página 3
+
+===== PAGE 4 =====
+DALL - E features some styles like Digital Illustration, Drawing, 3D, 8 - bit (for pixel art), and several others. I have not tried specific authors. It does seem to know a few pop series such as Star Wars, Fallout and Dragon Ball. Example prompts and results domingo, 8 de setembro de 2024 03:20 Microsoft Bing DALL - E página 4
+
+===== PAGE 5 =====
+Most examples below I used "8 - bit" because I wanted to make my characters in a SNES / pixel art style. Feel free to remove it and try it out too! I added d ifferent characters for examples and possible inspiration. ---------------- Image Prompt Size 8 - bit Dark Fantasy drawing of elder man in a fantasy Gothic castle room. Tall, strong, honorable, serious expression. Dark graying medium hair, short dark graying beard. Tall, sharp facial features. Black ornate heavy knight armor, silver jewelry, belt. Hazel eyes. Fantasy Gothic metropolis in the background seen through the windows, mountains in the distance, sunset, cloudy. Square 8 - bit Dark Fantasy drawing of strong elder male knight in a fantasy Square Character - Pixel Art Fantasy domingo, 8 de setembro de 2024 03:38 Microsoft Bing DALL - E página 5
+
+===== PAGE 6 =====
+8 - bit Dark Fantasy drawing of strong elder male knight in a fantasy Gothic castle room. Tall, heroic, strong, honorable, serious expression. Dark graying medium hair, short dark graying beard. Tall, sharp facial features. Black ornate heavy knight armor, silver jewelry, knight belt, cape. Hazel eyes. Hands resting on sword pommel. Fantasy Gothic metropolis in the background seen through the windows, mountains in the distance, sunset, cloudy. Square Microsoft Bing DALL - E página 6
+
+===== PAGE 7 =====
+8 - bit Fantasy drawing of a Tiefling woman in Aztec palace. Tiefling horns, Tiefling tail. Delicate, round face. Cold, calculating, serious expression. Purple skin, purple long hair. Wearing lilac silk Aztec dress, wearing silver jewelry. Necklace with a purple gem. Leaning on balcony, reading note. Wind pushing hair. Lilac eyes. Aztec metropolis in the background, ziggurats, temples, mountains in the distance, sunset. Square Microsoft Bing DALL - E página 7
+
+===== PAGE 8 =====
+8 - bit Fantasy drawing of a Tiefling woman in Aztec palace. Tiefling horns, Tiefling tail. Delicate, round face. Cold, calculating, serious expression. Purple skin, purple long hair. Wearing lilac silk Aztec dress, wearing silver jewelry. Necklace with a purple gem. Leaning on balcony, reading note. Wind pushing hair. Lilac eyes. Aztec metropolis in the background, ziggurats, temples, mountains in the distance, sunset. Microsoft Bing DALL - E página 8
+
+===== PAGE 9 =====
+8 - bit Dark Fantasy colored digital drawing of adult female knight in a Gothic medieval city. Delicate, round face. Messy medium blonde hair with bangs. Silver ornate armor, belt. Glowing silver eyes. Cocky chuckle, looking up at the distance, holding two - handed sword on shoulder, hand on hip. Gothic metropolis in the distance. Mountains in the distance, clear day. Square Microsoft Bing DALL - E página 9
+
+===== PAGE 10 =====
+8 - bit Dark Fantasy drawing of adult woman in a fantasy Gothic living Square Microsoft Bing DALL - E página 10
+
+===== PAGE 11 =====
+8 - bit Dark Fantasy drawing of adult woman in a fantasy Gothic living room. Delicate, round face, serious, calculating expression. Leaning on balcony. Auburn hair with bangs, dark eyeliner. Gothic black princess dress, wearing silver jewelry. Dark green eyes, elf ears. Fantasy Gothic metropolis in the background through the windows, mountains in the distance, sunset, cloudy, godrays. Square Microsoft Bing DALL - E página 11
+
+===== PAGE 12 =====
+8 - bit Dark Fantasy drawing of strong elder king in a fantasy Gothic Square Microsoft Bing DALL - E página 12
+
+===== PAGE 13 =====
+8 - bit Dark Fantasy drawing of strong elder king in a fantasy Gothic palace throne room. Sitting on throne. Silver crown. Heroic, strong, honorable, serious expression, looking at the distance. Grayed brown hair, dark grayed beard. Tall, sharp facial features. Gothic ornate king outfit, silver jewelry, knight, cape. Brown eyes. Fantasy Gothic metropolis in the background seen through the windows, mountains in the distance, sunset, cloudy. Square 8 - bit Dark Fantasy drawing of strong elder king in a fantasy Gothic living room. Tall, heroic, strong, honorable, serious expression. Grayed brown hair, dark grayed beard. Tall, sharp facial features. Gothic ornate king outfit, silver jewelry, knight, cape, silver crown. Brown eyes. Fantasy Gothic metropolis in the background seen through the windows, mountains in the distance, sunset, cloudy. Square Microsoft Bing DALL - E página 13
+
+===== PAGE 14 =====
+8 - bit Dark Fantasy drawing of adult Aztec warrior queen sitting on Aztec throne. Dark skin, elf ears, hazel eyes, dark eyeliner. Tall, slim, intimidating, imposing, strong, warrior. Gold jewelry. Wearing silk Aztec white dress with gold trims, black nails. Strong, sharp facial features. She has long black hair with fringe. Intimidating, confident, smirk, smug, arrogant expression. Fantasy throne room background. Square Microsoft Bing DALL - E página 14
+
+===== PAGE 15 =====
+Microsoft Bing DALL - E página 15
+
+===== PAGE 16 =====
+8 - bit Dark Fantasy drawing of young man in a fantasy Gothic palace living room. Arrogant, smirk chuckle. Spoiled, brat, noble. Brown medium hair with bangs. Tall, sharp facial features. Gothic black prince outfit, silver jewelry. Dark green eyes, elf ears. Fantasy Gothic metropolis in the background seen through the windows, mountains in the distance, sunset, cloudy. Square Microsoft Bing DALL - E página 16
+
+===== PAGE 17 =====
+Microsoft Bing DALL - E página 17
+
+===== PAGE 18 =====
+8 - bit Dark Fantasy drawing of adult woman in a fantasy Gothic palace balcony. Delicate, round face, serious, calculating expression. Leaning on balcony. Auburn hair with bangs, dark eyeliner. Gothic black princess dress, wearing silver jewelry. Dark green eyes, elf ears. Fantasy Gothic metropolis in the background, mountains in the distance, sunset, cloudy, godrays. Square Microsoft Bing DALL - E página 18
+
+===== PAGE 19 =====
+Microsoft Bing DALL - E página 19
+
+===== PAGE 20 =====
+Microsoft Bing DALL - E página 20
+
+===== PAGE 21 =====
+Microsoft Bing DALL - E página 21
+
+===== PAGE 22 =====
+Character - Fallout domingo, 8 de setembro de 2024 03:38 Microsoft Bing DALL - E página 22
+
+===== PAGE 23 =====
+Character - Dragon Ball domingo, 8 de setembro de 2024 03:39 Microsoft Bing DALL - E página 23
+
+===== PAGE 24 =====
+A few examples on generating landscapes. These work well as AI Character Chat backgrounds. Plenty of examples for prompts and inspiration. ---------------- Size Prompt Image Wide A sprawling Aztec metropolis is nestled within tall mountains. The city is densely populated and vertically dense. The jungle surrounds the city, and temples and ziggurats punctuate the landscape. The mountains in the distance tower over the city. The city is bathed in a warm, golden light, with the sun setting behind the mountains. The sky is filled with clouds, and godrays shine down on the city, casting long shadows on the ground. Wide Low angle fantasy drawing of a horizontally and vertically dense Aztec Landscape domingo, 8 de setembro de 2024 03:39 Microsoft Bing DALL - E página 24
+
+===== PAGE 25 =====
+horizontally and vertically dense Aztec metropolis in a mountain valley, jungle terrain. Large Aztec fighting arena built lower into the ground floor, with many stands for a large spectator capacity. Mountains in the distance. The scene is captured in an aerial shot that allows for a breathtaking view of the city's meticulously designed layout. Microsoft Bing DALL - E página 25
+
+===== PAGE 26 =====
+Wide Low angle fantasy digital drawing of Aztec town, jungle terrain. Wide, vast ocean and gulf. Crowded, dense, busy ports and harbors. Many ships docked and other ships sailing. Microsoft Bing DALL - E página 26
+
+===== PAGE 27 =====
+Microsoft Bing DALL - E página 27
+
+===== PAGE 28 =====
+Wide 8 - bit fantasy drawing of a vertically and Microsoft Bing DALL - E página 28
+
+===== PAGE 29 =====
+Wide 8 - bit fantasy drawing of a vertically and horizontally dense fantasy medieval Gothic metropolis nestled within a tall mountain region. The city buildings go far into the horizon. Many tall castles and cathedrals punctuate the landscape. The mountains in the distance are towering and their snow - capped peaks pierce the clouds and cast long shadows across the land. Sunrise, cloudy, foggy. Microsoft Bing DALL - E página 29
+
+===== PAGE 30 =====
+Wide 8 - bit fantasy drawing of a fantasy medieval Gothic palace. The palace has many towers and spires. It is built upon the mountains of a snowy mountain range, with a trail that leads to a large Gothic town below. Many other tall castles and cathedrals punctuate the town below, and the city buildings go far into the horizon. The mountains in the distance are towering and their snow - capped peaks pierce the clouds and cast long shadows across the land. Sunrise, cloudy, foggy. Microsoft Bing DALL - E página 30
+
+===== PAGE 31 =====
+Microsoft Bing DALL - E página 31
+
+===== PAGE 32 =====
+Wide 8 - bit fantasy drawing of a vertically and horizontally dense fantasy medieval Aztec metropolis nestled within a tall mountain region. The city buildings go far into the horizon. Many tall ziggurats punctuate the landscape. The mountains in the distance are towering and their snow - capped peaks pierce the clouds and cast long shadows across the land. Sunrise, cloudy, foggy. Microsoft Bing DALL - E página 32
+
+===== PAGE 33 =====
+Microsoft Bing DALL - E página 33
+
+===== PAGE 34 =====
+Here are a few CSS templates with preview images: Preview CSS Background Image Link Misc This theme is fully responsive for desktop and mobile! This is a theme I designed inspired on Visual Novel / SNES RPG chat boxes. It features a customizer here: Petra's Perchance chat box creator You can change colors and other settings, and then at the bottom, click the css code to copy it! https://1drv.ms/i/s! AvFM4fuvdUASq9M3bM0Pe zDmTQ7imA?embed=1 &width=1792&height=1024 This theme is suitable for both desktop and mobile, it is responsive ! Although you may want to adjust the font - size to better fit your display. You can also change the -- max - chat - width variable in the css to prevent the chat box getting too long in large screens, in case you prefer it more condensed. Requires the bigger avatar script . Avatar size : In these images, I used 8 for desktop and 2 for mobile, but feel free to use what you think looks better for your screen. Avatar shape : square for desktop, portrait for mobile CSS Templates domingo, 8 de setembro de 2024 12:19 Visual Resources página 34
+
+===== PAGE 35 =====
+color: white; font - family: 'Noto Sans'; backdrop - filter: blur(3px); border: 20px; border - radius: 10px; margin: 2rem 12rem 2rem 12rem; padding: 2rem 2rem; padding - right: 4rem; box - shadow: 0 0 10px 10px rgb(0 0 0/ 0.5); background - color: rgb(40 40 40 / 0.8); https://1drv.ms/i/s! AvFM4fuvdUASq8cQPD8J_R gJ - V3vLQ?embed=1&width= 1792&height=1024 NOT SUITABLE FOR MOBILE DEVICES! Use only for Desktop. Requires the bigger avatar script . Avatar size: 5 (feel free to change to any size you prefer) Avatar shape: portrait color: #f7f0a2; font - size: 1em; font - family: 'Gabriela'; font - weight: 0; backdrop - filter: blur(3px); border: 20px; border - radius: 10px; margin: 2rem 12rem 2rem 12rem; padding: 2rem 2rem; padding - right: 4rem; box - shadow: 0 0 10px 10px rgb(0 0 0/ 0.5); background - color: rgb(67 51 45 / 0.9); https://1drv.ms/i/s! AvFM4fuvdUASq9QJ4neUnr hr3KknyQ?embed=1 &width=1792&height=1024 NOT SUITABLE FOR MOBILE DEVICES! Use only for Desktop. Requires the bigger avatar script . Avatar size: 5 (feel free to change to any size you prefer) Avatar shape: portrait color: #f7f0a2; font - size: 0.8em; font - family: 'Gabriela'; font - weight: 0; backdrop - filter: blur(3px); border: 20px; border - radius: 10px; box - shadow: 0 0 10px 10px rgb(0 0 0/ 0.5); background - color: rgb(0 0 0 / 0.85); https://1drv.ms/i/s! AvFM4fuvdUASq9QJ4neUnr hr3KknyQ?embed=1 &width=1792&height=1024 FOR MOBILE DEVICES! Requires the bigger avatar script . Avatar size: 2 (feel free to change to any size you prefer) Avatar shape: portrait Visual Resources página 35
+
+===== PAGE 36 =====
+Visual Resources página 36
+
+===== PAGE 37 =====
+Preview Fonte Recorte de tela efetuado: 23/02/2025 03:24 Cardo Recorte de tela efetuado: 23/02/2025 03:25 Alata Libre Baskerville Fonts domingo, 23 de fevereiro de 2025 03:08 Visual Resources página 37
+
+===== PAGE 38 =====
+Recorte de tela efetuado: 23/02/2025 03:25 Libre Baskerville Recorte de tela efetuado: 23/02/2025 03:25 Spectral Patua One Visual Resources página 38
+
+===== PAGE 39 =====
+Recorte de tela efetuado: 23/02/2025 03:26 Patua One Recorte de tela efetuado: 23/02/2025 03:26 Gelasio Brygada 1918 Visual Resources página 39
+
+===== PAGE 40 =====
+Recorte de tela efetuado: 23/02/2025 03:26 Brygada 1918 Recorte de tela efetuado: 23/02/2025 03:27 Trykker Milonga Visual Resources página 40
+
+===== PAGE 41 =====
+Recorte de tela efetuado: 23/02/2025 03:27 Milonga Recorte de tela efetuado: 23/02/2025 03:27 Atkinson Hyperlegible Next Montserrat Visual Resources página 41
+
+===== PAGE 42 =====
+Recorte de tela efetuado: 23/02/2025 03:28 Montserrat Recorte de tela efetuado: 23/02/2025 03:28 Roboto Nunito Visual Resources página 42
+
+===== PAGE 43 =====
+Recorte de tela efetuado: 23/02/2025 03:28 Nunito Recorte de tela efetuado: 23/02/2025 03:28 Fira Sans Schibsted Grotesk Visual Resources página 43
+
+===== PAGE 44 =====
+Recorte de tela efetuado: 23/02/2025 03:29 Schibsted Grotesk Recorte de tela efetuado: 23/02/2025 03:22 Archivo Figtree Visual Resources página 44
+
+===== PAGE 45 =====
+Recorte de tela efetuado: 23/02/2025 03:30 Figtree Recorte de tela efetuado: 23/02/2025 03:30 Arimo IM Fell Great Primer Visual Resources página 45
+
+===== PAGE 46 =====
+Recorte de tela efetuado: 23/02/2025 03:32 IM Fell Great Primer Recorte de tela efetuado: 23/02/2025 03:35 Syne Mono Expletus Sans Visual Resources página 46
+
+===== PAGE 47 =====
+Recorte de tela efetuado: 23/02/2025 03:37 Expletus Sans Recorte de tela efetuado: 23/02/2025 03:38 Underdog Yusei Magic Visual Resources página 47
+
+===== PAGE 48 =====
+Recorte de tela efetuado: 23/02/2025 03:39 Yusei Magic Recorte de tela efetuado: 23/02/2025 03:41 Yatra One Gabriela Visual Resources página 48
+
+===== PAGE 49 =====
+Recorte de tela efetuado: 23/02/2025 03:42 Gabriela Recorte de tela efetuado: 23/02/2025 03:46 Mali Shantell Sans Visual Resources página 49
+
+===== PAGE 50 =====
+Recorte de tela efetuado: 23/02/2025 03:47 Shantell Sans Recorte de tela efetuado: 23/02/2025 03:48 Macondo Sawarabi Gothic Visual Resources página 50
+
+===== PAGE 51 =====
+Recorte de tela efetuado: 23/02/2025 03:48 Sawarabi Gothic Recorte de tela efetuado: 23/02/2025 12:54 Literata Zen Antique Visual Resources página 51
+
+===== PAGE 52 =====
+Recorte de tela efetuado: 23/02/2025 12:55 Zen Antique Recorte de tela efetuado: 23/02/2025 12:57 Merriweather Donegal One Visual Resources página 52
+
+===== PAGE 53 =====
+Recorte de tela efetuado: 23/02/2025 12:57 Donegal One Recorte de tela efetuado: 23/02/2025 13:14 Amethysta Domine Visual Resources página 53
+
+===== PAGE 54 =====
+Recorte de tela efetuado: 23/02/2025 13:16 Domine Recorte de tela efetuado: 23/02/2025 13:23 Bitter Koh Santepheap Visual Resources página 54
+
+===== PAGE 55 =====
+Recorte de tela efetuado: 23/02/2025 13:24 Koh Santepheap Recorte de tela efetuado: 23/02/2025 13:29 Crete Round Aleo Visual Resources página 55
+
+===== PAGE 56 =====
+Recorte de tela efetuado: 23/02/2025 13:30 Aleo Recorte de tela efetuado: 23/02/2025 13:30 Fraunces Gowun Batang Visual Resources página 56
+
+===== PAGE 57 =====
+Recorte de tela efetuado: 23/02/2025 13:32 Gowun Batang Recorte de tela efetuado: 23/02/2025 13:34 Hanuman Charis SIL Visual Resources página 57
+
+===== PAGE 58 =====
+Recorte de tela efetuado: 23/02/2025 13:35 Charis SIL Recorte de tela efetuado: 23/02/2025 13:35 Castoro Ledger Visual Resources página 58
+
+===== PAGE 59 =====
+Recorte de tela efetuado: 23/02/2025 13:36 Ledger Recorte de tela efetuado: 23/02/2025 13:37 Habibi Alike Visual Resources página 59
+
+===== PAGE 60 =====
+Recorte de tela efetuado: 23/02/2025 13:44 Alike Recorte de tela efetuado: 23/02/2025 13:44 Battambang Lustria Visual Resources página 60
+
+===== PAGE 61 =====
+Recorte de tela efetuado: 23/02/2025 13:45 Lustria Recorte de tela efetuado: 23/02/2025 13:46 Aref Ruqaa Aref Ruqaa Ink Visual Resources página 61
+
+===== PAGE 62 =====
+Recorte de tela efetuado: 23/02/2025 13:47 Aref Ruqaa Ink Recorte de tela efetuado: 23/02/2025 13:47 Taviraj Quattrocento Visual Resources página 62
+
+===== PAGE 63 =====
+Recorte de tela efetuado: 23/02/2025 13:48 Quattrocento Recorte de tela efetuado: 23/02/2025 13:49 Stardos Stencil Platypi Visual Resources página 63
+
+===== PAGE 64 =====
+Recorte de tela efetuado: 23/02/2025 13:51 Platypi Recorte de tela efetuado: 23/02/2025 13:57 Inika Abyssinica SIL Visual Resources página 64
+
+===== PAGE 65 =====
+Recorte de tela efetuado: 23/02/2025 13:58 Abyssinica SIL Recorte de tela efetuado: 23/02/2025 15:58 Funnel Sans Lexend Visual Resources página 65
+
+===== PAGE 66 =====
+Recorte de tela efetuado: 23/02/2025 15:59 Lexend Recorte de tela efetuado: 23/02/2025 16:02 Kumbh Sans Inter Visual Resources página 66
+
+===== PAGE 67 =====
+Recorte de tela efetuado: 23/02/2025 16:02 Inter Recorte de tela efetuado: 23/02/2025 16:05 Rethink Sans Andika Visual Resources página 67
+
+===== PAGE 68 =====
+Recorte de tela efetuado: 23/02/2025 16:06 Andika Recorte de tela efetuado: 23/02/2025 16:06 Public Sans Geist Visual Resources página 68
+
+===== PAGE 69 =====
+Recorte de tela efetuado: 23/02/2025 16:07 Geist Recorte de tela efetuado: 23/02/2025 16:08 Mukta Readex Pro Visual Resources página 69
+
+===== PAGE 70 =====
+Recorte de tela efetuado: 23/02/2025 16:09 Readex Pro Recorte de tela efetuado: 23/02/2025 16:13 Lunasima Hanken Grotesk Visual Resources página 70
+
+===== PAGE 71 =====
+Recorte de tela efetuado: 23/02/2025 16:13 Hanken Grotesk Recorte de tela efetuado: 16/03/2025 20:25 PT Serif IBM Plex Serif Visual Resources página 71
+
+===== PAGE 72 =====
+Recorte de tela efetuado: 16/03/2025 21:07 IBM Plex Serif Recorte de tela efetuado: 16/03/2025 21:07 Prata Recorte de tela efetuado: 16/03/2025 21:08 Noticia Text Visual Resources página 72
+
+===== PAGE 73 =====
+Recorte de tela efetuado: 16/03/2025 21:08 Libre Caslon Text Recorte de tela efetuado: 16/03/2025 21:10 Libre Bodoni Recorte de tela efetuado: 16/03/2025 21:11 Shippori Mincho B1 Hanuman Visual Resources página 73
+
+===== PAGE 74 =====
+Recorte de tela efetuado: 16/03/2025 21:13 Hanuman Recorte de tela efetuado: 16/03/2025 21:13 Tiro Bangla Recorte de tela efetuado: 16/03/2025 21:14 Slabo 13px Jomolhari Visual Resources página 74
+
+===== PAGE 75 =====
+Recorte de tela efetuado: 16/03/2025 21:15 Jomolhari Recorte de tela efetuado: 16/03/2025 21:17 Sanchez Recorte de tela efetuado: 16/03/2025 21:17 Rufina Volkorn Visual Resources página 75
+
+===== PAGE 76 =====
+Recorte de tela efetuado: 16/03/2025 21:18 Volkorn Recorte de tela efetuado: 16/03/2025 21:20 Adamina Recorte de tela efetuado: 16/03/2025 21:21 Caudex Enriqueta Visual Resources página 76
+
+===== PAGE 77 =====
+Recorte de tela efetuado: 16/03/2025 21:21 Enriqueta Recorte de tela efetuado: 16/03/2025 21:22 Zen Antique Soft Recorte de tela efetuado: 16/03/2025 21:22 Montaga Roboto Slab Visual Resources página 77
+
+===== PAGE 78 =====
+Recorte de tela efetuado: 16/03/2025 21:23 Roboto Slab Recorte de tela efetuado: 16/03/2025 21:25 Alice Recorte de tela efetuado: 16/03/2025 21:25 Cambo Suwannaphum Visual Resources página 78
+
+===== PAGE 79 =====
+Recorte de tela efetuado: 16/03/2025 21:26 Suwannaphum Recorte de tela efetuado: 16/03/2025 21:26 Hedvig Letters Serif Recorte de tela efetuado: 16/03/2025 21:26 Lora Visual Resources página 79
+
+===== PAGE 80 =====
+Recorte de tela efetuado: 16/03/2025 21:27 Lustria Recorte de tela efetuado: 16/03/2025 21:28 Platypi Recorte de tela efetuado: 16/03/2025 21:29 Laila Kaisei Opti Visual Resources página 80
+
+===== PAGE 81 =====
+Recorte de tela efetuado: 16/03/2025 21:30 Kaisei Opti Recorte de tela efetuado: 16/03/2025 21:31 Podvoka Recorte de tela efetuado: 16/03/2025 21:32 Pó łtawski Nowy Visual Resources página 81
+
+===== PAGE 82 =====
+Visual Resources página 82
+
+===== PAGE 83 =====
+The following script allows all character images to be bigger, useful if you want to make character portraits very prominent in the chat. Some examples here . Contributed by: Vionet20. Download the script HERE and copy paste it the character custom JavaScript code section: 1. Paste it in the Custom JavaScript code section: 2. 3. Change the size and shape of the avatar to the one you want: 4. 5. Click on save character. A page refresh might be necessary to trigger the change (press F5 to reload the page). 6. The avatars will still look tiny when the image is generating, but they will grow to correct size once the message generation finishes. 7. Bigger JS Avatar script domingo, 8 de setembro de 2024 12:27 Visual Resources página 83
+
+===== PAGE 84 =====
+The background rotator will rotate among a list of available backgrounds. Options: URLs of the files containing links for background images, can be multiple different files to help with organization. • If the switch is random or sequential (default: sequential) • The time in seconds until it changes the background (default: 180 seconds = 3 minutes) • Important : I had to make the background change only after a new message is added or edited after this timer. This is because if the background was changed at the same time a message was being generated, the message would be deleted before it could finish. How to use: First, you need to have a link to an external txt file that will have a list of image links that you want to rotate. 1. You can host this txt file in the same way I showed in the DropBox lorebook tutorial . 2. The file needs to have a list of direct links to images, in the same manner I showed in the Hosting images on Cloud tutorial, but any direct link will work, such as the Perchance File Uploader . 3. Paste a link in each line, without any blank lines, like this: 4. 5. Duplicate entries will be ignored, so don't worry if you repeated a background by mistake. 6. Download the script HERE , there are a few options we must change first. 7. Now, at the start of the script, note there are the following options: 8. Background image rotator domingo, 8 de setembro de 2024 21:15 Visual Resources página 84
+
+===== PAGE 85 =====
+9. On the "const urls" line (line 5 to 10), add the URL of your text files containing background links. You need at least 1 file and can set as many files as you want, make sure they are wrapped by single quotes and each link is separated by a comma, as in the example. 10. On the "const randomBackgrounds" line (line 12), choose if you want to have the backgrounds be rotated in a random order instead of sequential on the list. True = random, false = sequential. 11. On the "const intervalSeconds" line (line 14), choose how many seconds you want to pass before the background changes. 12. After choosing your options, copy the entire script and paste it on the AI Character you want the backgrounds to be rotated: 13. 14. Click save character, and just to be sure, press F5 to reload the page. The script should start changing backgrounds using the interval you have provided. I have used 4 files with around 150 images on total and have had no issues so far. 15. If you wish to remove this script, make sure to press F5 to reload the page to make sure there are no timers currently running. 16. Visual Resources página 85
+
+===== PAGE 86 =====
+You can change your font by using the font - family command in the css, as in: Make sure the font name is between single quotes. You can use Browse Fonts - Google Fonts to find fonts to use. I think any font available on this site should work. I have included previews of some fonts below: Preview Font name Prata Oldenburg Marcellus Metamorphous Font Previews (Old) sábado, 21 de setembro de 2024 02:08 Visual Resources página 86
+
+===== PAGE 87 =====
+Metamorphous Cardo Noticia Text Gelasio Visual Resources página 87
+
+===== PAGE 88 =====
+Literata Fraunces Faustina Fredericka the Great Visual Resources página 88
+
+===== PAGE 89 =====
+Fredericka the Great Kurale Grenze Gotisch Gabriela Rye Visual Resources página 89
+
+===== PAGE 90 =====
+Rye Amarante Texturina Alice Visual Resources página 90
+
+===== PAGE 91 =====
+Visual Resources página 91
+
+===== PAGE 92 =====
+What is Perchance AI Character Chat (ACC)? Perchance is a website about various generators, some including AI. This guide is specifically for Perchance AI Character Chat , which essentially boils down to a tool that allows you to have an AI act as specific characters according to descriptions that are provided. With Perchance ACC, you can: Create utility bots or AIs to you help you with specific tasks • Create AIs that simulate original or famous characters that you can talk to • Have an endless text generated conversation or text choice story with a character or in a specific world • Have multiple created characters interact with each other as if writing a narrated story • And a lot more you can think of! • By giving the AI an explanation of what it should do, it can take various roles or tasks. There are many other generators on Perchance that allows you to do some of the tasks above, but ACC has several advanced interface and customization features that allow more control over what you want to do. This guide will have several sections explaining several features of the tool, and is meant to complement other guides like the ones below: Tips - Official ACC Documentation • Perchance AI Character Chat Guide - Google Docs • 1.1 - Overview terça - feira, 3 de dezembro de 2024 15:39 1 - Basics página 92
+
+===== PAGE 93 =====
+The first time you open the Perchance AI Character Chat, you should be greeted with a basic interface and Chloe saying Hi to you: This starting screen has a simple starting conversation with Chloe, who is one of the preset characters that are already available. Let's take a look at each section of the screen: Chat interface The main chat interface is the section where you can enter prompts and have the messages displayed. We can talk to a character by using this section of the screen. If we type a message to Chloe, she should respond accordingly. To start, I'll ask her about something: Hello Chloe! What is Mount Everest? 1.2 - Basic Interface terça - feira, 3 de dezembro de 2024 15:48 1 - Basics página 93
+
+===== PAGE 94 =====
+By pressing the ENTER / RETURN key or clicking on send, we are posting this question to Chloe, and she should respond accordingly. She is an AI based character, so her responses will always differ. This is the main section of the screen we will use to communicate with the AI. Messages A message is any message sent either by the player or the AI. We currently have 2 messages by Chloe and 1 by the player (myself). We have a few buttons we can interact with each message. Pencil Icon : By clicking on the pencil icon we can edit any message, either ours or from the AI. This is useful for editing things the AI said that you don't like. • Trash Icon : Deletes an entire message. • Repeat Icon : The repeat icon allows you to regenerate a message. After a message is regenerated, you can switch between generated versions to choose which one you want to keep. • Before we can see the other sections of the interface, there are a few other concepts we should understand such as characters and threads, which we will see in the next sections. 1 - Basics página 94
+
+===== PAGE 95 =====
+The character we interacted, Chloe, is an AI that was directed to act as a helpful assistant with a kind and warm personality. By using ACC, we can create characters with any sort of task or personality. In this whole guide, I will be using Chloe as an example for many lessons, but these are not tied to her specifically, but rather to demonstrate the AI's common behavior that affects all characters. First, let's understand what are characters. On the left of the screen, click on the new chat / character button: 1.3 - Characters terça - feira, 3 de dezembro de 2024 16:14 1 - Basics página 95
+
+===== PAGE 96 =====
+After clicking on the button, the main section of the screen should change to this, which is the character list: 1 - Basics página 96
+
+===== PAGE 97 =====
+In this screen we can see the characters we already created (red square) and a few example characters (blue square) provided by the developer. At the start, we will have an instance of the Chloe character, and there are a few others that come bundled in as examples. If for some reason you don't have a Chloe at the red square, click on the Chloe on the blue square to create another instance of her. For now, we will take a look at what defines a character. To do this, we will click on the edit button on the Chloe that is in the red square. 1 - Basics página 97
+
+===== PAGE 98 =====
+Once we click here, a pop - up with several fields will appear. This screen is common to all characters / bots / AIs made in ACC: The first field is the name of the character, while the second field is perhaps the most important, the description of the character. As shown by the instruction for the description, this is the explanation to the AI of what this character is supposed to be, what it's supposed to do and how it's supposed to act. As you can see on the description, it is very detailed and specifies who Chloe is and what are the general rules for her character. What sort of characters can we make? We can go wild with the possibilities, as the AI is able to interpret your instructions and act as various characters, animals, robots, objects, aliens or whatever you describe them as. Here is a general rule of what the AI is good at and what it is not: Good: The AI is very good with taking simple, direct personality instructions and acting as that specific character, be it with actions, personality, conversation style and conversation themes. • The AI can do dialog and narration for the character and their physical features if described. • 1 - Basics página 98
+
+===== PAGE 99 =====
+The AI can do dialog and narration for the character and their physical features if described. • The AI excels at narrating stories, has extensive vocabulary, a lot of basic knowledge of popular series (Star Wars, Fallout, Mass Effect, Marvel, DC, and many others), and can act as original or existing characters in these worlds besides a few flaws. • Bad: The AI interprets instructions in a loose manner, often with ambiguous or open interpretations at times. This can be useful narratively and creatively since it can interpret things in different ways, but it would be bad at more rigid tasks. • If you define specific, rigid, inflexible rules and directions, it may not always follow them. Such as trying to make a character that does a turn based RPG style calculation game with lots of mechanical elements or asking the narration to follow a rigid formatting style. Instructions like these tend not to work well. • Always keep in mind that the AI can be flawed, so expect mistakes here and there, even when doing what the AI is best at. The AI has limited context available to it, and thus it cannot remember all that happened before, so make sure to be patient and understand its limits. Creating a new character Let's try to create a new character to test things out. I will create a simple character from the Star Wars setting, giving him some information on how to act. Close Chloe's window and click on the "Create new character" button: All the fields will be blank, so we can start filling our character. 1 - Basics página 99
+
+===== PAGE 100 =====
+This character will be a Padawan (a recruit of a group called Jedi from Star Wars). I have written him a short, simple description for the AI to have some more of this character's personality to work with: ------ Name: Kadosv Tinlem Description: Kadosv is a 21 - year - old Padawan hailing from the world of Coruscant. He is eager to complete his training and become a full Jedi, although his Jedi teachers of the academy think he is sometimes too brash and hasty for his own good. Kadosv was drawn by the fact that the Jedi are famous heroes; he is eager for fame, although he does take pleasure in helping others in need. -------- This is optional, but we can also define an avatar image for him. I will provide the link below, so copy the link and paste it on the Character avatar image URL field: https://1drv.ms/i/s!AvFM4fuvdUASrdwubYNKpCl6Z6Fdfg?embed=1&width=1024&height=1024 Lastly, at the bottom there is a "Character reminder note" field. This field is for very important information of this character that the AI will always check before typing a message. This field was blank for Chloe; it is not always necessary to fill this field, and if it is filled, it should be short. We will add to this field the conversational style of this character, just to reinforce to the AI the way he is supposed to talk and act. 1 - Basics página 100

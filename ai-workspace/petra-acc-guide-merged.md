@@ -1,16 +1,15 @@
 # ACC + Petrafied — merged guide (2026-06-18)
 
 > Merge of the two reachable guides + the verified fork-feature analysis.
-> **Source status:** petra's *prose* doc ("Petra's Perchance AI Character Chat
-> Resources", Scribd) is CAPTCHA-walled to automation — but we don't need it: the
-> **`downloadGenerator` API returns petra's live fork source** (plain GET, no auth,
-> legally public), which is the *implementation* behind that guide. Part 2.5 below
-> is transcribed directly from it (`petrafied-acc`, fetched 2026-06-18). Here:
+> **Source status:** all three petra sources are now in hand —
 > - **Official ACC usage** ← `acc-complete-guide.txt` (the "Complete Guide")
 > - **Petrafied additions** ← VERIFIED by cross-referencing 3 fork sources
 >   (official `ai-character-chat` vs `petrafied-acc`/`new-petrafied-acc`)
 > - **Source-verified field shapes + petra's actual prompts** ← Part 2.5, pulled
 >   live via `python3 scripts/perchance_api.py download petrafied-acc`
+> - **Petra's own prose guide** ← Part 2.6 + full extract in
+>   `ai-workspace/petra-guide-prose.txt` (her 100-page notebook PDF, provided by the
+>   repo owner — the Scribd doc that was CAPTCHA-walled to automation)
 > - **Build reference** ← `perchance-generator-tutorial.txt` (the templating engine)
 
 ---
@@ -132,6 +131,54 @@ prompt-builder + grader, NOT for emission into a character):
    if we ever add RAG.
 4. Keep the fork/official split intact: **B is fork-only**; A is core ACC.
 
+## Part 2.6 — Petra's own words (her 100-page prose guide)
+The Scribd doc finally came through as a PDF (provided by the repo owner). Full
+text-layer extract: `ai-workspace/petra-guide-prose.txt`. It's a notebook covering
+external resources, image-gen tips, CSS themes, and a "Basics" walkthrough (ends at
+character creation — no advanced lorebook/memory chapter in this export). The bits
+that matter for **char-wiz**, in her framing:
+
+**Her assessment of what the ACC AI is GOOD at** (use to justify our prompt design):
+- Takes **simple, direct personality instructions** and acts them out (actions,
+  personality, conversation style, themes).
+- Dialog + narration, including the character's physical features *if described*.
+- Excels at **narrating stories**; extensive vocabulary; solid knowledge of popular
+  series (Star Wars, Fallout, Mass Effect, Marvel, DC…); can play original or
+  existing characters in those worlds.
+
+**…and what it's BAD at** (these are our guardrails — char-wiz already leans this way):
+- Interprets instructions **loosely/ambiguously** — good for creativity, bad for
+  rigid tasks.
+- **Rigid, inflexible rules often aren't followed**: turn-based RPG calculation/
+  mechanics, or "follow this exact formatting" instructions "tend not to work well."
+- **Limited context** — it can't remember everything; expect mistakes even on its
+  strengths. → validates our "control length via prompt wording, not hard mechanics"
+  stance and the second-pass grader.
+
+**Character-field philosophy** (matches char-info, in her words):
+- **Description is "perhaps the most important" field** — it's the explanation to the
+  AI of *what the character is, what it does, and how it acts*; be detailed, state the
+  general rules. (char-wiz's role/persona prompts already target this.)
+- **Character reminder note** = "very important information the AI will always check
+  before typing a message." Keep it **short**; not always needed; good for
+  **reinforcing conversational style**. (= ACC `reminderMessage`; confirms our usage.)
+- Avatar image URL is optional.
+
+**Image-prompt formula** (her DALL-E/landscape style — informs the Image Style tool):
+`[style] drawing of [subject]. [build/expression]. [hair/features]. [clothing/
+jewelry]. [eyes]. [background], [time of day], [weather].` Landscapes in this same
+shape "work well as AI Character Chat backgrounds." Bing/DALL-E caps prompts at
+**~480 chars**; ~100–150 gens/account/day.
+
+**Avatar + CSS conventions** (reconcile with Part 2.5's `messageWrapperStyle`):
+- Avatar **size 8 (desktop) / 2 (mobile)**; **shape `square` desktop, `portrait`
+  mobile** — i.e. `avatar.shape:"portrait"` is her mobile default (matches Part 2.5).
+- Her chat-box CSS uses `backdrop-filter: blur(3px)`, `border-radius`, `box-shadow`,
+  `background-color: rgb(.. / 0.8)`, a Google font via `font-family:'…'` — same
+  shape as the source-verified `messageWrapperStyle` string in Part 2.5.
+- **Lorebook sync**: host the `.txt` on Dropbox and use a **`?dl=1`** direct link so
+  edits sync without re-upload (matches the `loreBookUrls[]` Dropbox links in 2.5).
+
 ## Part 3 — Building generators (the engine behind all of this)
 From `perchance-generator-tutorial.txt` — the Perchance templating primitives the
 whole platform runs on (relevant when editing char-wiz-dat or any data panel):
@@ -141,11 +188,12 @@ Dynamic Odds · Import/Export. (Full text in that file; `char-info` §1 is our
 paste-safety layer on top of it.)
 
 ## Open item
-- **Petra's Scribd *prose* doc** is still CAPTCHA-walled to automation, but Part 2.5
-  now covers the *implementation* it documents (her live fork source). The only
-  thing the prose would add is her narrative tutorial/screenshots — if you paste
-  the text out of NotebookLM (Path A) or drop the PDF, I'll fold the wording in.
-  Link: https://www.scribd.com/document/846120997/Petra-s-Perchance-AI-Character-Chat-Resources
+- **CLOSED** — petra's prose guide is now transcribed (Part 2.6 +
+  `petra-guide-prose.txt`). The only thing not captured is the *image* content
+  (DALL-E result screenshots, font/CSS preview images, interface screenshots) — the
+  PDF's text layer keeps the captions but not the pictures. If a specific screenshot
+  matters, say which and I'll OCR that page. Source doc:
+  https://www.scribd.com/document/846120997/Petra-s-Perchance-AI-Character-Chat-Resources
 
 ## Sources
 `acc-complete-guide.txt` (perchance.org/6b6c5aeogh), `perchance-generator-tutorial.txt`
