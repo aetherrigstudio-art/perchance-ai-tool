@@ -81,6 +81,7 @@ script += `
 ;globalThis.__inspirationLine = function(){ return inspirationLine(); };
 ;globalThis.__buildShareJSON = function(){ return buildShareJSON(); };
 ;globalThis.__shareLink = function(u,n,g){ return shareLink(u,n,g); };
+;globalThis.__tuning = tuning;
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -264,6 +265,25 @@ check("share addCharacter keeps real character content", /Nina/.test(share.addCh
 check("share link matches petrafied-acc ?data=Name~uuid.gz format",
   globalThis.__shareLink("https://user.uploads.dev/file/abc123def.gz", "Zhila Yanna", "petrafied-acc") === "https://perchance.org/petrafied-acc?data=Zhila_Yanna~abc123def.gz");
 check("share link target generator is configurable", /\/ai-character-chat\?data=/.test(globalThis.__shareLink("https://user.uploads.dev/file/x.gz", "Bob", "ai-character-chat")));
+
+// Batch B: model & memory tuning.
+const T = globalThis.__tuning;
+// off by default -> export unchanged (temp 0.8, 800 tok for AI char, autoMemory none, no context prompts).
+T.enabled = false;
+let tOff = charsOf(globalThis.__export())[0];
+check("tuning off: defaults unchanged (temp 0.8, 800 tok, autoMemory none)", tOff.temperature === 0.8 && tOff.maxTokensPerMessage === 800 && tOff.autoGenerateMemories === "none");
+check("tuning off: no context-tracking prompt", tOff.contextInfoToggle !== "yes");
+check("tuning off: built-in writing instructions (not @roleplay)", !/^@roleplay/.test(tOff.generalWritingInstructions));
+// on -> knobs applied to AI characters; persona untouched.
+T.enabled = true; T.temperature = 1.1; T.maxTokens = 600; T.maxParas = 4; T.autoMemory = "v1"; T.contextTracking = "detailed"; T.writingPreset = "roleplay1";
+let rows = charsOf(globalThis.__export());
+let main = rows.find((r) => !r.customData.isPersona), persona = rows.find((r) => r.customData.isPersona);
+check("tuning on: temperature/maxTokens/maxParas applied to AI character", main.temperature === 1.1 && main.maxTokensPerMessage === 600 && main.maxParagraphCountPerMessage === 4);
+check("tuning on: autoGenerateMemories v1", main.autoGenerateMemories === "v1");
+check("tuning on: context tracking sets contextInfoPrompt + toggles", main.contextInfoToggle === "yes" && /Location:/.test(main.contextInfoPrompt) && main.detailedContextInfoToggle === "yes" && /per-character/.test(main.detailedContextInfoPrompt));
+check("tuning on: @roleplay1 writing preset used", /^@roleplay1/.test(main.generalWritingInstructions));
+check("tuning never alters the persona", persona.temperature === 0.8 && persona.contextInfoToggle !== "yes" && !/^@roleplay/.test(persona.generalWritingInstructions||""));
+T.enabled = false; T.writingPreset = "builtin"; T.contextTracking = "off";
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);

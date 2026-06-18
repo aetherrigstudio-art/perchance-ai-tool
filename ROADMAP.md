@@ -36,8 +36,17 @@ UI + `save`/`load`/`builderSnapshot`/`resetAll` state pattern (all in
 > **3** (default `scene.background.url`/`scene.music.url`), and **4** (static
 > `avatar.url` from a generated portrait) are implemented as the opt-in,
 > global-default **"Character presentation"** card (`advanced` state →
-> `characterRow()`), with smoke-test regressions. Remaining Tier-1: Batch B
-> (model/memory tuning #5–#6) and Batch C (`shortcutButtons` #1, `messageWrapperStyle` #7).
+> `characterRow()`), with smoke-test regressions.
+>
+> **Batch B shipped** (PR #1): a "Model & memory tuning" card (`tuning` state)
+> covers items **5** (`temperature`, `maxTokensPerMessage`, `maxParagraphCountPerMessage`)
+> and **6** (`autoGenerateMemories` none/v1), PLUS the now-confirmed
+> **context-tracking** fields (`contextInfo*`/`detailedContextInfo*`, basic/detailed,
+> with best-practice default prompts generalised from a real export) and a
+> **writing preset** selector (built-in / petrafied-acc `@roleplay1`/`@roleplay2`).
+> Off by default; smoke regressions cover off-unchanged, on-applied, persona-untouched.
+> The scene-image instruction also adopts Subject→Action→Setting ordering.
+> Remaining Tier-1: Batch C (`shortcutButtons` #1, richer `messageWrapperStyle` #7).
 
 ### 1. `shortcutButtons` · `[]`
 - **What:** Buttons rendered above the reply box for common actions.
