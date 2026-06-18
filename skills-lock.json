@@ -7,6 +7,11 @@
       "skillPath": "skills/accessibility-engineer/SKILL.md",
       "computedHash": "f14b0dcd1bf73f7bce06e9d85cda8c2873f67f6366ed47efaf702d8b4f26c121"
     },
+    "agent-orchestration": {
+      "source": "yonatangross/orchestkit",
+      "skillPath": ".agents/skills/agent-orchestration",
+      "version": "2.0.0"
+    },
     "agent-orchestrator-task": {
       "source": "ruvnet/ruflo",
       "sourceType": "github",
@@ -37,6 +42,18 @@
       "skillPath": "configure-plugin/skills/configure-web-session/SKILL.md",
       "computedHash": "7f0684bbec319c5eb90034654e99546d0cb540292165d0367129278d2de9c71e"
     },
+    "debugger": {
+      "source": "shubhamsaboo/awesome-llm-apps",
+      "sourceType": "github",
+      "skillPath": "awesome_agent_skills/debugger/SKILL.md",
+      "computedHash": "609b0b6d79fe21bcb5eb8a01b38f5571b8ae05be826936a312bc04d9c5400193"
+    },
+    "error-analysis": {
+      "source": "hamelsmu/evals-skills",
+      "sourceType": "github",
+      "skillPath": "skills/error-analysis/SKILL.md",
+      "computedHash": "64840896ab089c9315fc69764e5ebba7d4c3468dabf69b04423c19e8d9c23c87"
+    },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
@@ -61,6 +78,18 @@
       "skillPath": ".claude/skills/parallel-agents/SKILL.md",
       "computedHash": "43d406f2716cff0ec9acb4319768615c51708abb9571b1f3a4cfeb6a470a204e"
     },
+    "product-capability": {
+      "source": "affaan-m/everything-claude-code",
+      "sourceType": "github",
+      "skillPath": "skills/product-capability/SKILL.md",
+      "computedHash": "126569a04b17b0f86c41f9566fc397c6c9ab3bd5895875165a5ff4bbc896a125"
+    },
+    "self-reflecting-chain": {
+      "source": "kimasplund/claude_cognitive_reasoning",
+      "sourceType": "github",
+      "skillPath": "cognitive-skills/self-reflecting-chain/SKILL.md",
+      "computedHash": "fc030371b2688c621f134c8d70b9aff94715b47eb03b18bbc1b252a1de36ffd3"
+    },
     "session-start-hook": {
       "source": "camacho/ai-skills",
       "sourceType": "github",
@@ -79,6 +108,12 @@
       "skillPath": "skills/subagent-task-execution/SKILL.md",
       "computedHash": "518b84b845c126c2b833968db242168b9af7c58bef28ff56dd5698d61cc5c3cd"
     },
+    "thought-based-reasoning": {
+      "source": "guia-matthieu/clawfu-skills",
+      "sourceType": "github",
+      "skillPath": "skills/thinking/thought-based-reasoning/SKILL.md",
+      "computedHash": "15358ade86da843b9abec50fb0500b00e7dd34f9b9554134c0cc2b984d59b653"
+    },
     "token-efficiency": {
       "source": "nickcrew/claude-ctx-plugin",
       "sourceType": "github",
@@ -90,36 +125,6 @@
       "sourceType": "github",
       "skillPath": "skills/vanilla-web/SKILL.md",
       "computedHash": "71d55c038df13f897175218b6040de5d3a7749f15b4117a25ca9598c3cf77233"
-    },
-    "debugger": {
-      "source": "shubhamsaboo/awesome-llm-apps",
-      "sourceType": "github",
-      "skillPath": "awesome_agent_skills/debugger/SKILL.md",
-      "computedHash": "609b0b6d79fe21bcb5eb8a01b38f5571b8ae05be826936a312bc04d9c5400193"
-    },
-    "error-analysis": {
-      "source": "hamelsmu/evals-skills",
-      "sourceType": "github",
-      "skillPath": "skills/error-analysis/SKILL.md",
-      "computedHash": "64840896ab089c9315fc69764e5ebba7d4c3468dabf69b04423c19e8d9c23c87"
-    },
-    "product-capability": {
-      "source": "affaan-m/everything-claude-code",
-      "sourceType": "github",
-      "skillPath": "skills/product-capability/SKILL.md",
-      "computedHash": "126569a04b17b0f86c41f9566fc397c6c9ab3bd5895875165a5ff4bbc896a125"
-    },
-    "self-reflecting-chain": {
-      "source": "kimasplund/claude_cognitive_reasoning",
-      "sourceType": "github",
-      "skillPath": "cognitive-skills/self-reflecting-chain/SKILL.md",
-      "computedHash": "fc030371b2688c621f134c8d70b9aff94715b47eb03b18bbc1b252a1de36ffd3"
-    },
-    "thought-based-reasoning": {
-      "source": "guia-matthieu/clawfu-skills",
-      "sourceType": "github",
-      "skillPath": "skills/thinking/thought-based-reasoning/SKILL.md",
-      "computedHash": "15358ade86da843b9abec50fb0500b00e7dd34f9b9554134c0cc2b984d59b653"
     }
   }
 }
