@@ -13,13 +13,13 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - [x] 3 parallel deep-research briefs → `findings.md`
 - [x] This plan + `progress.md`
 
-## Phase 1 — Skill/tooling consolidation  (config; low-risk, high-value)  ⬜
-- [ ] Switch the 24 `user-invocable-only` parked skills → `name-only` (reclaims listing budget; keeps `/name`)
-- [ ] Prune ~20 irrelevant skills (list in findings ②): remove from `skills-lock.json`, `.agents/skills/`, `.claude/skills/` symlinks, `skillOverrides`; `check-skills.sh` stays green
+## Phase 1 — Skill/tooling consolidation  (config; low-risk, high-value)  🟡 in progress
+- [x] Switch parked `user-invocable-only` → `name-only` (18 entries; reclaims listing budget; keeps `/name`)
+- [x] Prune CONSERVATIVE set (8): caveman, performance-profiler, changelog-writer, product-capability, error-analysis, llm-prompt-optimizer, browser-tools, smoke-test → 38→30 skills, `check-skills` green. (NOT the brief's full ~20 — kept the orchestration/research/UX skills the operator actively uses.)
 - [ ] Build dispatcher skills with bundled `reference/*.md` (audits become refs): `building-vanilla-ui`, `ensuring-accessibility`, `reviewing-code`, `researching-web` (+ keep `run-perchance-ai-tool`, `/plan` chain)
 - [ ] `disable-model-invocation: true` on side-effect commands (`/audit`)
-- [ ] Reword CLAUDE.md skill-discipline note (≤~8 `on` + rest `name-only`/`off`; correct the budget mechanics)
-- **Gate:** `check-skills.sh` in sync; `/doctor` shows no description drops
+- [x] Reword CLAUDE.md skill-discipline note (budget mechanics, ≤~8 `on`)
+- **Gate:** `check-skills.sh` in sync ✅ ; `/doctor` shows no description drops (pending)
 
 ## Phase 2 — IA regroup + a11y fixes  (the original active task)  ⬜
 - [ ] Reorder `<div class="card">` into 4 phases w/ `<h2>` spine: ① START (build mode·import·scenario) ② BUILD (main·persona·additional·relationships·lore·opening) ③ POLISH ▸ collapsed `<details>` (image·immersion·presentation·tuning) ④ REVIEW&EXPORT (opening→top·[Part2]·consistency·export·share); Test Drive→bottom

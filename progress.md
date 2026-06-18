@@ -15,3 +15,16 @@
 
 ### Next action
 Update ROADMAP.md (Phase 8 preview) + CLAUDE.md skill-note correction (Phase 1), commit the plan, then execute phases on approval.
+
+## Session 2026-06-18 (cont.) — Phase 1 partial
+- Pruned 8 dead skills (caveman, performance-profiler, changelog-writer, product-capability, error-analysis, llm-prompt-optimizer, browser-tools, smoke-test): 38→30. `npx skills remove` left lock entries → fixed skills-lock.json + skillOverrides by hand; `check-skills` back in sync.
+- Switched 18 parked `user-invocable-only` → `name-only` (frees listing budget per research; keeps `/name` + model-by-name).
+- **Deliberately KEPT** skills the brief wanted cut but the operator actively uses: agent-orchestrator-task, subagent-task-execution, deep-research-agent, web-search, websearch-deep, roadmap-planning, ui-ux-pro-max, usability-testing, thought-based-reasoning, parallel-agents, track-management.
+- Verified: check-skills in sync (30); settings.json valid; `node test/smoke.mjs` PASS.
+- **Remaining Phase 1:** build the 4 dispatcher skills (+bundled refs), `disable-model-invocation` on `/audit`. Then Phase 2 (regroup+a11y).
+
+| Check | Result |
+|-------|--------|
+| check-skills (30 skills) | in sync |
+| smoke.mjs | PASS |
+| settings.json | valid JSON |
