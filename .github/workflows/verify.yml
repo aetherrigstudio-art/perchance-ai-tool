@@ -35,3 +35,13 @@ jobs:
         run: |
           node -e "const fs=require('fs');const h=fs.readFileSync('char-wiz-html','utf8');const s=[...h.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]).sort((a,b)=>b.length-a.length)[0];if(!s){console.error('no wizard <script> block found');process.exit(1);}fs.writeFileSync('/tmp/wiz.js',s);"
           node --check /tmp/wiz.js
+
+      - name: char-wiz-html.sha256 in sync (loader integrity digest)
+        run: |
+          have="$(tr -d '[:space:]' < char-wiz-html.sha256)"
+          want="$(sha256sum char-wiz-html | awk '{print $1}')"
+          if [ "$have" != "$want" ]; then
+            echo "::error::char-wiz-html.sha256 is stale (have=$have want=$want). Run scripts/gen-hash.sh and commit."
+            exit 1
+          fi
+          echo "loader digest in sync: $want"

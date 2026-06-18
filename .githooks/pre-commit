@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Committed pre-commit hook. Enable once per clone with:
+#   git config core.hooksPath .githooks
+# (the SessionStart hook does this automatically for agent sessions).
+#
+# Keeps char-wiz-html.sha256 in lock-step with char-wiz-html so the loader's
+# soft integrity check matches the deployed bytes. CI also verifies this, so a
+# missed hook only costs a red check, never a stale deployed hash.
+set -euo pipefail
+root="$(git rev-parse --show-toplevel)"
+if git diff --cached --name-only | grep -qx "char-wiz-html"; then
+  bash "$root/scripts/gen-hash.sh" >/dev/null
+  git add "$root/char-wiz-html.sha256"
+fi

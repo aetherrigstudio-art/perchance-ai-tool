@@ -84,4 +84,11 @@ if command -v npx >/dev/null 2>&1; then
   fi
 fi
 
+# Enable the committed git hooks (regenerates char-wiz-html.sha256 on commit so the
+# loader's soft integrity digest stays in lock-step). Cheap, idempotent.
+if [ -d .githooks ]; then
+  git config core.hooksPath .githooks >/dev/null 2>&1 \
+    && echo "[session-start] git hooks: core.hooksPath -> .githooks" || true
+fi
+
 echo "[session-start] ready. Lint: bash .claude/hooks/check-wizard.sh  |  Test: node test/smoke.mjs  |  Skills: bash .claude/hooks/check-skills.sh"

@@ -37,7 +37,43 @@
   var BRANCH = "main", FILE = "char-wiz-html";
   var API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + FILE + "?ref=" + BRANCH;
   var RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/" + FILE;
+  var HASH_API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + FILE + ".sha256?ref=" + BRANCH;
+  var HASH_RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/" + FILE + ".sha256";
   var root = document.getElementById("wiz-root");
+
+  // SOFT integrity check. Fetches the committed char-wiz-html.sha256 and compares
+  // it to a SHA-256 of the bytes we just injected. On mismatch it only shows a
+  // warning banner — it NEVER blocks rendering — because the loader is pasted once
+  // and a hard fail would brick the generator for everyone. Stays silent if the
+  // hash can't be fetched or crypto.subtle is unavailable (don't cry wolf).
+  function toHex(buf) {
+    return [].map.call(new Uint8Array(buf), function (b) { return (b < 16 ? "0" : "") + b.toString(16); }).join("");
+  }
+  function integrityWarn(msg) {
+    var b = document.createElement("div");
+    b.style.cssText = "background:#b8860b; color:#fff; padding:8px 12px; border-radius:10px; margin-bottom:12px; font-size:90%; text-align:center; line-height:1.4;";
+    b.textContent = msg;
+    root.insertBefore(b, root.firstChild);
+  }
+  function verifyIntegrity(htmlText) {
+    if (!(window.crypto && window.crypto.subtle && window.TextEncoder)) return;
+    var expected = "";
+    fetch(HASH_API + "&t=" + Date.now(), { cache: "no-store", headers: { Accept: "application/vnd.github.raw" } })
+      .then(function (r) { if (!r.ok) throw new Error("api"); return r.text(); })
+      .catch(function () { return fetch(HASH_RAW + "?t=" + Date.now(), { cache: "no-store" }).then(function (r) { if (!r.ok) throw new Error("raw"); return r.text(); }); })
+      .then(function (txt) {
+        var m = (txt || "").toLowerCase().match(/[0-9a-f]{64}/);
+        expected = m ? m[0] : "";
+        return window.crypto.subtle.digest("SHA-256", new TextEncoder().encode(htmlText));
+      })
+      .then(function (buf) {
+        if (!expected) return; // no hash available — stay quiet
+        if (toHex(buf) !== expected) {
+          integrityWarn("Build integrity unverified (hash mismatch). The tool still loaded; if you didn't just push a change, reload in a few minutes.");
+        }
+      })
+      .catch(function () { /* hash/network/crypto unavailable — soft, stay quiet */ });
+  }
 
   function inject(htmlText) {
     root.innerHTML = htmlText;                 // markup + <style> take effect now
@@ -57,6 +93,8 @@
       warn.textContent = "Data panel not detected - the generate buttons will not work. Paste char-wiz-dat into the DATA editor and reload.";
       root.insertBefore(warn, root.firstChild);
     }
+    // Soft, non-blocking: verify the injected bytes against the committed digest.
+    verifyIntegrity(htmlText);
   }
   function fail(msg) {
     root.textContent = "Could not load the latest build (" + msg + "). As a fallback, open " + RAW + " and paste its contents here manually.";

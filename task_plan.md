@@ -52,10 +52,11 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - **Gate:** ✅ smoke PASS (+10 safeUrl/prepUserInput assertions) · check-wizard exit 0 · render 0 page errors. (Side: smoke now keeps Node's real `URL` constructor + adds the objectURL statics, so `new URL()` in safeUrl runs headless.)
 - Mirror (Phase 4+5) → `wizard-html-panel-23.txt`
 
-## Phase 6 — CI + loader integrity  🟡 in progress
+## Phase 6 — CI + loader integrity  ✅ complete
 - [x] `.github/workflows/verify.yml`: checkout → setup-node@22 → `node test/smoke.mjs` + `node test/grade-generation.mjs` + `node --check` on the extracted wizard `<script>`. (Deliberately NOT running `ci-verify.sh` in CI — it compares vs GitHub raw which is CDN-lagged after a push and would flake; it's a manual deploy-sync tool.)
-- [ ] **Loader integrity (`char-wiz-html.sha256` + `crypto.subtle.digest` in the loader)** — DEFERRED pending operator decision. Risk: the loader is a paste-once live deploy path; a hash mismatch (e.g. forgetting to regen the .sha256 on a commit, or any byte/encoding skew vs GitHub-served bytes) bricks the generator for ALL users until re-pasted. Needs an agreed approach (commit-SHA pin vs digest+regen-hook) before touching the live loader.
-- **Gate:** CI Action green on the push (verify) ✅ pending run
+- [x] **Loader integrity — DIGEST + SOFT-FAIL** (operator-chosen). `char-wiz-html.sha256` committed; `scripts/gen-hash.sh` generates it; `.githooks/pre-commit` regenerates+stages it on any char-wiz-html change (enabled via `git config core.hooksPath .githooks`, auto-set by session-start.sh); CI fails if it drifts. Loader (`wizard-loader-html.txt`) fetches the digest + compares `crypto.subtle.digest` of the injected bytes; on mismatch it shows a warning banner but STILL renders (never blocks). Verified: `sha256sum` == `crypto.subtle.digest(TextEncoder.encode(text))`, so no false warnings.
+- ⚠️ **Operator action: re-paste `wizard-loader-html.txt` into the Perchance HTML editor ONCE** to activate the integrity banner (the loader is paste-once; this is the only manual step).
+- **Gate:** ✅ CI Action `verify` run #1 (commit 4cf0434) success; loader `node --check` OK; hash-sync CI step added + dry-run green; pre-commit hook functionally tested
 
 ## Phase 7 — ROADMAP features (ranked)  ⬜
 - [ ] `stopSequences: ["=== END ==="]` in data-panel `settings`; remove length-hack prompt scaffolding

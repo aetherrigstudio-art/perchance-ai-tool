@@ -116,6 +116,35 @@ guard, RFC-4122 UUID fallback, resetAll clears accSchemaV1/accWB_*).
 loader sha256 check). NOTE: Phase 6 is the highest-risk remaining phase — it
 touches CI + the live loader deploy path; read findings ③ + AUTOMATION.md first.
 
+## Session 2026-06-18 (cont.) — Phase 6 COMPLETE (CI + loader integrity)
+- **CI:** `.github/workflows/verify.yml` (push/PR → main): smoke + grade-generation
+  self-test + wizard `node --check` + a hash-sync step. Run #1 (commit 4cf0434)
+  conclusion=success. (ci-verify.sh deliberately excluded — CDN-lag flake.)
+- **Loader integrity (digest + soft-fail, operator's pick):** `char-wiz-html.sha256`
+  committed; `scripts/gen-hash.sh` writes it; `.githooks/pre-commit` regenerates +
+  stages it on any char-wiz-html change; session-start.sh sets `core.hooksPath
+  .githooks`; CI fails on drift. `wizard-loader-html.txt` now fetches the digest and
+  compares `crypto.subtle.digest` of the injected bytes — on mismatch shows a
+  warning banner but STILL renders (never blocks; loader is paste-once so a hard
+  fail would brick the generator). Verified `sha256sum` == subtle.digest, no false
+  positives. Pre-commit hook functionally tested (regenerates + stages, reverts clean).
+- ⚠️ **PENDING OPERATOR ACTION:** re-paste `wizard-loader-html.txt` into the
+  Perchance HTML editor ONCE to activate the banner (only manual step; everything
+  else auto-deploys via the loader as usual).
+
+| Check | Result |
+|-------|--------|
+| CI verify run #1 (4cf0434) | success |
+| loader node --check | OK |
+| hash-sync (sha256sum == .sha256) | in sync |
+| smoke.mjs | PASS |
+
+**Resume at Phase 7** (ROADMAP features: `stopSequences:["=== END ==="]` in data
+panel; `shortcutButtons`; defer richer `messageWrapperStyle`). NOTE: Phase 7 touches
+the DATA panel (`char-wiz-dat`) — which is paste-once into the Perchance DATA editor,
+so a data-panel change ALSO needs a one-time manual re-paste. Read AUTOMATION.md +
+char-info §9 verified/unverified before adding fields.
+
 ---
 ## ▶ NEXT SESSION — START HERE (resume the optimization initiative)
 
@@ -125,8 +154,9 @@ The `/plan` skill (pi-planning-with-files) auto-loads `task_plan.md` on start.
 **Where we are:** Phase 0 ✅, Phase 1 🟡 (skills 38→30, parked→name-only done;
 dispatcher skills NOT built), Phase 2 ✅ (IA regroup + a11y, mirrored to -21),
 Phase 3 ✅ (Review/refine second pass + window.gradeCharacter, mirrored to -22),
-Phases 4 ✅ (correctness) + 5 ✅ (security) hardening, mirrored to -23, all gates
-green. **Resume at Phase 6.**
+Phases 4 ✅ (correctness) + 5 ✅ (security) hardening, mirrored to -23,
+Phase 6 ✅ (CI workflow + loader digest soft-fail integrity), all gates green.
+**Resume at Phase 7** (ROADMAP features). ⚠️ operator must re-paste the loader once.
 
 **Phase 2 = the original task: 4-phase IA regroup + a11y fixes** (`task_plan.md`).
 Workflow to execute it:
