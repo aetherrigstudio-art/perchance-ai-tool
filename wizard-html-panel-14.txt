@@ -9,23 +9,7 @@
 <div class="wrap">
   <div class="bar">
     <button onclick="resetAll();">start over</button>
-    <span id="status" style="font-size:85%; opacity:0.85;" aria-live="polite" aria-atomic="true"></span>
-  </div>
-
-  <div class="bar" style="margin-top:0;">
-    <label class="hint" style="margin:0;">Build mode:</label>
-    <select id="buildMode" style="padding:0.4rem;">
-      <option value="cast">Full cast (scenario, main, persona, side characters, lore, opening)</option>
-      <option value="single">Single character (one character + optional persona, lore &amp; style)</option>
-    </select>
-  </div>
-
-  <div class="bar" style="margin-top:0;">
-    <label class="hint" style="margin:0;">Build mode:</label>
-    <select id="buildMode" style="padding:0.4rem;">
-      <option value="cast">Full cast (scenario, main, persona, side characters, lore, opening)</option>
-      <option value="single">Single character (one character + optional persona, lore &amp; style)</option>
-    </select>
+    <span id="status" style="font-size:85%; opacity:0.85;"></span>
   </div>
 
   <div class="bar" style="margin-top:0;">
@@ -39,23 +23,23 @@
   <div class="card">
     <h3>Scenario</h3>
     <p class="hint">Describe the world / situation. Everything else builds from this.</p>
-    <textarea id="scenarioNotes" class="notes" placeholder="e.g. A rainy cyberpunk city where you are a rookie detective..." aria-label="Scenario notes"></textarea>
+    <textarea id="scenarioNotes" class="notes" placeholder="e.g. A rainy cyberpunk city where you are a rookie detective..."></textarea>
     <div class="row"><button onclick="genScenario(false);">generate scenario</button></div>
-    <textarea id="scenarioOut" class="out" placeholder="Generated scenario (editable)" aria-label="Generated scenario (editable)" aria-live="polite"></textarea>
-    <input id="scenarioAdj" class="adj" placeholder="Adjustment (e.g. make it darker, set it at night)" aria-label="Scenario adjustment">
+    <textarea id="scenarioOut" class="out" placeholder="Generated scenario (editable)"></textarea>
+    <input id="scenarioAdj" class="adj" placeholder="Adjustment (e.g. make it darker, set it at night)">
     <div class="row"><button onclick="genScenario(true);">apply adjustment</button></div>
   </div>
 
   <div class="card">
     <h3>Main character</h3>
     <p class="hint">The character you mainly talk to.</p>
-    <textarea id="mainNotes" class="notes" placeholder="Name, personality, role in the scenario..." aria-label="Main character notes"></textarea>
+    <textarea id="mainNotes" class="notes" placeholder="Name, personality, role in the scenario..."></textarea>
     <div class="row"><button onclick="genChar('main',false);">generate</button></div>
-    <textarea id="mainOut" class="out" placeholder="Generated character (editable)" aria-label="Generated main character (editable)" aria-live="polite"></textarea>
-    <input id="mainAdj" class="adj" placeholder="Adjustment (e.g. make her older, add a scar)" aria-label="Main character adjustment">
+    <textarea id="mainOut" class="out" placeholder="Generated character (editable)"></textarea>
+    <input id="mainAdj" class="adj" placeholder="Adjustment (e.g. make her older, add a scar)">
     <div class="row"><button onclick="genChar('main',true);">apply adjustment</button></div>
     <div class="row">
-      <select id="mainRerollSel" aria-label="Section to re-roll for main character"><option>ROLE INSTRUCTION</option><option>FIRST MESSAGE</option><option>APPEARANCE</option><option>DEFAULT OUTFIT</option><option>WARDROBE</option><option>IMAGE TRIGGERS</option><option>REMINDER</option><option>TAGLINE</option><option>WRITING INSTRUCTION</option><option>NAME</option></select>
+      <select id="mainRerollSel"><option>ROLE INSTRUCTION</option><option>FIRST MESSAGE</option><option>APPEARANCE</option><option>DEFAULT OUTFIT</option><option>WARDROBE</option><option>IMAGE TRIGGERS</option><option>REMINDER</option><option>TAGLINE</option><option>WRITING INSTRUCTION</option><option>NAME</option></select>
       <button onclick="doReroll('mainOut','mainRerollSel','main');">re-roll section</button>
     </div>
   </div>
@@ -63,13 +47,13 @@
   <div class="card">
     <h3>Your persona (you)</h3>
     <p class="hint">Who you play as. Optional - leave blank to skip.</p>
-    <textarea id="personaNotes" class="notes" placeholder="Your name, who you are in this world." aria-label="Persona notes"></textarea>
+    <textarea id="personaNotes" class="notes" placeholder="Your name, who you are in this world."></textarea>
     <div class="row"><button onclick="genChar('persona',false);">generate</button></div>
-    <textarea id="personaOut" class="out" placeholder="Generated persona (editable)" aria-label="Generated persona (editable)" aria-live="polite"></textarea>
-    <input id="personaAdj" class="adj" placeholder="Adjustment (e.g. make me a veteran, not a rookie)" aria-label="Persona adjustment">
+    <textarea id="personaOut" class="out" placeholder="Generated persona (editable)"></textarea>
+    <input id="personaAdj" class="adj" placeholder="Adjustment (e.g. make me a veteran, not a rookie)">
     <div class="row"><button onclick="genChar('persona',true);">apply adjustment</button></div>
     <div class="row">
-      <select id="personaRerollSel" aria-label="Section to re-roll for persona"><option>ROLE INSTRUCTION</option><option>APPEARANCE</option><option>DEFAULT OUTFIT</option><option>IMAGE TRIGGERS</option><option>WRITING INSTRUCTION</option><option>TAGLINE</option><option>NAME</option></select>
+      <select id="personaRerollSel"><option>ROLE INSTRUCTION</option><option>APPEARANCE</option><option>DEFAULT OUTFIT</option><option>IMAGE TRIGGERS</option><option>WRITING INSTRUCTION</option><option>TAGLINE</option><option>NAME</option></select>
       <button onclick="doReroll('personaOut','personaRerollSel','persona');">re-roll section</button>
     </div>
   </div>
@@ -84,10 +68,10 @@
   <div class="card">
     <h3>Lore</h3>
     <p class="hint">Generates a keyworded lorebook: each entry has trigger words in square brackets so it's pulled into a scene only when relevant. Covers places, people, history, customs, relationships, and hooks. Attached to the main character and embedded in the card. Editable.</p>
-    <textarea id="loreNotes" class="notes" placeholder="Optional focus (e.g. the rival bakery across the street, the town's summer festival, the cafe regulars)" aria-label="Lore notes (optional focus)"></textarea>
+    <textarea id="loreNotes" class="notes" placeholder="Optional focus (e.g. the rival bakery across the street, the town's summer festival, the cafe regulars)"></textarea>
     <div class="row"><button onclick="genLore(false);">generate lore</button></div>
-    <textarea id="loreOut" class="out" placeholder="A self-contained fact (editable)" aria-label="Generated lore (editable)" aria-live="polite"></textarea>
-    <input id="loreAdj" class="adj" placeholder="Adjustment (e.g. add more about the festival, fewer secrets)" aria-label="Lore adjustment">
+    <textarea id="loreOut" class="out" placeholder="A self-contained fact (editable)"></textarea>
+    <input id="loreAdj" class="adj" placeholder="Adjustment (e.g. add more about the festival, fewer secrets)">
     <div class="row"><button onclick="genLore(true);">apply adjustment</button></div>
     <p class="hint" style="margin-top:0.75rem;">How to attach the lore:</p>
     <div class="row">
@@ -107,12 +91,12 @@
     <h3>Relationships</h3>
     <p class="hint">Optional. Each line is woven into the relevant character's role instruction. Uncheck "both know" for secrets or one-sided feelings.</p>
     <div class="row">
-      <select id="relA" aria-label="First character"></select>
-      <select id="relType" aria-label="Relationship type"></select>
+      <select id="relA"></select>
+      <select id="relType"></select>
     </div>
     <p class="hint" style="margin-top:0.5rem;">related to (pick one or more - hold Ctrl/Cmd or drag):</p>
-    <select id="relB" multiple size="4" style="width:100%; padding:0.4rem;" aria-label="Related characters (select one or more)"></select>
-    <input id="relNote" class="adj" placeholder="Optional detail (e.g. since the war)" aria-label="Relationship detail (optional)">
+    <select id="relB" multiple size="4" style="width:100%; padding:0.4rem;"></select>
+    <input id="relNote" class="adj" placeholder="Optional detail (e.g. since the war)">
     <label class="hint" style="display:block; margin-top:0.5rem;"><input type="checkbox" id="relMutual" checked> both characters know it</label>
     <div class="row"><button onclick="addRel();">add relationship</button></div>
     <div id="relList" style="margin-top:0.5rem;"></div>
@@ -122,7 +106,7 @@
     <h3>Consistency check</h3>
     <p class="hint">Reviews the whole cast against the scenario and flags contradictions. Suggestions only - nothing changes automatically.</p>
     <div class="row"><button onclick="genConsistency();">check consistency</button></div>
-    <textarea id="consistencyOut" class="out" placeholder="Issues will be listed here" readonly aria-label="Consistency check results" aria-live="polite"></textarea>
+    <textarea id="consistencyOut" class="out" placeholder="Issues will be listed here" readonly></textarea>
     <div id="consistencyList" style="margin-top:0.5rem;"></div>
   </div>
 
@@ -130,8 +114,8 @@
     <h3>Opening scene (run after generating the whole cast)</h3>
     <p class="hint">Generates one shared opening that brings every character into the scene, plus a hidden SYSTEM context line. This becomes the chat's first messages on export. Editable.</p>
     <div class="row"><button onclick="genOpening(false);">generate opening scene</button></div>
-    <textarea id="openingOut" class="out" placeholder="Opening scene (editable)" aria-label="Generated opening scene (editable)" aria-live="polite"></textarea>
-    <input id="openingAdj" class="adj" placeholder="Adjustment (e.g. start outside, make it more playful)" aria-label="Opening scene adjustment">
+    <textarea id="openingOut" class="out" placeholder="Opening scene (editable)"></textarea>
+    <input id="openingAdj" class="adj" placeholder="Adjustment (e.g. start outside, make it more playful)">
     <div class="row"><button onclick="genOpening(true);">apply adjustment</button></div>
     <p class="hint">Relationships, persona context, world facts, and this opening are all assembled onto the cast automatically when you export - no need to apply them per character.</p>
   </div>
@@ -139,12 +123,12 @@
   <div class="card">
     <h3>Import &amp; portability</h3>
     <p class="hint">Paste an exported character .json to edit it again, or to teach the exporter your install's real schema/defaults.</p>
-    <textarea id="importJson" class="out" placeholder="Paste an exported .json here" aria-label="Paste exported character JSON here"></textarea>
+    <textarea id="importJson" class="out" placeholder="Paste an exported .json here"></textarea>
     <div class="row">
       <button onclick="importBack();">load into workbench</button>
       <button onclick="learnSchema();">read real schema from this file</button>
     </div>
-    <div id="importStatus" class="hint" style="margin-top:0.5rem;" role="alert" aria-live="assertive"></div>
+    <div id="importStatus" class="hint" style="margin-top:0.5rem;"></div>
   </div>
 
   <div class="card">
@@ -155,13 +139,13 @@
       <p class="hint" style="margin-top:0.5rem;">Refine (pick any):</p>
       <div id="styleSubBtns" class="btns"></div>
     </div>
-    <input id="styleNotes" class="adj" placeholder="Optional extra notes (mood, palette, era)" aria-label="Image style extra notes (optional)">
+    <input id="styleNotes" class="adj" placeholder="Optional extra notes (mood, palette, era)">
     <div class="row"><button onclick="genStyle(false);">build style</button></div>
     <p class="hint" style="margin-top:0.5rem;">imagePromptPrefix (before every prompt):</p>
-    <textarea id="prefixOut" class="out2" placeholder="Generated style prefix (editable)" aria-label="Generated image prompt prefix (editable)" aria-live="polite"></textarea>
+    <textarea id="prefixOut" class="out2" placeholder="Generated style prefix (editable)"></textarea>
     <p class="hint">imagePromptSuffix (after every prompt):</p>
-    <textarea id="suffixOut" class="out2" placeholder="Generated quality suffix (editable)" aria-label="Generated image prompt suffix (editable)" aria-live="polite"></textarea>
-    <input id="styleAdj" class="adj" placeholder="Adjustment (e.g. warmer, less saturated, more painterly)" aria-label="Image style adjustment">
+    <textarea id="suffixOut" class="out2" placeholder="Generated quality suffix (editable)"></textarea>
+    <input id="styleAdj" class="adj" placeholder="Adjustment (e.g. warmer, less saturated, more painterly)">
     <div class="row"><button onclick="genStyle(true);">apply adjustment</button></div>
     <label class="hint" style="display:block; margin-top:0.5rem;"><input type="checkbox" id="imgVariety" checked> Add lighting variety to the prefix (test once; untick if you see literal braces in images)</label>
   </div>
@@ -319,10 +303,10 @@
 
   <div class="card">
     <div class="row" style="align-items:center;">
-      <span id="loaderEl" role="status" aria-live="polite"></span>
-      <button id="generateBtn" style="display:none;" aria-label="Generate"></button>
+      <span id="loaderEl"></span>
+      <button id="generateBtn" style="display:none;"></button>
       <button id="stopBtn" style="display:none;">stop</button>
-      <span class="hint" id="busyHint" role="status" aria-live="polite"></span>
+      <span class="hint" id="busyHint"></span>
     </div>
     <textarea id="responseEl" style="display:none;"></textarea>
     <textarea id="rerollBuf" style="display:none;"></textarea>
@@ -348,22 +332,22 @@
     <div class="card">
       <h3>Image generator</h3>
       <p class="hint">Generate standalone images with the same wholesome semi-real style. Right-click or long-press an image to save it.</p>
-      <textarea id="igPrompt" class="notes" placeholder="Describe the image (e.g. two friends laughing at a sunny cafe)" aria-label="Image description"></textarea>
-      <input id="igNeg" class="adj" placeholder="Anti-description (things to avoid)" aria-label="Anti-description (things to avoid in image)">
+      <textarea id="igPrompt" class="notes" placeholder="Describe the image (e.g. two friends laughing at a sunny cafe)"></textarea>
+      <input id="igNeg" class="adj" placeholder="Anti-description (things to avoid)">
       <div class="row">
-        <select id="igStyle" aria-label="Image style">
+        <select id="igStyle">
           <option value="default">Semi-real (idol) default</option>
           <option value="built">Use my built style</option>
           <option value="none">No style</option>
         </select>
-        <select id="igShape" aria-label="Image shape">
+        <select id="igShape">
           <option value="512x768">Portrait</option>
           <option value="512x512">Square</option>
           <option value="768x512">Landscape</option>
         </select>
-        <select id="igCount" aria-label="Number of images"><option>1</option><option>2</option><option>3</option><option>4</option></select>
+        <select id="igCount"><option>1</option><option>2</option><option>3</option><option>4</option></select>
       </div>
-      <div class="row"><button onclick="igGenerate();">generate image</button><span class="hint" id="igBusy" role="status" aria-live="polite"></span></div>
+      <div class="row"><button onclick="igGenerate();">generate image</button><span class="hint" id="igBusy"></span></div>
       <div id="igResults" class="igresults"></div>
     </div>
   </div>
@@ -2431,9 +2415,6 @@
 </script>
 
 <style>
-  :root {
-    --subcard-bg: rgba(127,127,127,0.12); /* translucent surface for nested cards */
-  }
   .tabbar { width:95%; max-width:720px; margin:0 auto 0.75rem; display:flex; gap:0.5rem; }
   .tabbtn { flex:1; padding:0.6rem 1rem; cursor:pointer; border-radius:8px 8px 0 0; font-size:95%; }
   .tabbtn.active { font-weight:bold; outline:2px solid currentColor; }
@@ -2443,7 +2424,7 @@
   .bar { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
   .card { background: var(--box-color, #f0f0f0); padding:1rem; border-radius:8px; margin-bottom:1rem; }
   .card h3 { margin:0 0 0.25rem 0; }
-  .subcard { background: var(--subcard-bg); padding:0.75rem; border-radius:6px; margin-bottom:0.75rem; }
+  .subcard { background: rgba(127,127,127,0.12); padding:0.75rem; border-radius:6px; margin-bottom:0.75rem; }
   .hint { font-size:85%; opacity:0.8; margin:0.25rem 0; }
   .notes { width:100%; height:80px; padding:0.5rem; }
   .out { width:100%; height:220px; padding:0.5rem; font-family:monospace; margin-top:0.5rem; }
