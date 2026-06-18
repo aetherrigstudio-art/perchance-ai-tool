@@ -29,6 +29,38 @@ Update ROADMAP.md (Phase 8 preview) + CLAUDE.md skill-note correction (Phase 1),
 | smoke.mjs | PASS |
 | settings.json | valid JSON |
 
+## Session 2026-06-18 (cont.) — Phase 2 COMPLETE (IA regroup + a11y)
+- **Reorder:** `char-wiz-html` `.wrap` cards regrouped into the 4-phase spine via a
+  block-extraction script (zero retyping): ① Start (build mode · import · scenario)
+  · ② Build (main · persona · additional · relationships · lore) · ③ Polish
+  (collapsed `<details class="phase-polish">` — image · immersion · presentation ·
+  tuning) · ④ Review & export (opening → consistency → export → share). Plumbing +
+  Test Drive at bottom. `<h2 class="phase">` headers for ①②④; ▸/▾ summary for ③.
+- **Opening** lives ONLY at ④ REVIEW top now; dropped the stale `·opening` from the
+  BUILD line in task_plan.md. No dup `buildMode` to delete (already fixed in -20).
+- **a11y:** blanket `:focus-visible`; `min-height:44px` on controls + `<480px` media
+  query; 6 unlabeled controls get `aria-label` from `<script>` (a11yInit IIFE); tab
+  bar → full ARIA tabs (tablist/tab/tabpanel, aria-selected, roving tabindex,
+  Arrow/Home/End); streaming uses a `setBusy()` helper (single role=status announce
+  + `aria-busy` on #tab-builder); `onWizFinish` focuses the visible output.
+- **Tooling fixes:** `test/smoke.mjs` fake DOM extended (getAttribute/setAttribute/
+  addEventListener/focus + `document.querySelector`) so a11yInit runs headless;
+  `validate-generator.py` now skips test harnesses (was a false-positive buildDexie
+  9-table failure on `smoke.mjs`).
+- **Mirrored** → `wizard-html-panel-21.txt`.
+- **Markup paste-safety:** verified no raw/entity `[ ] { }` before the first
+  `<script>`.
+
+| Check | Result |
+|-------|--------|
+| smoke.mjs | PASS (all checks) |
+| check-wizard.sh | exit 0 |
+| validate-generator.py (smoke.mjs / char-wiz-html) | exit 0 / exit 0 |
+| headless render 384px + 820px | 0 page errors; screenshots sent |
+
+**Resume at Phase 3** (Part-2 in-browser review/refine: `window.gradeCharacter` +
+generalize `genConsistency`/`applyFix`/`doReroll` into ④ REVIEW).
+
 ---
 ## ▶ NEXT SESSION — START HERE (resume the optimization initiative)
 
@@ -36,7 +68,8 @@ Update ROADMAP.md (Phase 8 preview) + CLAUDE.md skill-note correction (Phase 1),
 The `/plan` skill (pi-planning-with-files) auto-loads `task_plan.md` on start.
 
 **Where we are:** Phase 0 ✅, Phase 1 🟡 (skills 38→30, parked→name-only done;
-dispatcher skills NOT built). **Resume at Phase 2.**
+dispatcher skills NOT built), Phase 2 ✅ (IA regroup + a11y, mirrored to -21,
+all gates green). **Resume at Phase 3.**
 
 **Phase 2 = the original task: 4-phase IA regroup + a11y fixes** (`task_plan.md`).
 Workflow to execute it:

@@ -21,15 +21,16 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - [x] Reword CLAUDE.md skill-discipline note (budget mechanics, ≤~8 `on`)
 - **Gate:** `check-skills.sh` in sync ✅ ; `/doctor` shows no description drops (pending)
 
-## Phase 2 — IA regroup + a11y fixes  (the original active task)  ⬜
-- [ ] Reorder `<div class="card">` into 4 phases w/ `<h2>` spine: ① START (build mode·import·scenario) ② BUILD (main·persona·additional·relationships·lore·opening) ③ POLISH ▸ collapsed `<details>` (image·immersion·presentation·tuning) ④ REVIEW&EXPORT (opening→top·[Part2]·consistency·export·share); Test Drive→bottom
-- [ ] Delete the 2 duplicate `id="buildMode"` blocks
-- [ ] Add blanket `:focus-visible` rule; `min-height:44px` + mobile media query (≥24px targets)
-- [ ] Label the 6 controls via `<script>` aria-label (loreMode/lorebookUrl/imMusic/tunCtx/tunWriting/sceneMode)
-- [ ] Streaming `aria-busy` toggle + single status announce; focus output on finish
-- [ ] Tab ARIA: role=tablist/tab/tabpanel + aria-selected + arrow keys
-- [ ] Mirror → `wizard-html-panel-21.txt`
-- **Gate:** smoke + check-wizard + render(0 err) + screenshot to operator
+## Phase 2 — IA regroup + a11y fixes  (the original active task)  ✅ complete
+- [x] Reorder `<div class="card">` into 4 phases w/ `<h2>` spine: ① START (build mode·import·scenario) ② BUILD (main·persona·additional·relationships·lore) ③ POLISH ▸ collapsed `<details>` (image·immersion·presentation·tuning) ④ REVIEW&EXPORT (opening→top·consistency·export·share); Test Drive→bottom. (Opening lives ONLY at REVIEW top — the old `·opening` in BUILD was a stale dup, dropped. Part-2 placeholder omitted on purpose; Phase 3 inserts the real review card.)
+- [x] ~~Delete the 2 duplicate `id="buildMode"` blocks~~ — already deduped in `-20`/main; nothing to delete.
+- [x] Add blanket `:focus-visible` rule; `min-height:44px` + mobile media query (≥24px targets)
+- [x] Label the 6 controls via `<script>` aria-label (loreMode/lorebookUrl/imMusic/tunCtx/tunWriting/sceneMode)
+- [x] Streaming `aria-busy` toggle (setBusy helper) + single status announce; focus visible output on finish
+- [x] Tab ARIA: role=tablist/tab/tabpanel + aria-selected + roving tabindex + arrow/Home/End keys (wired from `<script>`)
+- [x] Mirror → `wizard-html-panel-21.txt`
+- **Gate:** ✅ smoke PASS · check-wizard exit 0 · render 0 page errors · screenshots (384/820px) sent to operator
+- **Side fix:** `test/smoke.mjs` fake DOM gained getAttribute/setAttribute/addEventListener/focus + `document.querySelector` so a11yInit runs headless; `validate-generator.py` now skips test harnesses (false-positive buildDexie table check on `smoke.mjs`).
 
 ## Phase 3 — Part-2 review/refine phase (post-generation)  ⬜
 - [ ] Port `test/grade-generation.mjs` rubric → in-browser `window.gradeCharacter`

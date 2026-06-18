@@ -33,18 +33,24 @@ script = script.replace(/\n\s*load\(\);\s*$/, "\n");
 const store = {};
 const elements = {};
 function fakeEl(id) {
+  const attrs = {};
   return {
     get value() { return store[id] != null ? store[id] : ""; },
     set value(v) { store[id] = v; },
     style: {}, checked: false, options: [], selectedOptions: [],
-    innerHTML: "", textContent: "",
+    innerHTML: "", textContent: "", tabIndex: 0, offsetParent: null,
     appendChild() {}, querySelector() { return null; }, querySelectorAll() { return []; },
+    getAttribute(k) { return attrs[k] != null ? attrs[k] : null; },
+    setAttribute(k, v) { attrs[k] = String(v); },
+    removeAttribute(k) { delete attrs[k]; },
+    addEventListener() {}, removeEventListener() {}, focus() {},
   };
 }
 globalThis.window = {};
 globalThis.document = {
   getElementById(id) { return (elements[id] ||= fakeEl(id)); },
   createElement() { return { style: {} }; },
+  querySelector() { return null; }, querySelectorAll() { return []; },
   body: { appendChild() {} },
 };
 globalThis.localStorage = { getItem() { return null; }, setItem() {}, removeItem() {} };

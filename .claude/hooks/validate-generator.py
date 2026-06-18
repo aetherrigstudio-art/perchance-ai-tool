@@ -48,6 +48,12 @@ def main() -> int:
     # Only inspect generator source; skip docs and the validator itself.
     if base.endswith(".md") or base in ("CLAUDE.md",) or base.startswith("validate-generator"):
         return 0
+    # Skip test harnesses: they drive the real exporter in char-wiz-html (so they
+    # reference buildDexie) but are not generator source and never redeclare the
+    # 9 tables themselves. Inspecting them is a guaranteed false positive.
+    norm = path.replace("\\", "/")
+    if "/test/" in norm or norm.endswith(".mjs") or norm.endswith(".test.js"):
+        return 0
 
     try:
         with open(path, "r", encoding="utf-8", errors="replace") as fh:
