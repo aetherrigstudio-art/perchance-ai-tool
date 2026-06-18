@@ -5,6 +5,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 See `ROADMAP.md` for the prioritized list of ACC character/user fields not yet
 implemented by the wizard.
 
+See `AUTOMATION.md` for the **loader** deploy path: `wizard-loader-html.txt` is
+pasted into the Perchance HTML editor once, then fetches `char-wiz-html` from
+GitHub at runtime — so editing the repo deploys, with no re-paste. Perchance has
+no API and 403s automation, so this runtime-fetch loader is the only way to
+avoid copy-pasting the HTML panel on every change.
+
 ## What this repository is
 
 This is **not** a conventional application. It holds the source for several
