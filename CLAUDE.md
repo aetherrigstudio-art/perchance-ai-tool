@@ -227,8 +227,12 @@ Use the right dispatch for each type of work:
 - Use `isolation: "worktree"` for any work that modifies `char-wiz-html` or other shared files.
 - Cherry-pick the worktree branch back to main after review; resolve conflicts keeping the newest ARIA/CSS attrs.
 
-**Skill count discipline**: keep installed skills ≤ 20. Past that, auto-triggering degrades.
-Currently 22 skills are parked as `user-invocable-only` via `skillOverrides` in `.claude/settings.json`.
+**Skill count discipline**: the real lever is the **skill-listing budget** (~1% of
+context, `skillListingBudgetFraction`), not raw count. Keep **≤ ~8 `on` skills**;
+push the rest to **`name-only`** or **`off`**. NOTE: `user-invocable-only` hides a
+skill from the model but does **not** free listing budget (and a command/skill
+cannot invoke it — only `/name` can); only `name-only`/`off` reclaim budget. Diagnose
+drops with `/doctor`. (See `findings.md` ② + `task_plan.md` Phase 1 for the consolidation.)
 
 ## Shared memory (basic-memory MCP)
 

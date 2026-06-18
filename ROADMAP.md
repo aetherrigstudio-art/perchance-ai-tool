@@ -15,6 +15,25 @@ purpose"). Docs: [AI Character Chat Docs](https://perchance.org/ai-character-cha
 
 Each entry: **field · default · what it does · source · approach · risk.**
 
+## ⮕ Recommended build order (2026-06-18 optimization research)
+From the deep-research synthesis in `findings.md` / `task_plan.md` Phase 7:
+1. **`stopSequences: ["=== END ==="]`** in the data-panel `settings` (#15) — *do
+   first.* One line; deterministic output termination lets us delete the
+   length-control prompt scaffolding (simplifies `buildWizardPrompt`, improves
+   grader scores). Safe, isolated.
+2. **`shortcutButtons`** (#1) — schema `{name, message, autoSend,
+   insertionType:"replace", clearAfterSend}` externally corroborated; gate behind
+   advanced UI; empty `[]` is the safe default.
+3. **Richer `messageWrapperStyle`** (#7) — defer until rendering is confirmed
+   in-app; extend only with a strict `#hex`-style validator (CSS-injection surface).
+
+**Also tracked (infra, not ACC fields — see `task_plan.md` Phases 5–6):**
+- **Loader integrity** (HIGH): `wizard-loader-html.txt` `innerHTML`s remote HTML
+  with no integrity check → CI publishes `char-wiz-html.sha256`, loader verifies
+  via `crypto.subtle.digest` (preserves auto-deploy) or pin to a commit-SHA URL.
+- **CI**: add `.github/workflows/` running `smoke.mjs` + `node --check` +
+  `ci-verify.sh html` on push/PR (no npm; the `dat` check stays local).
+
 ## Already populated (not on the roadmap)
 
 `name`, `roleInstruction`, `reminderMessage`, `generalWritingInstructions`,
