@@ -145,6 +145,42 @@ the DATA panel (`char-wiz-dat`) — which is paste-once into the Perchance DATA 
 so a data-panel change ALSO needs a one-time manual re-paste. Read AUTOMATION.md +
 char-info §9 verified/unverified before adding fields.
 
+## Session 2026-06-18 (cont.) — Phase 7 COMPLETE (ROADMAP features)
+- **stopSequences:** the data panel ALREADY wired `stopSequences() => window.WIZ_STOP_SEQUENCES
+  || ["=== END ==="]`, so NO data-panel re-paste was needed. Activated it by appending
+  a terminal `=== END ===` instruction to the char + persona multi-section prompts.
+  (Conservative; live-confirm it helps termination — trivially revertable.)
+- **shortcutButtons (ROADMAP #1, verified field):** "Quick reply buttons" sub-card in
+  the presentation card — global list (name / message / auto-send / clear-after-send),
+  DOM-built with aria-labels. `characterRow` exports it per AI character as
+  `{name,message,insertionType:"replace",autoSend,clearAfterSend,type:"message"}`;
+  persona gets none; empty/partial entries filtered. Stored on `advanced.shortcutButtons`
+  (persists via the existing snapshot).
+- **messageWrapperStyle:** left deferred (per-character #hex color only; unconfirmed in-app).
+- All HTML-side → **auto-deploys via loader; no data-panel re-paste.** Mirror → `wizard-html-panel-24.txt`.
+
+### 📌 sha256sum for future review (requested)
+`char-wiz-html` digest after Phase 7:
+```
+e1a6369c6734e87f02c96e2ee75b9a4e0cd4bdc20205155c7832c58739772d0e
+```
+- Committed in `char-wiz-html.sha256` (the loader's soft integrity check compares against it).
+- Verify anytime: `sha256sum char-wiz-html` (must equal `cat char-wiz-html.sha256`).
+- Regenerate after any char-wiz-html edit: `bash scripts/gen-hash.sh` (the
+  `.githooks/pre-commit` hook does this automatically; CI fails if it drifts).
+- Prior digests this initiative: Phase 6 baseline `aa08ffb6f7f0df21899b0e0a36b95a152dd3e75fa3f637b8d6507043f64201fb`.
+
+| Check | Result |
+|-------|--------|
+| smoke.mjs (+3 shortcutButtons) | PASS |
+| check-wizard.sh | exit 0 |
+| markup paste-safety | clean |
+| functional render (shortcut UI) | 0 page errors; screenshot sent |
+| hash in sync | e1a6369… |
+
+**Resume at Phase 8** (docs/ship: update ROADMAP.md, reconcile CLAUDE/README/memory,
+final verify). Most of the initiative is done — Phase 8 is documentation + wrap-up.
+
 ---
 ## ▶ NEXT SESSION — START HERE (resume the optimization initiative)
 
@@ -155,8 +191,10 @@ The `/plan` skill (pi-planning-with-files) auto-loads `task_plan.md` on start.
 dispatcher skills NOT built), Phase 2 ✅ (IA regroup + a11y, mirrored to -21),
 Phase 3 ✅ (Review/refine second pass + window.gradeCharacter, mirrored to -22),
 Phases 4 ✅ (correctness) + 5 ✅ (security) hardening, mirrored to -23,
-Phase 6 ✅ (CI workflow + loader digest soft-fail integrity), all gates green.
-**Resume at Phase 7** (ROADMAP features). ⚠️ operator must re-paste the loader once.
+Phase 6 ✅ (CI workflow + loader digest soft-fail integrity),
+Phase 7 ✅ (stopSequences activation + shortcutButtons), mirrored to -24, all gates
+green. **Resume at Phase 8** (docs/ship). ⚠️ operator must re-paste the loader once
+(Phase 6 — optional, activates the integrity banner). No data-panel re-paste needed.
 
 **Phase 2 = the original task: 4-phase IA regroup + a11y fixes** (`task_plan.md`).
 Workflow to execute it:

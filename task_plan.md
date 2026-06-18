@@ -58,11 +58,12 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - ⚠️ **Operator action: re-paste `wizard-loader-html.txt` into the Perchance HTML editor ONCE** to activate the integrity banner (the loader is paste-once; this is the only manual step).
 - **Gate:** ✅ CI Action `verify` run #1 (commit 4cf0434) success; loader `node --check` OK; hash-sync CI step added + dry-run green; pre-commit hook functionally tested
 
-## Phase 7 — ROADMAP features (ranked)  ⬜
-- [ ] `stopSequences: ["=== END ==="]` in data-panel `settings`; remove length-hack prompt scaffolding
-- [ ] `shortcutButtons` UI (advanced) → export `{name,message,autoSend,insertionType,clearAfterSend}`
-- [ ] (defer) richer `messageWrapperStyle` until in-app confirmed
-- **Gate:** smoke + grader + render
+## Phase 7 — ROADMAP features (ranked)  ✅ complete
+- [x] `stopSequences` — data panel ALREADY wired it (`stopSequences() => window.WIZ_STOP_SEQUENCES || ["=== END ==="]`), so NO data-panel re-paste. Activated it by appending a terminal `=== END ===` instruction to the char + persona multi-section prompts so the model emits the stop marker. (Conservative; needs live confirmation it improves termination — easily revertable.)
+- [x] `shortcutButtons` UI — "Quick reply buttons" sub-card in the presentation/advanced card (global list: name/message/auto-send/clear-after-send, DOM-built with aria-labels). Exported per AI character in `characterRow` as `{name,message,insertionType:"replace",autoSend,clearAfterSend,type:"message"}`; persona gets none; empty/partial entries filtered. Verified field (ROADMAP #1, low risk).
+- [x] (deferred) richer `messageWrapperStyle` — left as the existing per-character #hex color (unconfirmed in-app).
+- **Gate:** ✅ smoke PASS (+3 shortcutButtons assertions) · check-wizard exit 0 · markup bracket-clean · functional render 0 page errors + UI screenshot sent. **HTML-only → auto-deploys via loader; no data-panel re-paste.**
+- Mirror → `wizard-html-panel-24.txt`
 
 ## Phase 8 — Docs / roadmap / memory + ship  ⬜
 - [ ] Update ROADMAP.md (build order, loader-integrity, CI items)

@@ -359,5 +359,24 @@ check("prepUserInput fences input with BEGIN/END markers", /BEGIN USER INPUT/.te
 check("prepUserInput caps length", pi("x".repeat(9000)).length < 4100);
 check("prepUserInput maps empty to (none)", pi("   ") === "(none)");
 
+// 13) shortcutButtons (ROADMAP #1): exported on AI characters from the advanced
+// presentation list, dropped on the persona, empty/partial entries filtered.
+globalThis.__adv.enabled = true;
+globalThis.__adv.shortcutButtons = [
+  { name: "continue", message: "Continue the scene.", autoSend: true, clearAfterSend: false },
+  { name: "", message: "no label so dropped" },
+  { name: "look", message: "" }, // no message so dropped
+];
+let js = JSON.parse(globalThis.__export());
+let charsS = js.data.data.find((t) => t.tableName === "characters").rows;
+let mainSC = charsS[0].shortcutButtons, personaSC = charsS[1].shortcutButtons;
+check("shortcutButtons: only complete entries exported", Array.isArray(mainSC) && mainSC.length === 1);
+check("shortcutButtons: schema is name/message/insertionType/autoSend/clearAfterSend/type",
+  mainSC[0] && mainSC[0].name === "continue" && mainSC[0].message === "Continue the scene." &&
+  mainSC[0].insertionType === "replace" && mainSC[0].autoSend === true &&
+  mainSC[0].clearAfterSend === false && mainSC[0].type === "message");
+check("shortcutButtons: persona gets none", Array.isArray(personaSC) && personaSC.length === 0);
+globalThis.__adv.enabled = false; globalThis.__adv.shortcutButtons = [];
+
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);
