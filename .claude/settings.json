@@ -27,6 +27,8 @@
     "thought-based-reasoning": "user-invocable-only",
     "token-efficiency": "user-invocable-only",
     "track-management": "user-invocable-only",
+    "ui-ux-pro-max": "user-invocable-only",
+    "usability-testing": "user-invocable-only",
     "web-search": "user-invocable-only",
     "websearch-deep": "user-invocable-only"
   },

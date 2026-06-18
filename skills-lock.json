@@ -174,6 +174,18 @@
       "sourceType": "github",
       "skillPath": ".agents/skills/track-management/SKILL.md"
     },
+    "ui-ux-pro-max": {
+      "source": "nextlevelbuilder/ui-ux-pro-max-skill",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/ui-ux-pro-max/SKILL.md",
+      "computedHash": "0a413bf988d06481f69bb81df2070741c3ba12dd9f1be2706d57f259c905992d"
+    },
+    "usability-testing": {
+      "source": "rampstackco/claude-skills",
+      "sourceType": "github",
+      "skillPath": "skills/usability-testing/SKILL.md",
+      "computedHash": "b3b30672ba91d9e527a2045b12a1b87fe71a9fda02055b2ee851e472a499e33f"
+    },
     "vanilla-web": {
       "source": "janjaszczak/cursor",
       "sourceType": "github",
