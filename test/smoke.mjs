@@ -76,6 +76,8 @@ script += `
 ;globalThis.__adv = advanced;
 ;globalThis.__charSeed = function(){ return charSeed(); };
 ;globalThis.__scenarioSeed = function(){ return scenarioSeed(); };
+;globalThis.__rotatePool = function(p, b){ return rotatePool(p, b); };
+;globalThis.__seedTone = SEED.tone;
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -228,6 +230,16 @@ check("variety seeds carry the vivid-vocabulary directive", globalThis.__charSee
 let voc = charsOf(globalThis.__export())[0];
 check("exported character's writing instructions request vivid varied vocabulary",
   /varied vocabulary/.test(voc.generalWritingInstructions) && /vivid active verbs/.test(voc.generalWritingInstructions));
+
+// 4-hour rotation: a large pool keeps a rotating ~60% active subset that swaps per window.
+const fullTone = globalThis.__seedTone.replace(/[{}]/g, "").split("|");
+const win1 = globalThis.__rotatePool(globalThis.__seedTone, 1000).replace(/[{}]/g, "").split("|");
+const win2 = globalThis.__rotatePool(globalThis.__seedTone, 1001).replace(/[{}]/g, "").split("|");
+check("rotation keeps a strict subset of a large pool", win1.length < fullTone.length && win1.length >= 4);
+check("rotation active subset differs between 4h windows", win1.join("|") !== win2.join("|"));
+check("rotation is deterministic for the same window", globalThis.__rotatePool(globalThis.__seedTone, 1000).replace(/[{}]/g, "") === win1.join("|"));
+check("rotated subset uses only real pool members (no invented words)", win1.every((w) => fullTone.includes(w)));
+check("small pools (<=4 options) are left fully active", globalThis.__rotatePool("{a|b|c}", 5) === "{a|b|c}");
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);
