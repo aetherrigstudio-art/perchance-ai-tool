@@ -319,15 +319,25 @@
     do { prev = s; s = s.replace(/\{([^{}]*)\}/g, function(_, g){ var o = g.split("|"); return o[Math.floor(Math.random()*o.length)]; }); } while(s !== prev);
     return s;
   }
+  // Curated {a|b|c} variety pools — richer synonym banks for tone/trait/speech/etc.
+  // roll() picks one per generation BEFORE the prompt is sent, so the model only
+  // ever sees a single chosen word (never literal braces) and output stays varied.
   var SEED = {
-    tone: "{brooding|warm|playful|sardonic|stoic|eccentric|melancholic|fierce|gentle|aloof|world-weary|earnest}",
-    trait: "{an unexpected hobby|a hidden fear|a nervous habit|a secret talent|a stubborn opinion|a peculiar obsession|a guarded soft spot|a recurring vice|an old regret}",
-    speech: "{clipped and dry|florid and theatrical|warm and rambling|terse|teasing|formal and precise|blunt|measured and careful}",
-    vibe: "{tense|cozy|ominous|hopeful|chaotic|melancholy|electric|uneasy|serene|gritty}",
-    loreFocus: "{the factions and powers|the history and old conflicts|the geography and notable places|the magic or technology|daily life and customs|myths, rumors and secrets}"
+    tone: "{brooding|warm|playful|sardonic|stoic|eccentric|melancholic|fierce|gentle|aloof|world-weary|earnest|wry|tender|guarded|mischievous|haunted|sunny|deadpan|wistful|intense|whimsical|bittersweet|hard-edged|disarming}",
+    trait: "{an unexpected hobby|a hidden fear|a nervous habit|a secret talent|a stubborn opinion|a peculiar obsession|a guarded soft spot|a recurring vice|an old regret|a private ritual|an unlikely loyalty|a contradiction they hide|a quiet ambition|a superstition they swear by|a debt they never mention|a forbidden curiosity}",
+    speech: "{clipped and dry|florid and theatrical|warm and rambling|terse|teasing|formal and precise|blunt|measured and careful|sly and indirect|breathless and eager|low and unhurried|sharp and quick-witted|gentle and coaxing|gruff but kind|playfully sarcastic|poetic and roundabout}",
+    vibe: "{tense|cozy|ominous|hopeful|chaotic|melancholy|electric|uneasy|serene|gritty|dreamlike|charged|bustling|hushed|sultry|foreboding|nostalgic|wondrous|claustrophobic|liberating}",
+    loreFocus: "{the factions and powers|the history and old conflicts|the geography and notable places|the magic or technology|daily life and customs|myths, rumors and secrets|trade, food and festivals|forbidden places and taboos|legends and the people who tell them|rival families and their grudges}",
+    sensory: "{the sounds and small noises|the light and shadow|texture and touch|scent and air|color and movement|warmth or cold}",
+    verb: "{drive|color|sharpen|soften|unsettle|warm|charge|tighten|loosen|electrify}",
+    pacing: "{slow-burn and atmospheric|brisk and punchy|languid and sensual|escalating and urgent|playful and quick|patient and simmering}"
   };
-  function charSeed(){ return roll("Creative direction (use loosely; do NOT mention these words or list them): lean toward a " + SEED.tone + " tone, give them " + SEED.trait + ", and a " + SEED.speech + " way of speaking."); }
-  function scenarioSeed(){ return roll("Creative direction (do NOT mention this): lean toward a " + SEED.vibe + " atmosphere."); }
+  // Prose-quality directive: vivid, varied, precise vocabulary. Used both in the
+  // generation prompts (HTML) and baked into the exported character so the
+  // in-chat AI writes well too.
+  var VOCAB = "Write with rich, precise, varied vocabulary: choose strong specific nouns and vivid active verbs over generic ones, add concrete sensory adjectives and the occasional well-placed adverb, and vary sentence length and rhythm. Avoid repeating the same words, weak intensifiers (very, really, suddenly, somewhat), and filler; show through specific detail instead of telling.";
+  function charSeed(){ return roll("Creative direction (use loosely; do NOT mention these words or list them): lean toward a " + SEED.tone + " tone, give them " + SEED.trait + ", and a " + SEED.speech + " way of speaking. Let " + SEED.sensory + " " + SEED.verb + " the scene.\n\n" + VOCAB); }
+  function scenarioSeed(){ return roll("Creative direction (do NOT mention this): lean toward a " + SEED.vibe + " atmosphere with " + SEED.pacing + " pacing; ground it in " + SEED.sensory + ".\n\n" + VOCAB); }
   function loreSeed(){ return roll("Lean the facts toward " + SEED.loreFocus + "."); }
 
   function getSection(label, text){
@@ -1491,7 +1501,7 @@
     base.reminderMessage = isPersona ? "" : (c.reminder ? c.reminder.trim() : "");
     if(!isPersona) base.reminderMessage += (base.reminderMessage ? " " : "") + "Always reply in at least two full paragraphs, blending narration, action, and dialogue. Never answer with a single short line.";
     base.generalWritingInstructions = (c.writing ? c.writing.trim() : "");
-    if(!isPersona) base.generalWritingInstructions += (base.generalWritingInstructions ? " " : "") + "Every reply must be at least two full paragraphs that weave narration, action, and dialogue together; even for terse characters, never reply with a single short line.";
+    if(!isPersona) base.generalWritingInstructions += (base.generalWritingInstructions ? " " : "") + "Every reply must be at least two full paragraphs that weave narration, action, and dialogue together; even for terse characters, never reply with a single short line. " + VOCAB;
     if(useDirective){
       base.generalWritingInstructions += (base.generalWritingInstructions ? " " : "") + SCENE_DIRECTIVE;
       base.reminderMessage += (base.reminderMessage ? " " : "") + SCENE_DIRECTIVE;

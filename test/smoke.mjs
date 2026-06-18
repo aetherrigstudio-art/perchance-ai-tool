@@ -74,6 +74,8 @@ script += `
 ;globalThis.__clearExtras = function(){ extras.length = 0; };
 ;globalThis.__validateCast = function(){ return validateCast(); };
 ;globalThis.__adv = advanced;
+;globalThis.__charSeed = function(){ return charSeed(); };
+;globalThis.__scenarioSeed = function(){ return scenarioSeed(); };
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -216,6 +218,16 @@ globalThis.__I.avatarSet = { neutral: "https://x/n.png", happy: "https://x/h.png
 let imc = charsOf(globalThis.__export())[0].customCode;
 check("expression: runtime parses a bracketed emotion from the scene call", /neutral\|happy\|sad\|angry\|surprised\|shy/.test(imc) && /setAvatarTo/.test(imc));
 globalThis.__I.enabled = false;
+
+// vocabulary/variety: {a|b|c} seeds expand to one choice (no literal braces leak to the model).
+const seedSamples = Array.from({ length: 20 }, () => globalThis.__charSeed() + globalThis.__scenarioSeed());
+check("variety seeds expand fully (no leftover { | } reach the prompt)", seedSamples.every((s) => !/[{}|]/.test(s)));
+check("variety seeds actually vary across runs", new Set(seedSamples).size > 1);
+check("variety seeds carry the vivid-vocabulary directive", globalThis.__charSeed().includes("varied vocabulary"));
+// exported character carries the vocabulary directive (improves in-chat prose).
+let voc = charsOf(globalThis.__export())[0];
+check("exported character's writing instructions request vivid varied vocabulary",
+  /varied vocabulary/.test(voc.generalWritingInstructions) && /vivid active verbs/.test(voc.generalWritingInstructions));
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);
