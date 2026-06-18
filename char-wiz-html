@@ -2202,7 +2202,7 @@
         var img = document.createElement("img"); img.src = url; img.className = "igimg"; img.loading = "lazy";
         results.insertBefore(img, results.firstChild);
       } else {
-        el("igBusy").textContent = "image generation unavailable (check the DATA panel import)";
+        el("igBusy").textContent = "image generation failed: " + (window.__imgErr || "check the DATA panel import");
       }
     }
     if(el("igBusy").textContent === "generating...") el("igBusy").textContent = "";

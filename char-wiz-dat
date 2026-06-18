@@ -33,18 +33,21 @@ async generate() =>
   stopBtn.style.display = "none";
 
 async genCharacterImage(prompt, negativePrompt, resolution) =>
+  window.__imgErr = "";
   let opts = { prompt: prompt, negativePrompt: (negativePrompt || ""), resolution: (resolution || "512x768") };
   let result = null;
-  try { result = await imageGen(opts); }
-  catch(e) { try { result = await imageGen.image(opts); } catch(e2) { return ""; } }
-  if(!result) return "";
+  try { if(typeof imageGen === "function") result = await imageGen(opts); else if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else { window.__imgErr = "imageGen import not callable (type " + (typeof imageGen) + ")"; return ""; } }
+  catch(e) { try { if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else throw e; } catch(e2) { window.__imgErr = "imageGen error: " + (e2 && e2.message ? e2.message : e2); return ""; } }
+  if(!result) { window.__imgErr = "imageGen returned nothing"; return ""; }
   if(typeof result === "string") return result;
   if(result.imageURL) return result.imageURL;
   if(result.imageUrl) return result.imageUrl;
   if(result.url) return result.url;
   if(result.src) return result.src;
+  if(result.imageElement && result.imageElement.src) return result.imageElement.src;
   if(result.outputEl && result.outputEl.src) return result.outputEl.src;
   if(typeof result.querySelector === "function") { let im = result.querySelector("img"); if(im) return im.src; }
+  try { window.__imgErr = "unrecognized result keys: " + Object.keys(result).join(","); } catch(e3) { window.__imgErr = "unrecognized result shape"; }
   return "";
 
 // Fresh words from Perchance's shared word banks (adjective/noun/verb), used by
