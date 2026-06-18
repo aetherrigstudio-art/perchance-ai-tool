@@ -104,6 +104,12 @@
       "source": "onewave-ai/claude-skills",
       "skillPath": ".agents/skills/performance-profiler/SKILL.md"
     },
+    "pi-planning-with-files": {
+      "source": "othmanadi/planning-with-files",
+      "sourceType": "github",
+      "skillPath": ".pi/skills/planning-with-files/SKILL.md",
+      "computedHash": "8ab19ddfdf26db41026eaf09da071fbf54d01b16871aab6ab212afd4fb518ecb"
+    },
     "plan-mode": {
       "source": "vercel-labs/open-agents",
       "sourceType": "github",

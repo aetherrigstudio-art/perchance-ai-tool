@@ -23,6 +23,11 @@ is what keeps all agents on the same page.
    note is the current source of truth; older session notes are historical.
 6. **End of life:** verify → commit → memory note → `git push origin main`
    (README §6). The "Unverified signature" git nag is harmless — ignore it.
+7. **Plan non-trivial work with `/plan`.** For any multi-step / multi-file task,
+   run **`/plan` first** — it chains `plan-mode` (system-aware analysis) +
+   `pi-planning-with-files` (durable `task_plan.md` / `progress.md`), gets plan
+   approval before code, and lets a fresh session resume mid-task. Don't
+   free-solo big changes.
 
 Everything below is the build reference; the rules above govern *how we work*.
 
@@ -212,7 +217,9 @@ Use the right dispatch for each type of work:
 | Parallel or isolated work | **Subagent** (`Agent` tool) | Isolated worktree or context; splits load |
 | Independent calls in one turn | **Parallel tool calls** | Batch in one message; faster |
 
-**Installed slash commands** (`.claude/commands/`): `/recap`, `/reflect`, `/find-skills`, `/audit`
+**Installed slash commands** (`.claude/commands/`): `/plan`, `/recap`, `/reflect`, `/find-skills`, `/audit`
+
+**`/plan`** = the must-fire planning workflow: `plan-mode` (analysis) → `pi-planning-with-files` (durable `task_plan.md`/`progress.md`) → approval → tracked execution. Both skills are kept ON so the command can invoke them. Run it before any non-trivial change.
 
 **Subagent delegation rules** (from `ai-workspace/workflow-tool-calling-research.md`):
 - The delegation prompt is the *only* input channel — make it fully self-contained.
