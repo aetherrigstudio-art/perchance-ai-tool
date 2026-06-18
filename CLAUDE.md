@@ -140,3 +140,12 @@ data block and HTML block into the two editors of a Perchance generator and
 exercise it; for the character/fixer tools, confirm the downloaded `.json`
 imports cleanly into ACC. Treat the "Minimal checklist" in `char-info` §11 as
 the acceptance checklist.
+
+## Shared memory (basic-memory MCP)
+
+`ai-workspace/memory/` (basic-memory MCP, project `perchar`, declared in `.mcp.json`)
+is the shared cross-session/cross-agent memory. **At session start, consult it**
+(`search_notes` / `recent_activity`) for current state; **record durable findings and
+decisions** with `write_note` before ending a task. A SessionStart hook injects this
+rule each session. The git-tracked markdown is the source of truth; the `.bm/` index is
+local and rebuildable.

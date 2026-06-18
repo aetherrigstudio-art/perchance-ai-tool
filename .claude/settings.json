@@ -2,6 +2,10 @@
   "env": {
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["basic-memory"],
+  "enableWorkflows": true,
+  "workflowKeywordTriggerEnabled": true,
   "permissions": {
     "allow": [
       "Bash(git *)",
@@ -10,7 +14,13 @@
       "Bash(md5sum *)",
       "Bash(ls *)",
       "Bash(mkdir *)",
-      "Bash(wc *)"
+      "Bash(wc *)",
+      "Bash(uvx basic-memory *)",
+      "mcp__basic-memory__read_note",
+      "mcp__basic-memory__search_notes",
+      "mcp__basic-memory__recent_activity",
+      "mcp__basic-memory__build_context",
+      "mcp__basic-memory__write_note"
     ]
   },
   "hooks": {
@@ -20,6 +30,10 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\""
+          },
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"basic-memory MCP (project perchar, ai-workspace/memory/) is the shared cross-session/cross-agent memory. At session start consult it (search_notes/recent_activity) for current state; record durable findings and decisions with write_note before ending a task.\"}}'"
           }
         ]
       }
