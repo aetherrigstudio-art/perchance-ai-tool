@@ -164,7 +164,8 @@
 
       <div class="subcard">
         <label class="hint" style="display:block; font-weight:bold;"><input type="checkbox" id="imAvatars"> Dynamic expression avatars (main character)</label>
-        <p class="hint">Pre-generates a set of expression portraits; the avatar swaps to match the mood of each reply. Only the main/single character's avatar can be controlled this way.</p>
+        <p class="hint">Pre-generates a set of expression portraits; the avatar swaps to match the mood of each reply. Only the main/single character's avatar can be controlled this way. The <b>neutral</b> portrait is also kept as the character's <b>persistent reference image</b> (stored with the character) to anchor the look.</p>
+        <p class="hint"><b>Appearance lock:</b> each character's permanent physical features (from their <code>APPEARANCE</code>) are re-injected into every generated image so the face/body stay consistent, while clothing is free to change per scene (from the wardrobe). Keep clothing out of <code>APPEARANCE</code>/<code>IMAGE TRIGGERS</code> - put outfits in <code>WARDROBE</code>.</p>
         <div class="row"><button onclick="genExpressionAvatars();">generate expression avatars</button><span class="hint" id="imAvatarBusy"></span></div>
         <div id="imAvatarThumbs" class="igresults"></div>
       </div>
@@ -358,7 +359,7 @@
       "=== APPEARANCE ===\nA short comma-separated list of PERMANENT physical features only (hair, eyes, build, skin, distinctive marks) - no clothing, no background, no art style.\n" +
       "=== DEFAULT OUTFIT ===\nA short comma-separated default outfit, used only as a fallback.\n" +
       "=== WARDROBE ===\nTwo or three outfits, each on its own line, written as a plain comma-separated list of clothing items only - no labels, no quotation marks, no outfit names. Each line should read like an image description, for example: red flannel shirt, dark jeans, scuffed leather boots.\n" +
-      "=== IMAGE TRIGGERS ===\nImage-generation trigger lines that lock {{char}}'s look whenever they are drawn. Format: each line is a trigger word, then a colon, then a comma-separated visual description. First line MUST start with the character's exact name, then a colon, then their permanent features plus signature outfit as plain image tags (no art-style words, no lighting). Optionally add one extra line for a nickname or a key alternate outfit. Example:\nNina: warm brown skin, dark curly hair, freckles, slim build, mustard cardigan, jeans\n" +
+      "=== IMAGE TRIGGERS ===\nImage-generation trigger lines that lock {{char}}'s PERMANENT look whenever they are drawn, so their face and body stay consistent across every image while their clothing can change per scene. Format: each line is a trigger word, then a colon, then a comma-separated visual description. First line MUST start with the character's exact name, then a colon, then ONLY their permanent physical features as plain image tags - skin, hair (color/length/style), eyes, face shape, build, height, and any distinctive marks. Do NOT include clothing, outfits, accessories, art-style words, or lighting (clothing is handled separately per scene). Optionally add one extra line for a nickname pointing to the same features. Example:\nNina: warm brown skin, dark curly hair, freckles, slim build, brown eyes, heart-shaped face\n" +
       "=== WRITING INSTRUCTION ===\nTwo or three sentences on how to write {{char}}: point of view, tone, pacing, content rules.";
   }
   function personaPromptCtx(notes, ctx){
@@ -1028,17 +1029,35 @@
         var who = lc(message.name);
         var ws = (cfg.wardrobe && cfg.wardrobe[who]) || [];
         var outfit = ws.length ? ws[Math.floor(Math.random()*ws.length)] : "";
+        // appearance lock: persistent permanent features for the characters present (clothing stays per-scene)
+        var feat = cfg.features || {};
+        var present = Object.keys(feat).filter(function(k){ return ctx.toLowerCase().indexOf(k) >= 0; });
+        if(!present.length && who && feat[who]) present = [who];
+        var lockClause = present.map(function(k){ return k + " has " + feat[k]; }).join("; ");
         var result = await oc.getInstructCompletion({
-          instruction: "You generate ONE image-generation prompt depicting the current moment, read mainly from the LATEST message. Use the established location; name every character present so their appearance applies; describe the clearest action plus expression of the latest speaker; keep it pleasant and wholesome; no art-style words. Output one comma-separated line, present tense, under 70 words.\n\nCONVERSATION (recent last):\n" + ctx + "\n\nLATEST - " + (message.name||"the speaker") + ": " + (message.content||"") + (outfit ? ("\n\n" + (message.name||"") + " is wearing: " + outfit) : ""),
+          instruction: "You generate ONE image-generation prompt depicting the current moment, read mainly from the LATEST message. Use the established location; name every character present; describe the clearest action plus expression of the latest speaker, their current clothing, and the setting. Do NOT restate permanent physical features (hair, eyes, face shape, build) - those are added automatically and must stay consistent. Keep it pleasant and wholesome; no art-style words. Output one comma-separated line, present tense, under 70 words.\n\nCONVERSATION (recent last):\n" + ctx + "\n\nLATEST - " + (message.name||"the speaker") + ": " + (message.content||"") + (outfit ? ("\n\n" + (message.name||"") + " is wearing: " + outfit) : ""),
           startWith: "",
           stopSequences: ["\n"]
         });
         var prompt = ("" + (result && (result.text != null ? result.text : result))).trim().replace(/^["']|["']$/g, "");
         if(!prompt) return;
         var frame = ["medium shot","close-up","over-the-shoulder","two-shot","candid"][Math.floor(Math.random()*5)];
-        oc.thread.messages.push({ author:"ai", name:"Narrator", content:"<image>" + cfg.stylePrefix + prompt + ", " + frame + cfg.styleSuffix + "</image>" });
+        oc.thread.messages.push({ author:"ai", name:"Narrator", content:"<image>" + cfg.stylePrefix + prompt + (lockClause ? (", " + lockClause) : "") + ", " + frame + cfg.styleSuffix + "</image>" });
       } catch(e){}
     }
+
+    // ---- persistent reference portrait (locks the canonical look; clothing varies per scene) ----
+    try {
+      var ref = cfg.avatars && cfg.avatars.ref;
+      if(ref){
+        oc.character.customData = oc.character.customData || {};
+        oc.character.customData.refImage = ref;
+        if(cfg.avatars.enabled && (!oc.character.avatar || !oc.character.avatar.url)){
+          oc.character.avatar = oc.character.avatar || {};
+          oc.character.avatar.url = ref;
+        }
+      }
+    } catch(e){}
 
     // ---- unified handler (only the main character's customCode runs in a group) ----
     var busy = false;
@@ -1073,15 +1092,19 @@
     Object.keys(immersion.voices||{}).forEach(function(k){ voiceMap[k] = immersion.voices[k]; });
     var avMap = {};
     if(immersion.avatars && Object.keys(immersion.avatarSet||{}).length) avMap[mainKey] = immersion.avatarSet;
+    var refImage = (immersion.avatarSet && (immersion.avatarSet.neutral || immersion.avatarSet[Object.keys(immersion.avatarSet)[0]])) || "";
+    var features = {};
+    cast.forEach(function(o){ if(o.p) return; var k = (o.c.name||"").toLowerCase().trim(); var a = (o.c.appearance||"").replace(/\s+/g," ").trim(); if(k && a) features[k] = a; });
     return {
       main: mainKey,
       sceneImages: (sceneMode() !== "off"),
       stylePrefix: (val("prefixOut").trim() || DEFAULT_PREFIX),
       styleSuffix: styleSuffix(),
       wardrobe: wardrobeMap(cast),
+      features: features,
       emo: EMO_KEYWORDS,
       ttsNames: ttsNames,
-      avatars: { enabled: !!immersion.avatars, map: avMap },
+      avatars: { enabled: !!immersion.avatars, map: avMap, ref: refImage },
       backgrounds: { enabled: !!immersion.backgrounds, set: immersion.bgSet || {} },
       music: { enabled: !!immersion.musicOn, map: immersion.musicMap || {} },
       tts: { enabled: !!immersion.tts, voiceMap: voiceMap, storeKey: "accVoice_" + imSlug(mainName) },
