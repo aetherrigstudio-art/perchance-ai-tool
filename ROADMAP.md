@@ -92,11 +92,16 @@ UI + `save`/`load`/`builderSnapshot`/`resetAll` state pattern (all in
 - **Risk:** Low–medium. Confirm accepted values for `autoGenerateMemories`
   beyond `"none"` in-app.
 
-### 7. `messageWrapperStyle` · `""`
+### 7. `messageWrapperStyle` · `""`  — **partially shipped (per-character color)**
 - **What:** Per-character message/bubble styling (ACC "Message Styling" = CSS).
-- **Source:** Verified (docs "Message Styling" with CSS examples).
-- **Approach:** A few preset bubble themes + optional custom CSS; write the field.
-- **Risk:** Low–medium. Validate/escape custom CSS; offer safe presets first.
+- **Source:** Verified (docs "Message Styling" with CSS examples); exact field
+  format unconfirmed (perchance docs 403) — treated as inline-style declarations.
+- **Shipped:** the "Character presentation" card now sets a **per-character static
+  chat color** → `messageWrapperStyle: "background-color: #hex;"`, with a strict
+  `#hex` validator (rejects anything else, no CSS injection). Confirm the exact
+  rendering in-app.
+- **Remaining:** richer bubble themes / fonts / borders; confirm the field format.
+- **Risk:** Low–medium.
 
 ---
 

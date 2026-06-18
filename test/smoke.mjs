@@ -201,7 +201,21 @@ check("Batch A on: avatar shape/size applied to all", aOn.every((r) => r.avatar.
 check("Batch A on: portrait set as the named character's avatar.url", aOn.find((r) => r.name === "Nina").avatar.url === "https://x/nina-portrait.png");
 check("Batch A on: default background + music applied", aOn[0].scene.background.url === "https://x/cafe-bg.png" && aOn[0].scene.music.url === "https://x/ambient.mp3");
 check("Batch A on: character without a portrait keeps empty avatar.url", aOn.find((r) => r.customData.isPersona).avatar.url === "");
-A.enabled = false;
+
+// custom static per-character chat colors -> messageWrapperStyle
+A.colors = { nina: "#ffd1dc" };
+let col = charsOf(globalThis.__export());
+check("chat color sets messageWrapperStyle on the matching character", /#ffd1dc/i.test(col.find((r) => r.name === "Nina").messageWrapperStyle));
+check("chat color leaves uncolored characters' messageWrapperStyle empty", col.find((r) => r.customData.isPersona).messageWrapperStyle === "");
+check("invalid color value is ignored (no CSS injection)", (() => { A.colors = { nina: "red; }evil{" }; return charsOf(globalThis.__export()).find((r) => r.name === "Nina").messageWrapperStyle === ""; })());
+A.colors = {}; A.enabled = false;
+
+// context-driven expressions: immersion runtime classifies emotion from the scene call.
+globalThis.__I.enabled = true; globalThis.__I.avatars = true;
+globalThis.__I.avatarSet = { neutral: "https://x/n.png", happy: "https://x/h.png" };
+let imc = charsOf(globalThis.__export())[0].customCode;
+check("expression: runtime parses a bracketed emotion from the scene call", /neutral\|happy\|sad\|angry\|surprised\|shy/.test(imc) && /setAvatarTo/.test(imc));
+globalThis.__I.enabled = false;
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);

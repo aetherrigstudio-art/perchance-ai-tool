@@ -219,6 +219,11 @@
         <div id="advBgThumb" class="igresults"></div>
         <input id="advMusicUrl" class="adj" placeholder="Default music URL (e.g. https://example.org/ambient.mp3)">
       </div>
+      <div class="subcard">
+        <label class="hint" style="display:block; font-weight:bold;">Chat colors (per character)</label>
+        <p class="hint">A fixed (static) chat-bubble color for each character, so the cast is easy to tell apart. Written to <code>messageWrapperStyle</code> (best-effort; confirm the exact look in-app).</p>
+        <div id="advColorList"></div>
+      </div>
     </div>
   </div>
 
@@ -297,7 +302,7 @@
     memMax:8, memEvery:8, avatarSet:{}, bgSet:{}, musicMap:{}, voices:{}, bgLabels:"" };
   // Advanced presentation (Tier 1, global defaults): avatar shape/size, static
   // portraits per character, default scene background + music.
-  var advanced = { enabled:false, avatarShape:"square", avatarSize:1, portraits:{}, bgPrompt:"", bgUrl:"", musicUrl:"" };
+  var advanced = { enabled:false, avatarShape:"square", avatarSize:1, portraits:{}, colors:{}, bgPrompt:"", bgUrl:"", musicUrl:"" };
   var SCENE_DIRECTIVE = "At the end of EVERY reply, on its own final line, append exactly one image tag describing the FULL current scene: the location, every character present with their established appearance AND the clothing they are currently wearing (everyone is always clothed), their actions and expressions, and the lighting and mood. Format it exactly as <image>a detailed scene description</image>. Keep each character's permanent features consistent with their description and never blend features between characters.";
   function loreMode(){ return el("loreMode") ? el("loreMode").value : "inline"; }
   function sceneMode(){ return el("sceneMode") ? el("sceneMode").value : "both"; }
@@ -672,6 +677,7 @@
         advanced.avatarShape = (ad.avatarShape === "circle") ? "circle" : "square";
         advanced.avatarSize = (typeof ad.avatarSize === "number" && ad.avatarSize > 0) ? ad.avatarSize : 1;
         advanced.portraits = (ad.portraits && typeof ad.portraits === "object") ? ad.portraits : {};
+        advanced.colors = (ad.colors && typeof ad.colors === "object") ? ad.colors : {};
         advanced.bgPrompt = ad.bgPrompt || ""; advanced.bgUrl = ad.bgUrl || ""; advanced.musicUrl = ad.musicUrl || "";
       }
       extras = Array.isArray(snap.extras) ? snap.extras.filter(function(x){ return x && typeof x === "object"; }) : [];
@@ -717,7 +723,7 @@
     localStorage.removeItem(STORE_KEY); OLD_KEYS.forEach(function(k){ try { localStorage.removeItem(k); } catch(e){} });
     extras = []; rels = []; styleMain = ""; styleSubs = {}; buildMode = "cast";
     immersion = { enabled:false, tts:false, avatars:false, backgrounds:false, musicOn:false, memory:false, memMax:8, memEvery:8, avatarSet:{}, bgSet:{}, musicMap:{}, voices:{}, bgLabels:"" };
-    advanced = { enabled:false, avatarShape:"square", avatarSize:1, portraits:{}, bgPrompt:"", bgUrl:"", musicUrl:"" };
+    advanced = { enabled:false, avatarShape:"square", avatarSize:1, portraits:{}, colors:{}, bgPrompt:"", bgUrl:"", musicUrl:"" };
     ["scenarioNotes","scenarioOut","mainNotes","mainOut","personaNotes","personaOut","loreOut","loreNotes","openingOut","openingAdj","styleNotes","prefixOut","suffixOut","lorebookUrl","imBgLabels","imMusic","advBgPrompt","advMusicUrl"].forEach(function(id){ setVal(id,""); });
     if(el("imgVariety")) el("imgVariety").checked = true;
     if(el("buildMode")) el("buildMode").value = "cast";
@@ -753,6 +759,7 @@
     el("status").textContent = (names.length ? "cast: " + names.join(", ") : "no characters yet") + (lore ? "  -  " + lore + " lore facts" : "");
     updateBudget(); updateExportPreview(); refreshRelSelects(); renderRels();
     if(immersion.enabled && el("imVoiceList")) renderVoiceList();
+    if(advanced.enabled){ var cl = el("advColorList"); if(cl && cl.querySelectorAll(".advColor").length !== castNames().length) renderColorList(); }
   }
   function updateExportPreview(){
     var b = el("exportPreview"); if(!b) return;
@@ -780,7 +787,7 @@
       "  -  scene images: " + (sceneNames[sceneMode()] || sceneMode()) +
       "  -  mode: " + (buildMode === "single" ? "single character" : "full cast") +
       (immersion.enabled ? ("  -  immersion: " + (imParts.length ? imParts.join(", ") : "on")) : "") +
-      (advanced.enabled ? ("  -  presentation: " + advanced.avatarShape + " avatar" + (Object.keys(advanced.portraits||{}).length ? ", portraits" : "") + (advanced.bgUrl ? ", bg" : "") + (advanced.musicUrl ? ", music" : "")) : "");
+      (advanced.enabled ? ("  -  presentation: " + advanced.avatarShape + " avatar" + (Object.keys(advanced.portraits||{}).length ? ", portraits" : "") + (Object.keys(advanced.colors||{}).length ? ", colors" : "") + (advanced.bgUrl ? ", bg" : "") + (advanced.musicUrl ? ", music" : "")) : "");
   }
 
   // Side characters that count toward the export. Single mode ships only the
@@ -1031,13 +1038,16 @@
       for(var i=0;i<order.length;i++){ var ws = EMO[order[i]]||[]; for(var j=0;j<ws.length;j++){ if(t.indexOf(ws[j])>=0) return order[i]; } }
       return "neutral";
     }
-    function setAvatar(name, text){
+    var EMOS = ["neutral","happy","sad","angry","surprised","shy"];
+    function setAvatarTo(name, emo){
       if(!cfg.avatars || !cfg.avatars.enabled) return;
       if(lc(name) !== cfg.main) return; // only the main/single character's avatar is controllable from here
       var m = cfg.avatars.map && cfg.avatars.map[cfg.main]; if(!m) return;
-      var url = m[emotionOf(text)] || m.neutral; if(!url) return;
+      if(EMOS.indexOf(emo) < 0) emo = "neutral";
+      var url = m[emo] || m.neutral; if(!url) return;
       try { oc.character.avatar.url = url; } catch(e){}
     }
+    function setAvatar(name, text){ setAvatarTo(name, emotionOf(text)); } // immediate keyword guess
     var curBg = "";
     function setBackground(text){
       if(!cfg.backgrounds || !cfg.backgrounds.enabled) return;
@@ -1091,11 +1101,15 @@
         if(!present.length && who && feat[who]) present = [who];
         var lockClause = present.map(function(k){ return k + " has " + feat[k]; }).join("; ");
         var result = await oc.getInstructCompletion({
-          instruction: "You generate ONE image-generation prompt depicting the current moment, read mainly from the LATEST message. Use the established location; name every character present; describe the clearest action plus expression of the latest speaker, their current clothing, and the setting. Do NOT restate permanent physical features (hair, eyes, face shape, build) - those are added automatically and must stay consistent. Keep it pleasant and wholesome; no art-style words. Output one comma-separated line, present tense, under 70 words.\n\nCONVERSATION (recent last):\n" + ctx + "\n\nLATEST - " + (message.name||"the speaker") + ": " + (message.content||"") + (outfit ? ("\n\n" + (message.name||"") + " is wearing: " + outfit) : ""),
-          startWith: "",
+          instruction: "You generate ONE image-generation prompt depicting the current moment, read mainly from the LATEST message. FIRST output the latest speaker's emotion in square brackets, exactly one of [neutral] [happy] [sad] [angry] [surprised] [shy], chosen from the emotional context of their latest message. THEN, on the same line, the image prompt: use the established location; name every character present; describe the clearest action plus expression of the latest speaker, their current clothing, and the setting. Do NOT restate permanent physical features (hair, eyes, face shape, build) - those are added automatically and must stay consistent. Keep it pleasant and wholesome; no art-style words. After the bracket, one comma-separated line, present tense, under 70 words. Example: [happy] cozy cafe, a woman laughing while pouring coffee, warm afternoon light\n\nCONVERSATION (recent last):\n" + ctx + "\n\nLATEST - " + (message.name||"the speaker") + ": " + (message.content||"") + (outfit ? ("\n\n" + (message.name||"") + " is wearing: " + outfit) : ""),
+          startWith: "[",
           stopSequences: ["\n"]
         });
-        var prompt = ("" + (result && (result.text != null ? result.text : result))).trim().replace(/^["']|["']$/g, "");
+        var raw = ("" + (result && (result.text != null ? result.text : result))).trim();
+        // context-driven expression: use the model's bracketed emotion for the avatar (falls back to the keyword guess already set)
+        var em = raw.match(/^\[?\s*(neutral|happy|sad|angry|surprised|shy)\s*\]/i);
+        if(em){ try { setAvatarTo(message.name, em[1].toLowerCase()); } catch(e){} }
+        var prompt = raw.replace(/^\[?\s*(neutral|happy|sad|angry|surprised|shy)\s*\]\s*/i, "").replace(/^["']|["']$/g, "").trim();
         if(!prompt) return;
         var frame = ["medium shot","close-up","over-the-shoulder","two-shot","candid"][Math.floor(Math.random()*5)];
         oc.thread.messages.push({ author:"ai", name:"Narrator", content:"<image>" + cfg.stylePrefix + prompt + (lockClause ? (", " + lockClause) : "") + ", " + frame + cfg.styleSuffix + "</image>" });
@@ -1307,7 +1321,7 @@
     if(el("advAvatarSize")) el("advAvatarSize").value = advanced.avatarSize || 1;
     setVal("advBgPrompt", advanced.bgPrompt || "");
     setVal("advMusicUrl", advanced.musicUrl || "");
-    applyAdvancedUI(); renderPortraitThumbs(); renderAdvBgThumb();
+    applyAdvancedUI(); renderPortraitThumbs(); renderAdvBgThumb(); renderColorList();
   }
   window.genPortraits = async function(){
     if(typeof genCharacterImage !== "function"){ alert("Image generation unavailable - check the DATA panel import."); return; }
@@ -1342,6 +1356,27 @@
   function renderAdvBgThumb(){
     var c = el("advBgThumb"); if(!c) return; c.innerHTML = "";
     if(advanced.bgUrl){ var w = document.createElement("div"); w.innerHTML = "<img src='" + advanced.bgUrl.replace(/'/g,"&#39;") + "' class='igimg' style='width:160px;'>"; c.appendChild(w); }
+  }
+  function renderColorList(){
+    var c = el("advColorList"); if(!c) return;
+    var names = castNames();
+    if(!names.length){ c.innerHTML = "<span class='hint'>Generate characters first.</span>"; return; }
+    c.innerHTML = "";
+    names.forEach(function(disp){
+      var key = disp.toLowerCase();
+      var cur = (advanced.colors && advanced.colors[key]) || "";
+      var d = document.createElement("div"); d.className = "row"; d.style.alignItems = "center";
+      d.innerHTML = "<span class='hint' style='flex:1;'>" + disp.replace(/</g,"&lt;") + (cur ? "" : " <em>(none)</em>") + "</span>" +
+        "<input type='color' class='advColor' data-char='" + key.replace(/'/g,"&#39;") + "' value='" + (cur || "#dddddd") + "'>" +
+        "<button class='advColorClear' data-char='" + key.replace(/'/g,"&#39;") + "'>clear</button>";
+      c.appendChild(d);
+    });
+    Array.prototype.forEach.call(c.querySelectorAll(".advColor"), function(inp){
+      inp.oninput = function(){ advanced.colors[this.getAttribute("data-char")] = this.value; save(); };
+    });
+    Array.prototype.forEach.call(c.querySelectorAll(".advColorClear"), function(btn){
+      btn.onclick = function(){ delete advanced.colors[this.getAttribute("data-char")]; renderColorList(); save(); };
+    });
   }
 
   function wardrobeMap(cast){
@@ -1478,6 +1513,8 @@
       base.avatar.size = (typeof advanced.avatarSize === "number" && advanced.avatarSize > 0) ? advanced.avatarSize : 1;
       var port = advanced.portraits && advanced.portraits[(c.name || "").toLowerCase().trim()];
       if(port) base.avatar.url = port;
+      var col = advanced.colors && advanced.colors[(c.name || "").toLowerCase().trim()];
+      if(col && /^#[0-9a-fA-F]{3,8}$/.test(col)) base.messageWrapperStyle = "background-color: " + col + ";";
       if(advanced.bgUrl || advanced.musicUrl){
         if(!base.scene || typeof base.scene !== "object") base.scene = { background:{ url:"" }, music:{ url:"" } };
         if(!base.scene.background) base.scene.background = { url:"" };
@@ -1677,7 +1714,7 @@
     setVal("lorebookUrl", snap.lorebookUrl || "");
     if(el("sceneMode")) el("sceneMode").value = snap.sceneMode || "both";
     if(snap.immersion && typeof snap.immersion === "object"){ immersion = snap.immersion; if(!immersion.voices) immersion.voices = {}; if(!immersion.avatarSet) immersion.avatarSet = {}; if(!immersion.bgSet) immersion.bgSet = {}; if(!immersion.musicMap) immersion.musicMap = {}; if(el("imMusic")) setVal("imMusic", Object.keys(immersion.musicMap).map(function(k){ return k + " | " + immersion.musicMap[k]; }).join("\n")); }
-    if(snap.advanced && typeof snap.advanced === "object"){ advanced = snap.advanced; if(!advanced.portraits) advanced.portraits = {}; if(advanced.avatarShape !== "circle") advanced.avatarShape = "square"; if(!(advanced.avatarSize > 0)) advanced.avatarSize = 1; }
+    if(snap.advanced && typeof snap.advanced === "object"){ advanced = snap.advanced; if(!advanced.portraits) advanced.portraits = {}; if(!advanced.colors) advanced.colors = {}; if(advanced.avatarShape !== "circle") advanced.avatarShape = "square"; if(!(advanced.avatarSize > 0)) advanced.avatarSize = 1; }
     extras = Array.isArray(snap.extras) ? snap.extras.filter(function(x){ return x && typeof x === "object"; }) : [];
     rels = Array.isArray(snap.rels) ? snap.rels.filter(function(x){ return x && typeof x === "object"; }) : [];
     renderExtras(); renderStyleMains(); renderStyleSubs(); applyBuildMode(); applyLoreMode(); renderImmersion(); renderAdvanced(); save(); updateStatus();
