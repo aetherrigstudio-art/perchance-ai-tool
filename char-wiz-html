@@ -636,12 +636,27 @@
   //     calls like generate() in this file resolve to these window globals.
   window.generate = async function(){
     if(typeof window.ai !== "function"){ alert("Generator engine not ready - is the DATA panel pasted?"); return; }
-    var pendingObj = window.ai(window.settings);
+    // Single-flight: a fire-and-forget gen is already in flight; ignore re-entry so
+    // two streams can't race into window.activeOutputEl and misroute chunks. The
+    // entry points (startGen/rerollSection/genConsistency/genStyle) also guard
+    // before they mutate state, so this is the backstop.
+    if(window._generating) return;
+    window._generating = true;
     var sb = el("stopBtn"), le = el("loaderEl");
-    if(sb){ sb.style.display = ""; sb.onclick = function(){ pendingObj.stop(); sb.style.display = "none"; }; }
-    if(le) le.innerHTML = pendingObj.loadingIndicatorHtml;
-    await pendingObj.onFinishPromise;
-    if(sb) sb.style.display = "none";
+    try {
+      var pendingObj = window.ai(window.settings);
+      if(sb){ sb.style.display = ""; sb.onclick = function(){ pendingObj.stop(); sb.style.display = "none"; }; }
+      if(le) le.innerHTML = pendingObj.loadingIndicatorHtml;
+      await pendingObj.onFinishPromise;
+    } catch(e){
+      // onWizFinish only runs on success, so clear the busy state here on failure.
+      setBusy("");
+      try { alert("Generation failed: " + (e && e.message ? e.message : e)); } catch(_e){}
+    } finally {
+      window._generating = false;
+      if(sb) sb.style.display = "none";
+      if(le) le.innerHTML = "";
+    }
   };
   window.genCharacterImage = async function(prompt, negativePrompt, resolution){
     window.__imgErr = "";
@@ -758,6 +773,7 @@
   }
 
   function startGen(section, outId, refine, extraIndex){
+    if(window._generating) return;
     window.rerollInfo = null;
     window.activeSection = section;
     window.activeOutputEl = el(outId);
@@ -780,6 +796,7 @@
   // re-roll selects (doReroll, label comes from a <select>) and the Review pass
   // (rerollSection, label passed explicitly).
   window.rerollSection = function(outId, label, exclude){
+    if(window._generating) return;
     if(!el(outId) || !val(outId).trim()){ alert("Generate this character first."); return; }
     window.rerollInfo = { outId: outId, label: label, exclude: exclude };
     window.activeSection = "reroll"; window.refineMode = false;
@@ -793,6 +810,7 @@
   };
 
   window.genConsistency = function(){
+    if(window._generating) return;
     if(!val("mainOut").trim() && !castNames().length){ alert("Generate some characters first."); return; }
     window.rerollInfo = null;
     window.activeSection = "consistency"; window.refineMode = false;
@@ -1136,6 +1154,15 @@
   window.resetAll = function(){
     if(!confirm("Start over and erase the scenario, cast, and lore?")) return;
     localStorage.removeItem(STORE_KEY); OLD_KEYS.forEach(function(k){ try { localStorage.removeItem(k); } catch(e){} });
+    // Also clear the learned-schema + word-bank caches: a stale learned schema can
+    // corrupt future exports, and these are keyed independently of STORE_KEY.
+    try { localStorage.removeItem("accSchemaV1"); } catch(e){}
+    try {
+      var wbKeys = [];
+      for(var wi = 0; wi < localStorage.length; wi++){ var wk = localStorage.key(wi); if(wk && wk.indexOf("accWB_") === 0) wbKeys.push(wk); }
+      wbKeys.forEach(function(k){ try { localStorage.removeItem(k); } catch(e){} });
+    } catch(e){}
+    window.learned = null;
     extras = []; rels = []; styleMain = ""; styleSubs = {}; buildMode = "cast";
     immersion = { enabled:false, tts:false, avatars:false, backgrounds:false, musicOn:false, memory:false, memMax:8, memEvery:8, avatarSet:{}, bgSet:{}, musicMap:{}, voices:{}, bgLabels:"" };
     advanced = { enabled:false, avatarShape:"square", avatarSize:1, portraits:{}, colors:{}, bgPrompt:"", bgUrl:"", musicUrl:"" };
@@ -1883,6 +1910,7 @@
     return base;
   }
   window.genStyle = function(refine){
+    if(window._generating) return;
     if(!styleMain){ alert("Pick a base style first."); return; }
     window.rerollInfo = null;
     window.activeSection = "style"; window.refineMode = !!refine;
@@ -1908,7 +1936,23 @@
     return /^[,\s]/.test(s) ? s : (", " + s);
   }
   function uniqueId(){ return Date.now() * 10000 + (++_idSeq % 10000); }
-  function uniqueUuid(){ return (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + "-" + Math.floor(Math.random()*1e9)); }
+  // RFC-4122 v4 UUID. crypto.randomUUID is secure-context + modern-browser only;
+  // when it's missing, build a conformant v4 from getRandomValues (or Math.random
+  // as a last resort) instead of the old "timestamp-random" string Dexie can reject.
+  function uuidV4(){
+    var b = new Array(16), i;
+    if(typeof crypto !== "undefined" && crypto.getRandomValues){
+      var arr = new Uint8Array(16); crypto.getRandomValues(arr);
+      for(i = 0; i < 16; i++) b[i] = arr[i];
+    } else {
+      for(i = 0; i < 16; i++) b[i] = Math.floor(Math.random() * 256);
+    }
+    b[6] = (b[6] & 0x0f) | 0x40; // version 4
+    b[8] = (b[8] & 0x3f) | 0x80; // variant 10xx
+    var h = []; for(i = 0; i < 16; i++) h.push((b[i] + 0x100).toString(16).slice(1));
+    return h.slice(0,4).join("") + "-" + h.slice(4,6).join("") + "-" + h.slice(6,8).join("") + "-" + h.slice(8,10).join("") + "-" + h.slice(10,16).join("");
+  }
+  function uniqueUuid(){ return (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : uuidV4(); }
 
   function defaultTemplate(){
     return { name:"Character", roleInstruction:"", reminderMessage:"", messageWrapperStyle:"", petraCustomSecretInformation:"",

@@ -39,11 +39,11 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - **Gate:** ✅ smoke PASS (4 new gradeCharacter assertions track the node grader) · node grade-generation self-test exit 0 · check-wizard exit 0 · functional render (grade the cast) 0 page errors, screenshot sent
 - Mirror → `wizard-html-panel-22.txt`
 
-## Phase 4 — Correctness hardening  ⬜
-- [ ] `window.generate()` try-finally + `_generating` single-flight guard (~:632)
-- [ ] RFC-4122 UUID-v4 `getRandomValues` fallback
-- [ ] `resetAll()` clears `accSchemaV1` + `accWB_*`, nulls `window.learned`
-- **Gate:** smoke (export shape) + check-wizard
+## Phase 4 — Correctness hardening  ✅ complete
+- [x] `window.generate()` try-finally + `_generating` single-flight guard (backstop in generate() + guard at all 4 entry points: startGen/rerollSection/genConsistency/genStyle, before state mutation); clears busy + hides stop/loader on failure
+- [x] RFC-4122 UUID-v4 `uuidV4()` via `getRandomValues` (Math.random last resort); `uniqueUuid` uses it when `crypto.randomUUID` is unavailable
+- [x] `resetAll()` clears `accSchemaV1` + all `accWB_*` keys + nulls `window.learned`
+- **Gate:** ✅ smoke PASS (+2 uuidV4 RFC-4122 assertions) · check-wizard exit 0 · render 0 page errors
 
 ## Phase 5 — Security hardening  ⬜
 - [ ] `safeUrl()` protocol allowlist (http/https/blob) before image `src` at all 4 sinks

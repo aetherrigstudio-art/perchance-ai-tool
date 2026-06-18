@@ -88,6 +88,7 @@ script += `
 ;globalThis.__buildShareJSON = function(){ return buildShareJSON(); };
 ;globalThis.__shareLink = function(u,n,g){ return shareLink(u,n,g); };
 ;globalThis.__tuning = tuning;
+;globalThis.__uuidV4 = uuidV4;
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -328,6 +329,13 @@ check("gradeCharacter scores a weak character low (<=50%)", gBad.score <= 0.5);
 check("gradeCharacter separates good from bad by >=40 points", gGood.score - gBad.score >= 0.4);
 const gPersona = globalThis.window.gradeCharacter(store.personaOut, { persona: true });
 check("gradeCharacter persona mode drops the first-message checks", gPersona.checks.every((x) => x.section !== "FIRST MESSAGE"));
+
+// 10) UUID fallback: the getRandomValues path must emit a conformant RFC-4122 v4
+// (the old "timestamp-random" fallback was not, and Dexie can reject it).
+const v4re = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
+const u1 = globalThis.__uuidV4(), u2 = globalThis.__uuidV4();
+check("uuidV4 fallback is RFC-4122 v4 shaped", v4re.test(u1) && v4re.test(u2));
+check("uuidV4 fallback is unique across calls", u1 !== u2);
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);
