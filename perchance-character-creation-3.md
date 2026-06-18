@@ -35,10 +35,17 @@ panel's **markup** too — placeholder text, hint copy, visible labels, attribut
 values. It does **not** touch the contents of `<script>` or `<style>`. So a
 literal bracket/brace you want to *display* in the UI (a placeholder like
 `[trigger, trigger]`, a hint mentioning `[SYSTEM]`, a label showing `{a|b|c}`)
-must be HTML-entity-escaped — `&#91;` `&#93;` `&#123;` `&#125;` `&#124;` — or it
-errors at render ("[brackets] returned nothing"). JS string literals inside
-`<script>` remain safe. (This is why the rule above holds: building prompts in
-JS sidesteps the issue, but anything in raw markup still needs escaping.)
+errors at render ("[brackets] returned nothing").
+
+**HTML-entity escaping (`&#91;` …) is NOT reliable for this** — Perchance can
+decode entities before its template pass, so the bracket reappears and still
+errors. The robust rule: **keep `[ ] { }` out of HTML markup entirely.** Two
+safe options: (1) reword so the character never appears ("in square brackets"
+rather than "in [brackets]"); (2) when the literal bracket *is* the content (a
+format example), set it from `<script>`, which Perchance never templates —
+`el("loreOut").placeholder = "[trigger, trigger] …"`. JS string literals inside
+`<script>` are always safe, which is also why building prompts in JS (above)
+sidesteps the whole problem.
 
 ---
 

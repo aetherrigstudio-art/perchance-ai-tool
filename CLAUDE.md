@@ -54,13 +54,20 @@ escaping rules entirely (see `char-info` §1).
 evaluates `[...]` and `{a|b|c}` template expressions in the HTML panel's
 **markup** — placeholder text, hint copy, visible labels, attribute values —
 the same way it does in the data editor. It does **not** touch the contents of
-`<script>` or `<style>`. So any *literal* square bracket or brace you want to
-show in the UI (e.g. a placeholder like `[trigger, trigger]` or a hint
-mentioning `[SYSTEM]`) must be entity-escaped — `&#91;` `&#93;` `&#123;`
-`&#125;` `&#124;` — or it errors at render time ("[brackets] returned nothing").
-JS string literals inside `<script>` are safe and need no escaping. The smoke
-test guards the markup region (everything before the first `<script>`) against
-unescaped `[..]` / `{a|b|c}` regressions.
+`<script>` or `<style>`. So a *literal* square bracket or brace shown in the UI
+(e.g. a placeholder like `[trigger, trigger]` or a hint mentioning `[SYSTEM]`)
+errors at render time ("[brackets] returned nothing").
+
+**HTML-entity escaping (`&#91;` …) is NOT reliable here** — Perchance may decode
+entities before templating, so the bracket comes back and still errors. The
+rule for this repo is therefore: **keep all `[ ] { }` out of the markup
+entirely.** Either reword the copy (e.g. "in square brackets" instead of
+"in [brackets]"), or, when the literal bracket *is* the useful content (a format
+example like `[trigger, trigger]`), set it from `<script>` —
+`el("loreOut").placeholder = "[trigger, trigger] …"` — since Perchance never
+templates script. JS string literals inside `<script>` are always safe. The
+smoke test guards the markup region (everything before the first `<script>`)
+against any bracket/brace, raw **or** entity-escaped.
 
 ### The three tools currently in the repo
 

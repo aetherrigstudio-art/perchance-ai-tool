@@ -287,14 +287,18 @@ T.enabled = false; T.writingPreset = "builtin"; T.contextTracking = "off";
 
 // Perchance evaluates [..] / {..|..} template expressions in HTML *markup*
 // (placeholders, hint text, attributes) — but not inside <script>/<style>.
-// Any literal bracket/brace in the builder markup must be entity-escaped
-// (&#91; &#93; &#123; &#125; &#124;) or it errors at render time. Guard the
-// markup region (everything before the first <script>) against regressions.
+// HTML-entity escaping (&#91; …) is NOT reliably honored, so the rule for this
+// tool is: keep ALL square brackets and braces out of the markup entirely —
+// reword the copy, or set bracket-containing placeholders from <script> (which
+// Perchance never templates). Guard the markup region (everything before the
+// first <script>) against any bracket/brace, raw or entity-escaped.
 const markup = html.slice(0, html.indexOf("<script>"));
 const badBracket = markup.match(/\[[^\]\n]+\]/g) || [];
 const badBrace = markup.match(/\{[^}\n]*\|[^}\n]*\}/g) || [];
+const badEntity = markup.match(/&#(91|93|123|125|124);/g) || [];
 check("no unescaped [..] template expressions in HTML markup", badBracket.length === 0);
 check("no unescaped {a|b|c} template expressions in HTML markup", badBrace.length === 0);
+check("no entity-escaped brackets/braces in HTML markup (use <script> instead)", badEntity.length === 0);
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);
