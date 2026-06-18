@@ -36,6 +36,10 @@
       "skillPath": ".claude/skills/code-review-quality/SKILL.md",
       "computedHash": "2b1c2c4ba6cfa06d17e4dd4d67f2133736e2d3a5612d79514287bbe252370e3b"
     },
+    "code-security-audit": {
+      "source": "leonmelamud/claude-code-security-review",
+      "skillPath": ".agents/skills/code-security-audit"
+    },
     "configure-web-session": {
       "source": "laurigates/claude-plugins",
       "sourceType": "github",
@@ -70,6 +74,10 @@
       "skillPath": "skills/llm-prompt-optimizer/SKILL.md",
       "computedHash": "eef460bc1c02545bc7754e0b8f113e662a3294fad1ea2bfd92f0385efb2c42d4"
     },
+    "mobile-responsiveness": {
+      "source": "hoodini/ai-agents-skills",
+      "skillPath": ".agents/skills/mobile-responsiveness"
+    },
     "openless-voice-input": {
       "source": "aradotso/trending-skills",
       "sourceType": "github",
@@ -82,11 +90,19 @@
       "skillPath": ".claude/skills/parallel-agents/SKILL.md",
       "computedHash": "43d406f2716cff0ec9acb4319768615c51708abb9571b1f3a4cfeb6a470a204e"
     },
+    "performance-profiler": {
+      "source": "onewave-ai/claude-skills",
+      "skillPath": ".agents/skills/performance-profiler"
+    },
     "product-capability": {
       "source": "affaan-m/everything-claude-code",
       "sourceType": "github",
       "skillPath": "skills/product-capability/SKILL.md",
       "computedHash": "126569a04b17b0f86c41f9566fc397c6c9ab3bd5895875165a5ff4bbc896a125"
+    },
+    "security-best-practices": {
+      "source": "openai/skills",
+      "skillPath": ".agents/skills/security-best-practices"
     },
     "self-reflecting-chain": {
       "source": "kimasplund/claude_cognitive_reasoning",
