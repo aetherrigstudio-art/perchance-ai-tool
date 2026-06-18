@@ -1,3 +1,9 @@
+---
+title: README
+type: note
+permalink: perchar/readme
+---
+
 # Shared agent memory
 
 Persistent, cross-agent knowledge for this repo. Both Claude agents (and any

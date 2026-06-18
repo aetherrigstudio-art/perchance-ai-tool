@@ -25,7 +25,7 @@ set -euo pipefail
 
 OWNER="aetherrigstudio-art"
 REPO="perchance-ai-tool"
-BRANCH="claude/init-9i0np9"
+BRANCH="main"
 HTML_FILE="char-wiz-html"
 DAT_FILE="char-wiz-dat"
 PERCHANCE_GENERATOR="q83iy9tti5"
@@ -74,14 +74,20 @@ check_dat() {
   echo "  NOTE: perchance.org may return 403 in CI/cloud environments (Cloudflare protected)."
   echo "        This check is reliable from a desktop/local machine."
 
-  LIVE=$(curl -sf "${PERCHANCE_API}" 2>/dev/null) || {
+  # /api/downloadGenerator returns the rendered HTML page with the source
+  # embedded as URL-encoded JSON in <script id="preloaded-generator-data">.
+  # The Node client parses that and emits the data panel (modelText) to stdout
+  # (summary -> stderr) — so we diff the parsed source, not the raw 900KB page.
+  LIVE=$(node "${REPO_ROOT}/scripts/perchance-api.mjs" download "${PERCHANCE_GENERATOR}" 2>/dev/null) || {
     echo "API unreachable: perchance.org blocked this request (exit 2)." >&2
     echo "  This is expected in GitHub Actions / cloud CI — perchance.org uses Cloudflare." >&2
     echo "  Run this check locally: bash scripts/ci-verify.sh dat" >&2
     exit 2
   }
 
-  if diff <(printf '%s' "${LIVE}") <(cat "${DAT_LOCAL}") > "${DIFF_TMP}" 2>&1; then
+  # downloadGenerator emits modelText without a trailing newline; the local data
+  # panel file ends with one. Compare trailing-newline-insensitively.
+  if diff <(printf '%s' "${LIVE}") <(printf '%s' "$(cat "${DAT_LOCAL}")") > "${DIFF_TMP}" 2>&1; then
     echo "OK  ${DAT_FILE} matches live Perchance data panel"
     return 0
   else

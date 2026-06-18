@@ -39,7 +39,7 @@ runtime. After that, **editing the repo is deploying.**
 `wizard-loader-html.txt` points at one URL:
 
 ```
-https://raw.githubusercontent.com/aetherrigstudio-art/perchance-ai-tool/claude/init-9i0np9/char-wiz-html
+https://raw.githubusercontent.com/aetherrigstudio-art/perchance-ai-tool/main/char-wiz-html
 ```
 
 If you merge to `main` (or rename the branch), change that single `SRC` line in

@@ -711,7 +711,6 @@
   };
   var consistencyIssues = [];
   function escHtml(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
-  function escAttr(s){ return escHtml(s).replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
   function parseConsistency(raw){
     var out = [];
     raw.split(/\n(?=ISSUE:)/).forEach(function(b){
@@ -1048,7 +1047,7 @@
     ["relA","relB"].forEach(function(id){
       var s = el(id); if(!s) return;
       var cur = s.value;
-      s.innerHTML = names.map(function(n){ return '<option>' + escHtml(n) + '</option>'; }).join("");
+      s.innerHTML = names.map(function(n){ return '<option>' + n.replace(/</g,"&lt;") + '</option>'; }).join("");
       if(names.indexOf(cur) >= 0) s.value = cur;
     });
     var t = el("relType");
@@ -1438,10 +1437,10 @@
       var key = disp.toLowerCase();
       var cur = (immersion.voices[key] && immersion.voices[key].voiceURI) || "";
       var d = document.createElement("div"); d.style.margin = "0.4rem 0";
-      var opts = "<option value=''>(device default)</option>" + voices.map(function(v){ return "<option value='" + escAttr(v.voiceURI) + "'" + (v.voiceURI===cur?" selected":"") + ">" + escHtml(v.name + " (" + v.lang + ")") + "</option>"; }).join("");
-      d.innerHTML = "<div class='hint' style='font-weight:bold;'>" + escHtml(disp) + "</div>" +
-        "<div class='row'><select class='imVoiceSel' data-char='" + escAttr(key) + "' style='flex:1;padding:0.3rem;'>" + opts + "</select>" +
-        "<button class='imVoicePrev' data-char='" + escAttr(key) + "'>preview</button></div>";
+      var opts = "<option value=''>(device default)</option>" + voices.map(function(v){ return "<option value='" + v.voiceURI.replace(/'/g,"&#39;") + "'" + (v.voiceURI===cur?" selected":"") + ">" + v.name + " (" + v.lang + ")</option>"; }).join("");
+      d.innerHTML = "<div class='hint' style='font-weight:bold;'>" + disp.replace(/</g,"&lt;") + "</div>" +
+        "<div class='row'><select class='imVoiceSel' data-char='" + key.replace(/'/g,"&#39;") + "' style='flex:1;padding:0.3rem;'>" + opts + "</select>" +
+        "<button class='imVoicePrev' data-char='" + key.replace(/'/g,"&#39;") + "'>preview</button></div>";
       c.appendChild(d);
     });
     Array.prototype.forEach.call(c.querySelectorAll(".imVoiceSel"), function(sel){
@@ -1482,7 +1481,7 @@
     Object.keys(immersion.avatarSet||{}).forEach(function(emo){
       var u = immersion.avatarSet[emo]; if(!u) return;
       var w = document.createElement("div"); w.style.textAlign = "center";
-      w.innerHTML = "<img src='" + escAttr(u) + "' class='igimg' style='width:90px;'><div class='hint'>" + escHtml(emo) + "</div>";
+      w.innerHTML = "<img src='" + u.replace(/'/g,"&#39;") + "' class='igimg' style='width:90px;'><div class='hint'>" + emo + "</div>";
       c.appendChild(w);
     });
   }
@@ -1505,7 +1504,7 @@
     Object.keys(immersion.bgSet||{}).forEach(function(label){
       var u = immersion.bgSet[label]; if(!u) return;
       var w = document.createElement("div"); w.style.textAlign = "center";
-      w.innerHTML = "<img src='" + escAttr(u) + "' class='igimg' style='width:120px;'><div class='hint'>" + escHtml(label) + "</div>";
+      w.innerHTML = "<img src='" + u.replace(/'/g,"&#39;") + "' class='igimg' style='width:120px;'><div class='hint'>" + label.replace(/</g,"&lt;") + "</div>";
       c.appendChild(w);
     });
   }
@@ -1556,7 +1555,7 @@
     Object.keys(advanced.portraits||{}).forEach(function(name){
       var u = advanced.portraits[name]; if(!u) return;
       var w = document.createElement("div"); w.style.textAlign = "center";
-      w.innerHTML = "<img src='" + escAttr(u) + "' class='igimg' style='width:90px;'><div class='hint'>" + escHtml(name) + "</div>";
+      w.innerHTML = "<img src='" + u.replace(/'/g,"&#39;") + "' class='igimg' style='width:90px;'><div class='hint'>" + name.replace(/</g,"&lt;") + "</div>";
       c.appendChild(w);
     });
   }
@@ -1570,7 +1569,7 @@
   };
   function renderAdvBgThumb(){
     var c = el("advBgThumb"); if(!c) return; c.innerHTML = "";
-    if(advanced.bgUrl){ var w = document.createElement("div"); w.innerHTML = "<img src='" + escAttr(advanced.bgUrl) + "' class='igimg' style='width:160px;'>"; c.appendChild(w); }
+    if(advanced.bgUrl){ var w = document.createElement("div"); w.innerHTML = "<img src='" + advanced.bgUrl.replace(/'/g,"&#39;") + "' class='igimg' style='width:160px;'>"; c.appendChild(w); }
   }
   function renderColorList(){
     var c = el("advColorList"); if(!c) return;
@@ -1581,9 +1580,9 @@
       var key = disp.toLowerCase();
       var cur = (advanced.colors && advanced.colors[key]) || "";
       var d = document.createElement("div"); d.className = "row"; d.style.alignItems = "center";
-      d.innerHTML = "<span class='hint' style='flex:1;'>" + escHtml(disp) + (cur ? "" : " <em>(none)</em>") + "</span>" +
-        "<input type='color' class='advColor' data-char='" + escAttr(key) + "' value='" + escAttr(cur || "#dddddd") + "'>" +
-        "<button class='advColorClear' data-char='" + escAttr(key) + "'>clear</button>";
+      d.innerHTML = "<span class='hint' style='flex:1;'>" + disp.replace(/</g,"&lt;") + (cur ? "" : " <em>(none)</em>") + "</span>" +
+        "<input type='color' class='advColor' data-char='" + key.replace(/'/g,"&#39;") + "' value='" + (cur || "#dddddd") + "'>" +
+        "<button class='advColorClear' data-char='" + key.replace(/'/g,"&#39;") + "'>clear</button>";
       c.appendChild(d);
     });
     Array.prototype.forEach.call(c.querySelectorAll(".advColor"), function(inp){
@@ -2393,9 +2392,9 @@
       checks.forEach(function(c){
         var ok = results[c.field].pass;
         html += "<tr class='" + (ok ? "qa-pass" : "qa-fail") + "'>";
-        html += "<td>" + escHtml(c.field) + "</td>";
-        html += "<td>" + escHtml(c.expected) + "</td>";
-        html += "<td>" + escHtml(c.actual) + "</td>";
+        html += "<td>" + c.field + "</td>";
+        html += "<td>" + c.expected + "</td>";
+        html += "<td>" + c.actual + "</td>";
         html += "<td>" + (ok ? "✓" : "✗") + "</td>";
         html += "</tr>";
       });

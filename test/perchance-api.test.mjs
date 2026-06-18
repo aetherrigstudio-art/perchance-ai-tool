@@ -122,41 +122,32 @@ try {
 }
 
 if (networkAvailable) {
-  // Test 1: a known-good generator (ai-text-plugin exists on perchance.org)
-  // As of 2026-06-18 the endpoint returns an HTML page, so the client should
-  // throw an error with a clear message — that IS the correct behaviour.
+  // Test 1: a known-good generator. Verified 2026-06-18: /api/downloadGenerator
+  // returns the rendered HTML page with the source embedded as URL-encoded JSON
+  // in <script id="preloaded-generator-data">. downloadGenerator parses that and
+  // returns the structured { name, modelText, outputTemplate, imports, isPrivate }.
   try {
-    const source = await mod.downloadGenerator("ai-text-plugin");
-    // If we somehow got raw source (endpoint fixed), validate it looks like
-    // Perchance source text (not an HTML page).
+    const gen = await mod.downloadGenerator("ai-text-plugin");
     check(
-      "downloadGenerator('ai-text-plugin'): response is non-empty string",
-      typeof source === "string" && source.length > 0
+      "downloadGenerator('ai-text-plugin'): returns a parsed object",
+      gen && typeof gen === "object" && !Array.isArray(gen)
     );
     check(
-      "downloadGenerator('ai-text-plugin'): response is not an HTML page",
-      !source.trimStart().startsWith("<!DOCTYPE") && !source.trimStart().startsWith("<html")
+      "downloadGenerator('ai-text-plugin'): has string modelText (data panel)",
+      typeof gen.modelText === "string"
     );
-    // A real generator source would contain newlines and no HTML tags at the start
     check(
-      "downloadGenerator('ai-text-plugin'): response looks like generator source",
-      source.includes("\n") && !/<html/i.test(source.slice(0, 200))
+      "downloadGenerator('ai-text-plugin'): has string outputTemplate (HTML panel)",
+      typeof gen.outputTemplate === "string"
+    );
+    check(
+      "downloadGenerator('ai-text-plugin'): source is parsed, not a raw HTML page",
+      !(gen.modelText || "").trimStart().startsWith("<!DOCTYPE")
     );
   } catch (err) {
-    if (err.message.includes("HTML page instead of raw generator source")) {
-      // This is the expected/documented current state of the endpoint.
+    if (err.message.includes("HTTP 404") || err.message.includes("not found")) {
       console.log(
-        "PASS - downloadGenerator('ai-text-plugin'): correctly rejected HTML page response"
-      );
-      console.log(
-        "  NOTE: /api/downloadGenerator is returning the rendered HTML page (not raw source)."
-      );
-      console.log(
-        "  This is the documented current behaviour — see scripts/perchance-api.mjs header."
-      );
-    } else if (err.message.includes("HTTP 404")) {
-      console.log(
-        "SKIP - downloadGenerator('ai-text-plugin'): generator not found (404) — may be private or renamed"
+        "SKIP - downloadGenerator('ai-text-plugin'): generator not found — may be private or renamed"
       );
     } else {
       console.log("FAIL - downloadGenerator('ai-text-plugin') threw unexpected error: " + err.message);
@@ -174,10 +165,11 @@ if (networkAvailable) {
     // redirect/404 page with 200 status for missing generators too).
     const is404 = err.message.includes("404");
     const isHtmlPage = err.message.includes("HTML page");
-    if (is404 || isHtmlPage) {
+    const isNotFound = err.message.includes("not found");
+    if (is404 || isHtmlPage || isNotFound) {
       console.log(
         "PASS - downloadGenerator(non-existent): correctly failed (" +
-        (is404 ? "404" : "HTML page guard") + ")"
+        (is404 ? "404" : isNotFound ? "not found" : "HTML page guard") + ")"
       );
     } else {
       console.log("FAIL - downloadGenerator(non-existent): unexpected error: " + err.message);

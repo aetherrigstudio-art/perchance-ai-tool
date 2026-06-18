@@ -76,14 +76,20 @@ async function apiGet(path, params = {}) {
 // ---------------------------------------------------------------------------
 
 /**
- * Download the raw source (data/list panel text) of a public generator.
+ * Download the source of a public generator.
  *
  * Endpoint: GET /api/downloadGenerator?generatorName=<name>
  * Stability: backwards-compatibility guaranteed (per perchance.org/api-tutorial)
  * Auth: none — public generators only
  *
- * @param {string} name  Generator name, e.g. "char-wiz-dat"
- * @returns {Promise<string>} The generator's raw source text
+ * Verified 2026-06-18: this endpoint returns the *rendered* generator HTML page,
+ * not raw source. The real source is embedded as URL-encoded JSON in a
+ * <script id="preloaded-generator-data"> element, with keys:
+ *   name, modelText (data panel), outputTemplate (HTML panel), imports, isPrivate.
+ * We parse that and return the structured object (mirrors perchance_api.py).
+ *
+ * @param {string} name  Generator name, e.g. "char-wiz-dat" or a slug "q83iy9tti5"
+ * @returns {Promise<{name:string, modelText:string, outputTemplate:string, imports:string[], isPrivate:boolean}>}
  */
 export async function downloadGenerator(name) {
   if (!name || typeof name !== "string") {
@@ -95,18 +101,48 @@ export async function downloadGenerator(name) {
       `downloadGenerator("${name}"): HTTP ${res.status} ${res.statusText}`
     );
   }
-  const text = await res.text();
-  // Guard: as of 2026-06-18 this endpoint returns the rendered HTML page
-  // (Content-Type: text/html) instead of raw generator source. Detect and
-  // surface this rather than silently returning 800KB of HTML to the caller.
-  if (text.trimStart().startsWith("<!DOCTYPE") || text.trimStart().startsWith("<html")) {
+  const html = await res.text();
+  return parsePreloadedGeneratorData(html, name);
+}
+
+/**
+ * Extract and parse the <script id="preloaded-generator-data"> payload from a
+ * rendered Perchance generator page. The payload is URL-encoded JSON.
+ *
+ * @param {string} html  The rendered generator HTML page
+ * @param {string} name  Generator name (for error messages)
+ * @returns {{name:string, modelText:string, outputTemplate:string, imports:string[], isPrivate:boolean}}
+ */
+export function parsePreloadedGeneratorData(html, name = "<unknown>") {
+  const idx = html.indexOf("preloaded-generator-data");
+  if (idx === -1) {
+    const stripped = html.trim();
+    if (stripped.includes("Not found") || stripped.length < 100) {
+      throw new Error(`downloadGenerator("${name}"): generator not found on Perchance.`);
+    }
     throw new Error(
-      `downloadGenerator("${name}"): endpoint returned an HTML page instead of ` +
-      `raw generator source. The /api/downloadGenerator endpoint may have changed ` +
-      `its behaviour, or this generator requires authentication.`
+      `downloadGenerator("${name}"): could not find '#preloaded-generator-data' ` +
+      `in response. The Perchance page structure may have changed.`
     );
   }
-  return text;
+  const contentStart = html.indexOf(">", idx) + 1;
+  const contentEnd = html.indexOf("</script>", contentStart);
+  if (contentStart === 0 || contentEnd === -1) {
+    throw new Error(
+      `downloadGenerator("${name}"): malformed page — no </script> after preloaded-generator-data.`
+    );
+  }
+  const raw = html.slice(contentStart, contentEnd).trim();
+  if (!raw) {
+    throw new Error(`downloadGenerator("${name}"): preloaded-generator-data element is empty.`);
+  }
+  let data;
+  try {
+    data = JSON.parse(decodeURIComponent(raw));
+  } catch (err) {
+    throw new Error(`downloadGenerator("${name}"): failed to parse generator data JSON: ${err.message}`);
+  }
+  return data;
 }
 
 /**
@@ -204,9 +240,11 @@ if (process.argv[1] === fileURLToPath(import.meta.url)) {
 Usage: node scripts/perchance-api.mjs <command> [args]
 
 Commands:
-  download <generator-name> [output-file]
-      Fetch the raw source of a public Perchance generator.
-      If output-file is given, write to that path; otherwise print to stdout.
+  download <generator-name> [output-file] [--html]
+      Fetch the source of a public Perchance generator (parsed from the
+      embedded preloaded-generator-data JSON). Emits the data panel (modelText)
+      by default, or the HTML panel (outputTemplate) with --html. A summary is
+      printed to stderr; the panel source goes to the output-file or stdout.
 
   deps <generator-name>
       Fetch the generator and all its plugin dependencies.
@@ -230,16 +268,28 @@ Examples (generators used by this repo):
           console.error("download: missing generator-name\n\n" + usage);
           process.exit(1);
         }
-        let source;
+        // Flags: --html selects the HTML panel (outputTemplate); default is the
+        // data panel (modelText). A non-flag positional arg is the output file.
+        const rest = process.argv.slice(4);
+        const wantHtml = rest.includes("--html");
+        const outFile = rest.find((a) => !a.startsWith("--"));
+        let gen;
         try {
-          source = await downloadGenerator(arg1);
+          gen = await downloadGenerator(arg1);
         } catch (err) {
           console.error(`ERROR: ${err.message}`);
           process.exit(1);
         }
-        if (arg2) {
-          writeFileSync(arg2, source, "utf8");
-          console.log(`Written ${source.length} chars to ${arg2}`);
+        const source = wantHtml ? (gen.outputTemplate || "") : (gen.modelText || "");
+        // Summary to stderr so stdout stays a clean source dump for piping.
+        console.error(
+          `${gen.name}  (private: ${!!gen.isPrivate})  imports: [${(gen.imports || []).join(", ")}]\n` +
+          `  data panel: ${(gen.modelText || "").length} chars   HTML panel: ${(gen.outputTemplate || "").length} chars\n` +
+          `  -> emitting ${wantHtml ? "HTML panel (outputTemplate)" : "data panel (modelText)"}`
+        );
+        if (outFile) {
+          writeFileSync(outFile, source, "utf8");
+          console.error(`Written ${source.length} chars to ${outFile}`);
         } else {
           process.stdout.write(source);
         }
