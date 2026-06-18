@@ -1,31 +1,26 @@
 <div id="wiz-root">Loading the latest build…</div>
 
 <script>
-/* AI Character Set Builder - REMOTE LOADER.
- *
- * Paste this ONCE into the Perchance HTML editor. After that, every push to the
- * GitHub branch is live automatically - editing the repo IS deploying, so you
- * never copy-paste the HTML panel again.
- *
- * It fetches the real HTML panel (markup + <script> + <style>) at runtime,
- * injects it, and re-executes its scripts (innerHTML never runs <script>, so we
- * re-create each one). Because the markup is injected by JS, Perchance never
- * templates it - so the [ ] { } bracket rules stop applying to it too.
- *
- * SCOPE BRIDGE (important): Perchance exposes the DATA-panel functions
- * (generate, genCharacterImage, wordBank, uploadShare) only inside its own
- * evaluation scope. This loader runs in that scope (it's pasted directly), but
- * the fetched build's scripts run in plain global scope - so without help they
- * throw "generate is not defined" on every button. We copy those functions onto
- * window here so the injected code can reach them.
- *
- * FRESHNESS: it fetches from the GitHub API, which returns the newest commit
- * immediately. (raw.githubusercontent.com is CDN-cached ~5 min and ignores
- * cache-busting query strings.) Falls back to raw if the API's 60/hour
- * unauthenticated limit is hit.
- *
- * The data panel (char-wiz-dat) is still pasted once into the data editor.
- */
+// AI Character Set Builder - REMOTE LOADER.
+// Paste this ONCE into the Perchance HTML editor. After that, every push to the
+// GitHub branch is live automatically - editing the repo IS deploying, so you
+// never copy-paste the HTML panel again.
+//
+// It fetches the real HTML panel (markup, script and style) at runtime, injects
+// it, and re-executes its scripts (innerHTML never runs scripts, so we re-create
+// each one). Because the markup is injected by JS, Perchance never templates it.
+//
+// SCOPE BRIDGE: Perchance exposes the DATA-panel functions (generate,
+// genCharacterImage, wordBank, uploadShare) only inside its own evaluation
+// scope. This loader runs in that scope (it is pasted directly), but the fetched
+// build's scripts run in plain global scope, so without help they throw
+// "generate is not defined". We copy those functions onto window here.
+//
+// FRESHNESS: it fetches from the GitHub API, which returns the newest commit
+// immediately. raw.githubusercontent.com is CDN-cached ~5 min and ignores
+// cache-busting query strings, so it is only a fallback.
+//
+// The data panel (char-wiz-dat) is still pasted once into the data editor.
 (function () {
   // --- bridge data-panel functions onto window (each guarded: a missing one
   //     must not abort the others or the loader) ---
