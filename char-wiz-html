@@ -583,14 +583,20 @@
     if(sec === "lore"){
       var ctx3 = buildContext("lore");
       var focus = val("loreNotes").trim();
+      var coverage = focus
+        ? "Build the lorebook specifically around the FOCUS above: write 12 to 18 entries that develop it in depth - its key places, people, history, customs, relationships, and a few hooks or secrets - with every entry serving that focus. Do NOT drift onto unrelated topics."
+        : "Write 12 to 18 entries spread across these areas: key places, important people and groups, how things came to be (history), everyday customs and the unwritten rules of this world, the relationships between the characters, and a few gentle hooks, rumours, or little secrets that could spark a scene.";
       var p3 = "You are the loremaster for a cute, wholesome, slice-of-life roleplay. Using the story so far, write a LOREBOOK - the world and character facts the AI should remember.\n\n" +
         "SCENARIO:\n" + ctx3.scenario + "\n\nSTORY SO FAR:\n" + ctx3.bible + "\n\n" +
-        (focus ? ("FOCUS ON:\n" + focus + "\n\n") : "") +
-        "Write 12 to 18 entries spread across these areas: key places, important people and groups, how things came to be (history), everyday customs and the unwritten rules of this world, the relationships between the characters, and a few gentle hooks, rumours, or little secrets that could spark a scene.\n\n" +
+        (focus ? ("FOCUS - this is the most important instruction, follow it above all else:\n" + focus + "\n\n") : "") +
+        coverage + "\n\n" +
         "Output ONE entry per line in EXACTLY this format and nothing else:\n" +
         "[trigger, trigger] A self-contained fact of one or two sentences that repeats the proper noun so it reads on its own.\n\n" +
         "The words in [square brackets] are the trigger words that should pull this fact into a scene - usually the place name, person, group, or topic the fact is about. Keep everything wholesome and consistent with the scenario.";
-      return refine ? refineWrap(p3, val("loreOut"), val("loreAdj"), "Keep the same [trigger] line format, one entry per line, and output only the entries.") : (p3 + "\n\n" + loreSeed());
+      // With a focus, anchor it last and skip the random creative seed - the seed
+      // ("lean the facts toward <random>") is what pulled focused lore off-topic.
+      var loreTail = focus ? ("\n\nEvery entry must stay on the focus: " + focus) : ("\n\n" + loreSeed());
+      return refine ? refineWrap(p3, val("loreOut"), val("loreAdj"), "Keep the same [trigger] line format, one entry per line, and output only the entries.") : (p3 + loreTail);
     }
     return "";
   };
