@@ -1,10 +1,22 @@
 # Deploying without copy-paste (the loader)
 
-Perchance has **no API and 403s all automated access** (confirmed in
-`.claude/skills/run-perchance-ai-tool/SKILL.md`), so nothing can push code into
-the editors for you. The way to stop re-pasting the HTML panel on every change
-is to **invert the flow**: paste a tiny loader once, and let it pull the real
-build from GitHub at runtime. After that, **editing the repo is deploying.**
+**Perchance API — corrected understanding (2026-06-18):**
+Perchance 403s the *HTML/visual editor layer* — it does NOT block the underlying
+API endpoints. `/api/downloadGenerator` is stable, backwards-compatible, and
+callable via curl/Node.js/Python with no browser. The Python package
+`eeemoon/perchance` (`pip install perchance`) provides `TextGenerator` and
+`ImageGenerator` async clients. A Node.js proxy pattern (`ouoertheo/sd-webui-perchance`)
+can run the generator engine locally. See `ai-workspace/perchance-api-research.md`.
+
+The API layer does NOT help with pushing code into the editors — that still
+requires the loader below. But it enables CI verification, output testing, and
+data-panel fetching without a browser.
+
+---
+
+The way to stop re-pasting the HTML panel on every change is to **invert the
+flow**: paste a tiny loader once, and let it pull the real build from GitHub at
+runtime. After that, **editing the repo is deploying.**
 
 ## One-time setup
 
