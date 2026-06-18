@@ -29,6 +29,17 @@ text blocks*. When a prompt string is built in HTML JavaScript and returned via
 `{}`, `[]` all pass through literally. Build prompts in JS to avoid escaping
 headaches entirely.
 
+**Caveat — Perchance also templates HTML *markup*.** It is not only the data
+editor: Perchance evaluates `[...]` and `{a|b|c}` expressions in the HTML
+panel's **markup** too — placeholder text, hint copy, visible labels, attribute
+values. It does **not** touch the contents of `<script>` or `<style>`. So a
+literal bracket/brace you want to *display* in the UI (a placeholder like
+`[trigger, trigger]`, a hint mentioning `[SYSTEM]`, a label showing `{a|b|c}`)
+must be HTML-entity-escaped — `&#91;` `&#93;` `&#123;` `&#125;` `&#124;` — or it
+errors at render ("[brackets] returned nothing"). JS string literals inside
+`<script>` remain safe. (This is why the rule above holds: building prompts in
+JS sidesteps the issue, but anything in raw markup still needs escaping.)
+
 ---
 
 ## 2. The AI text plugin (`ai-text-plugin`)

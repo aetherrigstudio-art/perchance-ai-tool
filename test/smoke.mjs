@@ -285,5 +285,16 @@ check("tuning on: @roleplay1 writing preset used", /^@roleplay1/.test(main.gener
 check("tuning never alters the persona", persona.temperature === 0.8 && persona.contextInfoToggle !== "yes" && !/^@roleplay/.test(persona.generalWritingInstructions||""));
 T.enabled = false; T.writingPreset = "builtin"; T.contextTracking = "off";
 
+// Perchance evaluates [..] / {..|..} template expressions in HTML *markup*
+// (placeholders, hint text, attributes) — but not inside <script>/<style>.
+// Any literal bracket/brace in the builder markup must be entity-escaped
+// (&#91; &#93; &#123; &#125; &#124;) or it errors at render time. Guard the
+// markup region (everything before the first <script>) against regressions.
+const markup = html.slice(0, html.indexOf("<script>"));
+const badBracket = markup.match(/\[[^\]\n]+\]/g) || [];
+const badBrace = markup.match(/\{[^}\n]*\|[^}\n]*\}/g) || [];
+check("no unescaped [..] template expressions in HTML markup", badBracket.length === 0);
+check("no unescaped {a|b|c} template expressions in HTML markup", badBrace.length === 0);
+
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);

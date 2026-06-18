@@ -67,10 +67,10 @@
 
   <div class="card">
     <h3>Lore</h3>
-    <p class="hint">Generates a keyworded lorebook: each entry has trigger words in [brackets] so it's pulled into a scene only when relevant. Covers places, people, history, customs, relationships, and hooks. Attached to the main character and embedded in the card. Editable.</p>
+    <p class="hint">Generates a keyworded lorebook: each entry has trigger words in &#91;brackets&#93; so it's pulled into a scene only when relevant. Covers places, people, history, customs, relationships, and hooks. Attached to the main character and embedded in the card. Editable.</p>
     <textarea id="loreNotes" class="notes" placeholder="Optional focus (e.g. the rival bakery across the street, the town's summer festival, the cafe regulars)"></textarea>
     <div class="row"><button onclick="genLore(false);">generate lore</button></div>
-    <textarea id="loreOut" class="out" placeholder="[trigger, trigger] A self-contained fact (editable)"></textarea>
+    <textarea id="loreOut" class="out" placeholder="&#91;trigger, trigger&#93; A self-contained fact (editable)"></textarea>
     <input id="loreAdj" class="adj" placeholder="Adjustment (e.g. add more about the festival, fewer secrets)">
     <div class="row"><button onclick="genLore(true);">apply adjustment</button></div>
     <p class="hint" style="margin-top:0.75rem;">How to attach the lore:</p>
@@ -112,9 +112,9 @@
 
   <div class="card" id="cardOpening">
     <h3>Opening scene (run after generating the whole cast)</h3>
-    <p class="hint">Generates one shared opening that brings every character into the scene, plus a hidden [SYSTEM] context line. This becomes the chat's first messages on export. Editable.</p>
+    <p class="hint">Generates one shared opening that brings every character into the scene, plus a hidden &#91;SYSTEM&#93; context line. This becomes the chat's first messages on export. Editable.</p>
     <div class="row"><button onclick="genOpening(false);">generate opening scene</button></div>
-    <textarea id="openingOut" class="out" placeholder="[SYSTEM]: ...&#10;[CharacterName]: *...* &quot;...&quot;"></textarea>
+    <textarea id="openingOut" class="out" placeholder="&#91;SYSTEM&#93;: ...&#10;&#91;CharacterName&#93;: *...* &quot;...&quot;"></textarea>
     <input id="openingAdj" class="adj" placeholder="Adjustment (e.g. start outside, make it more playful)">
     <div class="row"><button onclick="genOpening(true);">apply adjustment</button></div>
     <p class="hint">Relationships, persona context, world facts, and this opening are all assembled onto the cast automatically when you export - no need to apply them per character.</p>
@@ -147,7 +147,7 @@
     <textarea id="suffixOut" class="out2" placeholder="Generated quality suffix (editable)"></textarea>
     <input id="styleAdj" class="adj" placeholder="Adjustment (e.g. warmer, less saturated, more painterly)">
     <div class="row"><button onclick="genStyle(true);">apply adjustment</button></div>
-    <label class="hint" style="display:block; margin-top:0.5rem;"><input type="checkbox" id="imgVariety" checked> Add {a|b|c} lighting variety to the prefix (test once; untick if you see literal braces in images)</label>
+    <label class="hint" style="display:block; margin-top:0.5rem;"><input type="checkbox" id="imgVariety" checked> Add &#123;a&#124;b&#124;c&#125; lighting variety to the prefix (test once; untick if you see literal braces in images)</label>
   </div>
 
   <div class="card" id="cardImmersion">

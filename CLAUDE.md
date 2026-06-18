@@ -50,6 +50,18 @@ output into DOM elements the HTML panel must provide (`responseEl`,
 JavaScript**, not in the data editor — that sidesteps Perchance's `[] {} `
 escaping rules entirely (see `char-info` §1).
 
+**Perchance templates HTML *markup*, not just the data panel.** Perchance
+evaluates `[...]` and `{a|b|c}` template expressions in the HTML panel's
+**markup** — placeholder text, hint copy, visible labels, attribute values —
+the same way it does in the data editor. It does **not** touch the contents of
+`<script>` or `<style>`. So any *literal* square bracket or brace you want to
+show in the UI (e.g. a placeholder like `[trigger, trigger]` or a hint
+mentioning `[SYSTEM]`) must be entity-escaped — `&#91;` `&#93;` `&#123;`
+`&#125;` `&#124;` — or it errors at render time ("[brackets] returned nothing").
+JS string literals inside `<script>` are safe and need no escaping. The smoke
+test guards the markup region (everything before the first `<script>`) against
+unescaped `[..]` / `{a|b|c}` regressions.
+
 ### The three tools currently in the repo
 
 | Tool | Data panel | HTML panel | Prompt builder |
