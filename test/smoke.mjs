@@ -153,12 +153,13 @@ check("embedded CFG is valid JSON", cfgJsonValid);
 // ---- regression cases for code-review findings #1-#5 ----
 
 // #1: directive/off modes must still produce clothed images — the scene
-// directive baked into writing instructions/reminder must mention clothing.
+// directive baked into reminderMessage must mention clothing. (generalWritingInstructions
+// no longer duplicates it — SCENE_DIRECTIVE lives in reminderMessage only.)
 globalThis.__I.enabled = false;
 store.sceneMode = "directive";
 let dir = charsOf(globalThis.__export())[0];
 check("#1 scene directive requires clothing (no nudity in directive mode)",
-  /clothing|wearing/i.test(dir.generalWritingInstructions) && /clothing|wearing/i.test(dir.reminderMessage));
+  /clothing|wearing/i.test(dir.reminderMessage));
 store.sceneMode = "both";
 
 // #2: single build mode exports only the main (+ persona), not hidden extras.

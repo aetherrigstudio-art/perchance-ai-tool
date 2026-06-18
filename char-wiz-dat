@@ -11,6 +11,7 @@ settings
   startWith = [ "" ]
   hideStartWith = [ false ]
   outputTo = [responseEl]
+  stopSequences = ["=== END ==="]
   onStart() =>
     responseEl.value = "";
   onChunk() =>

@@ -578,7 +578,7 @@
     var adjBlock, instruction;
     if(adjTrimmed){
       adjBlock = "\n\nADJUSTMENT REQUESTED:\n" + adjTrimmed;
-      instruction = "Rewrite the full output so the adjustment is clearly and unmistakably applied — not hinted at or softened. If the adjustment changes tone, pace, or a specific section, make that change prominent and concrete. Keep structural elements (names, section format, established facts) that the adjustment does not contradict. " + fmt;
+      instruction = "Apply the ADJUSTMENT decisively; rewrite whatever conflicts; keep what works. " + fmt;
     } else {
       adjBlock = "";
       instruction = "Sharpen the existing version: improve word choice, pacing, and specificity in the weakest parts. Do not change what is already working. " + fmt;
@@ -1736,7 +1736,6 @@
       if(!isPersona) base.generalWritingInstructions += (base.generalWritingInstructions ? " " : "") + "Every reply must be at least two full paragraphs that weave narration, action, and dialogue together; even for terse characters, never reply with a single short line. " + VOCAB;
     }
     if(useDirective){
-      base.generalWritingInstructions += (base.generalWritingInstructions ? " " : "") + SCENE_DIRECTIVE;
       base.reminderMessage += (base.reminderMessage ? " " : "") + SCENE_DIRECTIVE;
     }
     if(!isPersona) base.maxTokensPerMessage = 800;
@@ -2030,6 +2029,7 @@
     el("importStatus").textContent = "Learned: db version " + parsed.databaseVersion + ", " + (parsed.tables ? parsed.tables.length : 0) + " tables" + (template ? ", character template captured" : ", NO character in file") + ". Exports now use these real values.";
   };
 
+  // Inline CRC-32: Perchance blocks external modules, so no crypto import is possible.
   function crc32(bytes){
     if(!crc32.t){ crc32.t = []; for(var n=0;n<256;n++){ var c=n; for(var k=0;k<8;k++) c=(c&1)?(0xEDB88320^(c>>>1)):(c>>>1); crc32.t[n]=c>>>0; } }
     var crc = 0xFFFFFFFF;
@@ -2446,7 +2446,7 @@
   .subcard { background: var(--subcard-bg); padding:0.75rem; border-radius:6px; margin-bottom:0.75rem; }
   .hint { font-size:85%; opacity:0.8; margin:0.25rem 0; }
   .notes { width:100%; height:80px; padding:0.5rem; }
-  .out { width:100%; height:220px; padding:0.5rem; font-family:monospace; margin-top:0.5rem; }
+  .out { width:100%; min-height:220px; height:auto; padding:0.5rem; font-family:monospace; margin-top:0.5rem; }
   .out2 { width:100%; height:54px; padding:0.5rem; font-family:monospace; margin:0.25rem 0; }
   .btns { display:flex; flex-wrap:wrap; gap:0.5rem; margin-top:0.5rem; }
   .styleBtn { padding:0.4rem 0.8rem; cursor:pointer; border-radius:6px; }
