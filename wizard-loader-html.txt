@@ -22,15 +22,19 @@
 //
 // The data panel (char-wiz-dat) is still pasted once into the data editor.
 (function () {
-  // --- bridge data-panel functions onto window (each guarded: a missing one
-  //     must not abort the others or the loader) ---
-  try { window.generate = generate; } catch (e) {}
-  try { window.genCharacterImage = genCharacterImage; } catch (e) {}
-  try { window.wordBank = wordBank; } catch (e) {}
-  try { window.uploadShare = uploadShare; } catch (e) {}
+  // --- v2 bridge: expose the DATA-panel plugin imports + settings onto window so
+  //     the fetched HTML can define generate/genCharacterImage/wordBank/uploadShare
+  //     itself. Each guarded so a missing one can't abort the loader. ---
+  try { window.ai = ai; } catch (e) {}
+  try { window.imageGen = imageGen; } catch (e) {}
+  try { window.adjBank = adjBank; } catch (e) {}
+  try { window.nounBank = nounBank; } catch (e) {}
+  try { window.verbBank = verbBank; } catch (e) {}
+  try { window.uploader = uploader; } catch (e) {}
+  try { window.settings = settings; } catch (e) {}
 
   var OWNER = "aetherrigstudio-art", REPO = "perchance-ai-tool";
-  var BRANCH = "main", FILE = "char-wiz-html";
+  var BRANCH = "v2-data-loader", FILE = "char-wiz-html";
   var API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + FILE + "?ref=" + BRANCH;
   var RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/" + FILE;
   var root = document.getElementById("wiz-root");
@@ -47,7 +51,7 @@
     }
     // Self-diagnosis: if the data panel wasn't pasted, the bridge above found
     // nothing - warn on-screen (there's no console on mobile).
-    if (typeof window.generate !== "function") {
+    if (typeof window.ai !== "function") {
       var warn = document.createElement("div");
       warn.style.cssText = "background:#dc2626; color:#fff; padding:10px 14px; border-radius:10px; margin-bottom:12px; font-weight:700; text-align:center; line-height:1.4;";
       warn.textContent = "Data panel not detected - the generate buttons will not work. Paste char-wiz-dat into the DATA editor and reload.";

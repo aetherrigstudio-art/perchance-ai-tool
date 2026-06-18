@@ -5,10 +5,11 @@ nounBank = {import:noun}
 verbBank = {import:verb}
 uploader = {import:upload-plugin}
 
-// This data panel is a thin, stable bridge. The plugin imports above and the
-// settings wiring below are Perchance load-time constructs, so this file rarely
-// changes; mutable logic delegates to window functions in the HTML panel. See
-// AUTOMATION.md for the full rationale.
+// v2 MINIMAL DATA PANEL. Only the load-time constructs Perchance requires live
+// here: the plugin imports above, the settings wiring below, and $meta. Every
+// function (generate, genCharacterImage, wordBank, uploadShare) now lives in the
+// loader-fetched HTML; the loader bridges the imports above onto window so the
+// HTML can use them. This file should now essentially never need re-pasting.
 
 settings
   instruction() =>
@@ -31,64 +32,6 @@ settings
     if(window.activeOutputEl) window.activeOutputEl.value = responseEl.value;
     if(window.onWizFinish) window.onWizFinish();
   render = [ null ]
-
-async generate() =>
-  let pendingObj = ai(settings);
-  stopBtn.style.display = "";
-  stopBtn.onclick = function() { pendingObj.stop(); stopBtn.style.display = "none"; };
-  loaderEl.innerHTML = pendingObj.loadingIndicatorHtml;
-  await pendingObj.onFinishPromise;
-  stopBtn.style.display = "none";
-
-// Plugin bridge: calls the text-to-image plugin (scoped to this data editor)
-// then hands the raw result to window.parseImageResult (HTML panel) so
-// result-shape handling can evolve without re-pasting this file. The inline
-// branch below is the fallback used when that hook is absent.
-async genCharacterImage(prompt, negativePrompt, resolution) =>
-  window.__imgErr = "";
-  let opts = { prompt: prompt, negativePrompt: (negativePrompt || ""), resolution: (resolution || "512x768") };
-  let result = null;
-  try { if(typeof imageGen === "function") result = await imageGen(opts); else if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else { window.__imgErr = "imageGen import not callable (type " + (typeof imageGen) + ")"; return ""; } }
-  catch(e) { try { if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else throw e; } catch(e2) { window.__imgErr = "imageGen error: " + (e2 && e2.message ? e2.message : e2); return ""; } }
-  if(window.parseImageResult) return window.parseImageResult(result);
-  if(!result) { window.__imgErr = "imageGen returned nothing"; return ""; }
-  if(typeof result === "string") return result;
-  if(result.imageURL) return result.imageURL;
-  if(result.imageUrl) return result.imageUrl;
-  if(result.url) return result.url;
-  if(result.src) return result.src;
-  if(result.imageElement && result.imageElement.src) return result.imageElement.src;
-  if(result.outputEl && result.outputEl.src) return result.outputEl.src;
-  if(typeof result.querySelector === "function") { let im = result.querySelector("img"); if(im) return im.src; }
-  try { window.__imgErr = "unrecognized result keys: " + Object.keys(result).join(","); } catch(e3) { window.__imgErr = "unrecognized result shape"; }
-  return "";
-
-// Fresh words from Perchance's shared word banks (adjective/noun/verb), used by
-// the HTML to rotate in real vocabulary every 4 hours. Fully defensive: any
-// import/selection failure returns "" so the generator keeps working.
-wordBank(type, count) =>
-  try {
-    let n = count || 3;
-    let list = (type == "noun") ? nounBank : ((type == "verb") ? verbBank : adjBank);
-    if(!list) return "";
-    let out = [];
-    for(let i = 0; i < n; i++) {
-      let w = (typeof list.selectOne === "function") ? list.selectOne() : list.selectOne;
-      if(w) out.push(("" + w).trim());
-    }
-    return out.join("|");
-  } catch(e) { return ""; }
-
-// Upload a Blob (the gzipped share file) to Perchance's file store and return
-// its URL, used by the HTML to build a one-click "open in chat" share link.
-// Defensive: any failure returns "" or "ERR:<reason>" so the UI can report it.
-async uploadShare(blob) =>
-  try {
-    let r = await uploader(blob);
-    if(!r) return "";
-    if(r.error) return "ERR:" + r.error;
-    return r.url || "";
-  } catch(e) { return "ERR:" + (e && e.message ? e.message : "upload failed"); }
 
 $meta
   title = AI Character Set Builder

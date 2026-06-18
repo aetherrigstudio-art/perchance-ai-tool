@@ -626,6 +626,46 @@
     return "";
   };
 
+  // --- v2: the former data-panel functions, moved here. They use the plugin
+  //     imports the loader bridges onto window (window.ai/imageGen/etc). Bare
+  //     calls like generate() in this file resolve to these window globals.
+  window.generate = async function(){
+    if(typeof window.ai !== "function"){ alert("Generator engine not ready - is the DATA panel pasted?"); return; }
+    var pendingObj = window.ai(window.settings);
+    var sb = el("stopBtn"), le = el("loaderEl");
+    if(sb){ sb.style.display = ""; sb.onclick = function(){ pendingObj.stop(); sb.style.display = "none"; }; }
+    if(le) le.innerHTML = pendingObj.loadingIndicatorHtml;
+    await pendingObj.onFinishPromise;
+    if(sb) sb.style.display = "none";
+  };
+  window.genCharacterImage = async function(prompt, negativePrompt, resolution){
+    window.__imgErr = "";
+    var imageGen = window.imageGen;
+    var opts = { prompt: prompt, negativePrompt: (negativePrompt || ""), resolution: (resolution || "512x768") };
+    var result = null;
+    try { if(typeof imageGen === "function") result = await imageGen(opts); else if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else { window.__imgErr = "imageGen import not callable (type " + (typeof imageGen) + ")"; return ""; } }
+    catch(e){ try { if(imageGen && typeof imageGen.image === "function") result = await imageGen.image(opts); else throw e; } catch(e2){ window.__imgErr = "imageGen error: " + (e2 && e2.message ? e2.message : e2); return ""; } }
+    return window.parseImageResult(result);
+  };
+  window.wordBank = function(type, count){
+    try {
+      var n = count || 3;
+      var list = (type == "noun") ? window.nounBank : ((type == "verb") ? window.verbBank : window.adjBank);
+      if(!list) return "";
+      var out = [];
+      for(var i = 0; i < n; i++){ var w = (typeof list.selectOne === "function") ? list.selectOne() : list.selectOne; if(w) out.push(("" + w).trim()); }
+      return out.join("|");
+    } catch(e){ return ""; }
+  };
+  window.uploadShare = async function(blob){
+    try {
+      var r = await window.uploader(blob);
+      if(!r) return "";
+      if(r.error) return "ERR:" + r.error;
+      return r.url || "";
+    } catch(e){ return "ERR:" + (e && e.message ? e.message : "upload failed"); }
+  };
+
   window.buildWizardPrompt = function(){
     if(window.rerollInfo){
       var info = window.rerollInfo;
