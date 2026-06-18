@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+See `ROADMAP.md` for the prioritized list of ACC character/user fields not yet
+implemented by the wizard.
+
 ## What this repository is
 
 This is **not** a conventional application. It holds the source for several
