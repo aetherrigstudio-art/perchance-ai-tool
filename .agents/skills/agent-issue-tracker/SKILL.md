@@ -1,6 +1,6 @@
 ---
 name: agent-issue-tracker
-description: Agent skill for issue-tracker - invoke with $agent-issue-tracker
+description: Track, create, and coordinate GitHub issues using multi-agent swarm patterns. Use when automating issue creation, monitoring project progress, or coordinating multi-agent work tied to a specific issue or milestone.
 ---
 
 ---

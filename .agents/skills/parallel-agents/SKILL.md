@@ -1,6 +1,6 @@
 ---
 name: parallel-agents
-description: Parallel Agent Orchestration
+description: Orchestrate multiple agents in parallel using background tasks, file-based status handoffs, and split-and-merge patterns. Use when spawning more than one Agent tool call in a single turn, coordinating concurrent subagent work, or avoiding context bloat from parallel task output.
 user-invocable: false
 ---
 

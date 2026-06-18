@@ -1,6 +1,6 @@
 ---
 name: agent-orchestrator-task
-description: Agent skill for orchestrator-task - invoke with $agent-orchestrator-task
+description: Decompose a large task into subtasks, assign them to agents, manage dependencies, and aggregate results. Use when a complex goal needs sequential or parallel execution across multiple agents with priority ordering and progress tracking.
 ---
 
 ---
