@@ -1,0 +1,90 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["basic-memory"],
+  "enableWorkflows": true,
+  "workflowKeywordTriggerEnabled": true,
+  "skillOverrides": {
+    "agent-issue-tracker": "user-invocable-only",
+    "agent-orchestrator-task": "user-invocable-only",
+    "browser-tools": "user-invocable-only",
+    "changelog-writer": "user-invocable-only",
+    "code-review-quality": "user-invocable-only",
+    "code-security-audit": "user-invocable-only",
+    "deep-research-agent": "user-invocable-only",
+    "error-analysis": "user-invocable-only",
+    "find-skills": "user-invocable-only",
+    "llm-prompt-optimizer": "user-invocable-only",
+    "plugin-settings": "user-invocable-only",
+    "product-capability": "user-invocable-only",
+    "recap": "user-invocable-only",
+    "roadmap-planning": "user-invocable-only",
+    "self-reflecting-chain": "user-invocable-only",
+    "session-start-hook": "user-invocable-only",
+    "smoke-test": "user-invocable-only",
+    "thought-based-reasoning": "user-invocable-only",
+    "token-efficiency": "user-invocable-only",
+    "track-management": "user-invocable-only",
+    "web-search": "user-invocable-only",
+    "websearch-deep": "user-invocable-only"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(node *)",
+      "Bash(cp *)",
+      "Bash(md5sum *)",
+      "Bash(ls *)",
+      "Bash(mkdir *)",
+      "Bash(wc *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(cat *)",
+      "Bash(sed *)",
+      "Bash(awk *)",
+      "Bash(jq *)",
+      "Bash(curl *)",
+      "Bash(python3 *)",
+      "Bash(bash *)",
+      "Bash(uvx basic-memory *)",
+      "mcp__basic-memory__read_note",
+      "mcp__basic-memory__search_notes",
+      "mcp__basic-memory__recent_activity",
+      "mcp__basic-memory__build_context",
+      "mcp__basic-memory__write_note"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\""
+          },
+          {
+            "type": "command",
+            "command": "echo '{\"hookSpecificOutput\":{\"hookEventName\":\"SessionStart\",\"additionalContext\":\"basic-memory MCP (project perchar, ai-workspace/memory/) is the shared cross-session/cross-agent memory. At session start consult it (search_notes/recent_activity) for current state; record durable findings and decisions with write_note before ending a task.\"}}'"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-wizard.sh\""
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/validate-generator.py\""
+          }
+        ]
+      }
+    ]
+  }
+}

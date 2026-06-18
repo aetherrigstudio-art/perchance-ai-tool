@@ -1,0 +1,78 @@
+<div id="wiz-root">Loading the latest build…</div>
+
+<script>
+/* AI Character Set Builder - REMOTE LOADER.
+ *
+ * Paste this ONCE into the Perchance HTML editor. After that, every push to the
+ * GitHub branch is live automatically - editing the repo IS deploying, so you
+ * never copy-paste the HTML panel again.
+ *
+ * It fetches the real HTML panel (markup + <script> + <style>) at runtime,
+ * injects it, and re-executes its scripts (innerHTML never runs <script>, so we
+ * re-create each one). Because the markup is injected by JS, Perchance never
+ * templates it - so the [ ] { } bracket rules stop applying to it too.
+ *
+ * SCOPE BRIDGE (important): Perchance exposes the DATA-panel functions
+ * (generate, genCharacterImage, wordBank, uploadShare) only inside its own
+ * evaluation scope. This loader runs in that scope (it's pasted directly), but
+ * the fetched build's scripts run in plain global scope - so without help they
+ * throw "generate is not defined" on every button. We copy those functions onto
+ * window here so the injected code can reach them.
+ *
+ * FRESHNESS: it fetches from the GitHub API, which returns the newest commit
+ * immediately. (raw.githubusercontent.com is CDN-cached ~5 min and ignores
+ * cache-busting query strings.) Falls back to raw if the API's 60/hour
+ * unauthenticated limit is hit.
+ *
+ * The data panel (char-wiz-dat) is still pasted once into the data editor.
+ */
+(function () {
+  // --- bridge data-panel functions onto window (each guarded: a missing one
+  //     must not abort the others or the loader) ---
+  try { window.generate = generate; } catch (e) {}
+  try { window.genCharacterImage = genCharacterImage; } catch (e) {}
+  try { window.wordBank = wordBank; } catch (e) {}
+  try { window.uploadShare = uploadShare; } catch (e) {}
+
+  var OWNER = "aetherrigstudio-art", REPO = "perchance-ai-tool";
+  var BRANCH = "claude/init-9i0np9", FILE = "char-wiz-html";
+  var API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + FILE + "?ref=" + BRANCH;
+  var RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/" + FILE;
+  var root = document.getElementById("wiz-root");
+
+  function inject(htmlText) {
+    root.innerHTML = htmlText;                 // markup + <style> take effect now
+    // Re-create each <script> so it actually executes, in document order.
+    var scripts = root.querySelectorAll("script");
+    for (var i = 0; i < scripts.length; i++) {
+      var old = scripts[i], s = document.createElement("script");
+      for (var j = 0; j < old.attributes.length; j++) s.setAttribute(old.attributes[j].name, old.attributes[j].value);
+      s.textContent = old.textContent;
+      old.parentNode.replaceChild(s, old);
+    }
+    // Self-diagnosis: if the data panel wasn't pasted, the bridge above found
+    // nothing - warn on-screen (there's no console on mobile).
+    if (typeof window.generate !== "function") {
+      var warn = document.createElement("div");
+      warn.style.cssText = "background:#dc2626; color:#fff; padding:10px 14px; border-radius:10px; margin-bottom:12px; font-weight:700; text-align:center; line-height:1.4;";
+      warn.textContent = "Data panel not detected - the generate buttons will not work. Paste char-wiz-dat into the DATA editor and reload.";
+      root.insertBefore(warn, root.firstChild);
+    }
+  }
+  function fail(msg) {
+    root.textContent = "Could not load the latest build (" + msg + "). As a fallback, open " + RAW + " and paste its contents here manually.";
+  }
+
+  // Primary: GitHub API (fresh). Accept: raw returns the file bytes directly.
+  fetch(API + "&t=" + Date.now(), { cache: "no-store", headers: { Accept: "application/vnd.github.raw" } })
+    .then(function (r) { if (!r.ok) throw new Error("api " + r.status); return r.text(); })
+    .then(inject)
+    .catch(function () {
+      // Fallback: raw CDN (may be a few minutes behind, but always reachable).
+      fetch(RAW + "?t=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { if (!r.ok) throw new Error("raw " + r.status); return r.text(); })
+        .then(inject)
+        .catch(function (e) { fail(e && e.message ? e.message : "fetch blocked"); });
+    });
+})();
+</script>

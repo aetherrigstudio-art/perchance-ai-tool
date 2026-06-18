@@ -29,6 +29,24 @@ text blocks*. When a prompt string is built in HTML JavaScript and returned via
 `{}`, `[]` all pass through literally. Build prompts in JS to avoid escaping
 headaches entirely.
 
+**Caveat — Perchance also templates HTML *markup*.** It is not only the data
+editor: Perchance evaluates `[...]` and `{a|b|c}` expressions in the HTML
+panel's **markup** too — placeholder text, hint copy, visible labels, attribute
+values. It does **not** touch the contents of `<script>` or `<style>`. So a
+literal bracket/brace you want to *display* in the UI (a placeholder like
+`[trigger, trigger]`, a hint mentioning `[SYSTEM]`, a label showing `{a|b|c}`)
+errors at render ("[brackets] returned nothing").
+
+**HTML-entity escaping (`&#91;` …) is NOT reliable for this** — Perchance can
+decode entities before its template pass, so the bracket reappears and still
+errors. The robust rule: **keep `[ ] { }` out of HTML markup entirely.** Two
+safe options: (1) reword so the character never appears ("in square brackets"
+rather than "in [brackets]"); (2) when the literal bracket *is* the content (a
+format example), set it from `<script>`, which Perchance never templates —
+`el("loreOut").placeholder = "[trigger, trigger] …"`. JS string literals inside
+`<script>` are always safe, which is also why building prompts in JS (above)
+sidesteps the whole problem.
+
 ---
 
 ## 2. The AI text plugin (`ai-text-plugin`)
@@ -169,14 +187,50 @@ fields that define a character; leave the rest at these defaults.
   `fitMessagesInContextMethod` (`summarizeOld`), `modelName` (`perchance-ai`).
 - `customData.isPersona` — `true` for the user's own character (section 5).
 
-### Fields to leave blank unless you know their purpose
-`roleplay1Instructions`, `roleplay2Instructions`, `contextInfoPrompt`,
-`detailedContextInfoPrompt`, `vitalWritingInstructions`, `vitalRoleInstructions`.
-ACC leaves these empty by default. Stuffing them with restated role text tends
-to degrade output. Only fill them if the intended content is known.
+### Fields still to leave blank unless you know their purpose
+`vitalWritingInstructions`, `vitalRoleInstructions`, `writingFormat`,
+`petraCustomSecretInformation`. ACC leaves these empty by default and stuffing
+them with restated role text tends to degrade output. (Several fields formerly
+listed here — `roleplay1/2Instructions` and the `contextInfo*` family — are now
+understood; see **§4a**.)
 
 `avatar.url` cannot be set without an actual generated image; ACC shows a
-default until the user generates one in-app.
+default until the user generates one in-app. You *can* also set it at runtime
+from `customCode` (`oc.character.avatar.url = ...`).
+
+### 4a. Confirmed field semantics (from a real petrafied-acc export)
+Inspecting a live share file resolved fields the section above previously told
+you to leave blank. These are now safe to populate **deliberately** (keep them
+off by default — they change behavior):
+
+- **`roleplay1Instructions` / `roleplay2Instructions`** — named
+  writing-instruction **presets**. `generalWritingInstructions` can be the
+  literal string `"@roleplay1"`, which pulls in whatever `roleplay1Instructions`
+  holds. So they are referenced by `@roleplayN`, not injected on their own.
+- **`contextInfo` / `contextInfoPrompt` / `contextInfoToggle`** (plus the
+  `detailedContextInfo*` trio) — a **running structured-context memory** channel,
+  separate from RAG memories/summaries. `*Toggle` is `"yes"`/`"no"`; `*Prompt`
+  is an extraction prompt ACC runs each turn to maintain a rolling state
+  summary, and `contextInfo` holds the extracted text. The prompts use template
+  placeholders **`{{InputInformation}}`** (the latest turn) and
+  **`{{PreviousContextInformation}}`** (the prior summary) — write the prompt to
+  merge them ("update the running notes: location, who is present, mood, open
+  threads"). The `detailed*` variant is the heavier, per-character version.
+- **`autoGenerateMemories`** — `"none"` disables; **`"v1"`** enables ACC's
+  auto-memory generation.
+- **`avatar.shape`** — accepts **`"portrait"`** as well as `"square"`/`"circle"`;
+  **`avatar.size`** is a scale that can exceed 1 (e.g. `1.5`).
+- **`messageWrapperStyle`** — **inline CSS** applied to the message bubble (e.g.
+  `"backdrop-filter: blur(4px); border-radius: 5px;"`). Whitelist what you write
+  here; treat it as a style-attribute value, never arbitrary markup.
+- **`shortcutButtons`** — array of `{ name, message, insertionType: "replace",
+  autoSend, clearAfterSend, type: "message" }`, rendered above the reply box.
+  Wrapping reply text in `<...>` marks it as an editable placeholder.
+- **`userCharacter`** — embeds the **persona**:
+  `{ avatar, roleInstruction, reminderMessage }`. **`systemCharacter`** is
+  `{ avatar, name }` (the narrator/system voice).
+- **`scene.background.url` / `scene.music.url`** — confirmed in active use as
+  hosted URLs (a default chat background image and an ambient music track).
 
 ### `customCode` — in-chat scripting (documented API)
 The `customCode` field holds JavaScript that runs inside the chat, exposing an
@@ -493,6 +547,17 @@ the image prefix/suffix/trigger fields; `fitMessagesInContextMethod:
 `author`, `expectsReply`, `wrapperStyle`, `id`). Confirmed by community testing:
 in a group chat only the **main** character's `customCode` block runs.
 
+**Verified from a real petrafied-acc share export (see §4a, §13, §14):** the
+`@roleplayN` preset reference via `generalWritingInstructions`; the
+`contextInfo`/`detailedContextInfo` running-context channel (`*Toggle` yes/no,
+`*Prompt` using `{{InputInformation}}`/`{{PreviousContextInformation}}`);
+`autoGenerateMemories: "v1"`; `avatar.shape: "portrait"` and fractional
+`avatar.size`; `messageWrapperStyle` as inline CSS; the `shortcutButtons` item
+shape; `userCharacter` = persona `{avatar, roleInstruction, reminderMessage}`
+and `systemCharacter` = `{avatar, name}`; `scene.background.url` /
+`scene.music.url` as hosted URLs; the `{ addCharacter, quickAdd }` share-link
+payload; and the `upload-plugin` → `user.uploads.dev` file-hosting path.
+
 **Documented in ACC's own docs:** the inline `<image>...</image>` directive,
 told to a character via its instruction or reminder (see the "AI Artist" example
 character); the `/image` and `/image --num=N` commands, including
@@ -513,8 +578,9 @@ parse it correctly. Use positive description as the real lever.
   thread.
 - Native `lore` table row shape (the `loreBookUrls` path is documented; the raw
   table rows are not).
-- Semantics of `roleplay1Instructions`, `roleplay2Instructions`,
-  `contextInfoPrompt`, `detailedContextInfoPrompt`, `vital*`.
+- Semantics of `vitalWritingInstructions` / `vitalRoleInstructions` and
+  `writingFormat` (still undocumented). The `roleplay*` and `contextInfo*`
+  families are now **confirmed** — see §4a.
 - Per-turn reliability of the `<image>` directive (the feature is documented;
   whether the model appends one every single message is not guaranteed).
 - Whether non-main characters' `generalWritingInstructions`/`reminderMessage`
@@ -638,3 +704,97 @@ here — test it on a scratch generator.)
 
 These are reported from community Perchance usage; verify exact behavior on a
 test generator, since list-syntax details vary by feature version.
+
+---
+
+## 13. Additional Perchance plugins & browser APIs
+
+Beyond `ai-text-plugin` and `text-to-image-plugin`, these are confirmed useful
+for character tools.
+
+### `upload-plugin` — host a file from the generator
+```
+uploader = {import:upload-plugin}
+
+async uploadFile(blob) =>
+  let r = await uploader(blob);     // r.url is the hosted file URL
+  return (r && r.url) ? r.url : "";
+```
+Uploads a `Blob` to Perchance's file store and returns a
+`https://user.uploads.dev/file/<uuid>` URL — no external host, no signup. Use it
+to host **lorebook `.txt` files** (for `loreBookUrls`, §7) and **share files**
+(§14) straight from the tool. The plugin runs in the **data editor**; call it
+from HTML via a data-panel function and wrap it defensively (return `""`/an
+error string on failure). A raw `POST` to the upload endpoint is rejected — go
+through the plugin.
+
+### Shared word banks — `{import:adjective|noun|verb}`
+Perchance publishes reusable word-list generators you can import in the data
+editor and sample from:
+```
+adjBank = {import:adjective}
+nounBank = {import:noun}
+verbBank = {import:verb}
+// in a data-panel function:  adjBank.selectOne  → a random adjective
+```
+Useful for injecting fresh vocabulary variety into prompts (or in-chat writing
+instructions). Pull a few words in HTML via a data-panel helper, and keep it
+optional — wrap in try/catch and fall back to `""` so an import hiccup never
+breaks generation. (Related list generator: `random-nouns-verbs-and-adjectives`.)
+
+### `CompressionStream` — gzip in the browser (no plugin)
+A standard browser API available on Perchance, used to gzip a share payload
+before upload (§14):
+```javascript
+async function gzip(str){
+  var cs = new CompressionStream("gzip");
+  var stream = new Blob([str]).stream().pipeThrough(cs);
+  return await new Response(stream).blob();   // gzipped Blob
+}
+```
+
+### Device TTS — `speechSynthesis` (local-only)
+The Web Speech API (`window.speechSynthesis`) speaks text with the **device's
+own** neural voices — free, no signup, nothing sent to a server. Enumerate with
+`speechSynthesis.getVoices()`; to keep it **fully local**, filter to
+`voice.localService === true` (drops the cloud voices some browsers list).
+Voices populate asynchronously, so also listen for the `voiceschanged` event.
+This runs inside ACC from a character's `customCode` (§4), so each character can
+pick its own local voice.
+
+---
+
+## 14. petrafied-acc & one-click share links
+
+**petrafied-acc** (a community fork of ACC) reads the same `chatbot-ui-v1` Dexie
+import format, so every export here imports into it unchanged. It also supports a
+**share-link** loader of the form
+`perchance.org/<generator>?data=<Name>~<uuid>.gz`.
+
+To build such a link from a tool:
+
+1. **Assemble the share payload** — *not* the full Dexie envelope (§3), but a
+   single wrapper learned from a real share file:
+   ```json
+   { "addCharacter": { /* ~47 character fields */ }, "quickAdd": true }
+   ```
+   The inner object is the character row **minus** `$types`, `id`, and the
+   timestamp fields, with `uuid` set to `null` and an added `folderName`. (The
+   importing app assigns fresh identity on load — same collision-safety goal as
+   §3, handled on the receiving side.)
+2. **Serialize → gzip** the JSON with `CompressionStream` (§13).
+3. **Upload** the gzipped `Blob` via `upload-plugin` (§13) → a
+   `user.uploads.dev/file/<uuid>` URL.
+4. **Assemble the link**: `perchance.org/<generator>?data=<Name>~<uuid>.gz`
+   (the `<uuid>` is the uploaded file's id; default generator `petrafied-acc`).
+
+Surface the raw uploaded-file URL too, as a fallback if the short-link format
+drifts. The gzip round-trip and upload are confirmed; the final `?data=` parsing
+lives in the target generator, so treat link reconstruction as **best-effort /
+unverified live**.
+
+**Hard limit — no live shared database.** A builder generator and petrafied-acc
+sit on different Perchance subdomains (origins), so the browser same-origin
+policy blocks writing directly into petrafied-acc's IndexedDB. File import and
+share links are the connection; a seamless no-file handoff would require the
+builder to live *inside* the target generator.
