@@ -39,6 +39,15 @@
       "Bash(ls *)",
       "Bash(mkdir *)",
       "Bash(wc *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(cat *)",
+      "Bash(sed *)",
+      "Bash(awk *)",
+      "Bash(jq *)",
+      "Bash(curl *)",
+      "Bash(python3 *)",
+      "Bash(bash *)",
       "Bash(uvx basic-memory *)",
       "mcp__basic-memory__read_note",
       "mcp__basic-memory__search_notes",
@@ -69,6 +78,10 @@
           {
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/check-wizard.sh\""
+          },
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/validate-generator.py\""
           }
         ]
       }
