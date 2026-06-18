@@ -163,13 +163,15 @@ names, and the differences between near-versions are the real signal — diff
 before assuming. Current state at time of writing:
 
 - `char-info` == `perchance-character-creation-3.md` (identical).
-- **Wizard current build (v2):** `char-wiz-html` == `wizard-html-panel-24.txt`
+- **Wizard current build (v2):** `char-wiz-html` == `wizard-html-panel-25.txt`
   (canonical HTML) and `char-wiz-dat` == `wizard-data-panel-14.txt` (canonical,
   minimal v2 data stub). These are the newest and the ones to edit. Lower-numbered
   `wizard-html-panel-*` / `wizard-data-panel-*` are historical snapshots — do not
   edit them. (`-21`→`-24` are the 2026-06-18 optimization: `-21` 4-phase IA regroup
   + a11y, `-22` in-browser Review/refine second pass, `-23` correctness+security
-  hardening, `-24` `stopSequences` activation + `shortcutButtons`. The data panel
+  hardening, `-24` `stopSequences` activation + `shortcutButtons`; `-25` applies
+  `prepUserInput()` to the scenario + lore prompt paths (security audit Finding A —
+  sanitizer parity). The data panel
   was unchanged throughout — all of it is HTML-side and auto-deploys via the loader.
   See `task_plan.md`/`progress.md` and the "SESSION STATE 2026-06-18 — optimization
   Phases 2-7 done" handoff note.)
