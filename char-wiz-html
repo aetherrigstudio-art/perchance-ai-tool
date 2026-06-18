@@ -263,7 +263,7 @@
   var styleSubs = {};
   var immersion = { enabled:false, tts:false, avatars:false, backgrounds:false, musicOn:false, memory:false,
     memMax:8, memEvery:8, avatarSet:{}, bgSet:{}, musicMap:{}, voices:{}, bgLabels:"" };
-  var SCENE_DIRECTIVE = "At the end of EVERY reply, on its own final line, append exactly one image tag describing the FULL current scene: the location, every character present with their established appearance, their actions and expressions, and the lighting and mood. Format it exactly as <image>a detailed scene description</image>. Keep each character's look consistent with their description and never blend features between characters.";
+  var SCENE_DIRECTIVE = "At the end of EVERY reply, on its own final line, append exactly one image tag describing the FULL current scene: the location, every character present with their established appearance AND the clothing they are currently wearing (everyone is always clothed), their actions and expressions, and the lighting and mood. Format it exactly as <image>a detailed scene description</image>. Keep each character's permanent features consistent with their description and never blend features between characters.";
   function loreMode(){ return el("loreMode") ? el("loreMode").value : "inline"; }
   function sceneMode(){ return el("sceneMode") ? el("sceneMode").value : "both"; }
   var RELTYPES = ["is allied with","is a close friend of","is a rival of","is an enemy of","is family to","is romantically interested in","is a mentor to","is a student of","distrusts","owes a debt to","protects","harbors a secret about","is a stranger to"];
@@ -731,11 +731,15 @@
       (immersion.enabled ? ("  -  immersion: " + (imParts.length ? imParts.join(", ") : "on")) : "");
   }
 
+  // Side characters that count toward the export. Single mode ships only the
+  // main (+ optional persona), so hidden extras must be ignored everywhere the
+  // export is assembled or validated.
+  function activeExtras(){ syncExtrasFromDOM(); return (buildMode === "single") ? [] : extras; }
   function validateCast(){
     var issues = [];
     var m = val("mainOut").trim(), p = val("personaOut").trim();
-    syncExtrasFromDOM();
-    var anyChar = m || extras.some(function(ex){ return (ex.out||"").trim(); });
+    var ex = activeExtras();
+    var anyChar = m || ex.some(function(e){ return (e.out||"").trim(); });
     if(!anyChar) issues.push("- No main or additional character has been generated.");
     function check(label, raw, needFirst){
       if(!raw) return;
@@ -746,11 +750,12 @@
     }
     check("Main character", m, true);
     check("Persona", p, false);
-    extras.forEach(function(ex,i){ if((ex.out||"").trim()) check("Character " + (i+1), ex.out.trim(), true); });
+    ex.forEach(function(e,i){ if((e.out||"").trim()) check("Character " + (i+1), e.out.trim(), true); });
+    // Duplicate-name check is only meaningful among the AI characters (main +
+    // side cast); the persona has a separate role/id and may share a name.
     var raw = [];
     if(m) raw.push(parseChar(m).name);
-    if(p) raw.push(parseChar(p).name);
-    extras.forEach(function(ex){ if((ex.out||"").trim()) raw.push(parseChar(ex.out).name); });
+    ex.forEach(function(e){ if((e.out||"").trim()) raw.push(parseChar(e.out).name); });
     var seen = {}, dupes = {};
     raw.forEach(function(n){ var k = (n||"").toLowerCase().trim(); if(k){ if(seen[k]) dupes[k] = n; seen[k] = true; } });
     Object.keys(dupes).forEach(function(k){ issues.push("- Duplicate character name: \"" + dupes[k] + "\" - rename one so they don't collide."); });
@@ -761,8 +766,7 @@
     var names = [];
     var m = val("mainOut").trim(); if(m) names.push(parseChar(m).name);
     var p = val("personaOut").trim(); if(p) names.push(parseChar(p).name);
-    syncExtrasFromDOM();
-    extras.forEach(function(ex){ if((ex.out||"").trim()) names.push(parseChar(ex.out).name); });
+    activeExtras().forEach(function(ex){ if((ex.out||"").trim()) names.push(parseChar(ex.out).name); });
     return names.filter(function(n,i){ return n && names.indexOf(n) === i; });
   }
   function refreshRelSelects(){
@@ -1031,7 +1035,7 @@
         var outfit = ws.length ? ws[Math.floor(Math.random()*ws.length)] : "";
         // appearance lock: persistent permanent features for the characters present (clothing stays per-scene)
         var feat = cfg.features || {};
-        var present = Object.keys(feat).filter(function(k){ return ctx.toLowerCase().indexOf(k) >= 0; });
+        var present = Object.keys(feat).filter(function(k){ try { return new RegExp("\\b" + k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(ctx); } catch(e){ return ctx.toLowerCase().indexOf(k) >= 0; } });
         if(!present.length && who && feat[who]) present = [who];
         var lockClause = present.map(function(k){ return k + " has " + feat[k]; }).join("; ");
         var result = await oc.getInstructCompletion({
@@ -1182,14 +1186,15 @@
     if(typeof genCharacterImage !== "function"){ alert("Image generation unavailable - check the DATA panel import."); return; }
     var c = parseChar(m);
     var emotions = [["neutral","neutral calm expression"],["happy","bright happy smile, cheerful"],["sad","sad teary downcast expression"],["angry","angry frown, stern expression"],["surprised","surprised wide-eyed expression"],["shy","shy blushing bashful expression"]];
+    var ok = 0;
     for(var i=0;i<emotions.length;i++){
       var emo = emotions[i];
       var prompt = styleOnly() + (c.name||"character") + ", " + (c.appearance||"") + ", " + emo[1] + ", solo character portrait, upper body, looking at viewer, simple background" + styleSuffix();
       el("imAvatarBusy").textContent = "generating " + emo[0] + " (" + (i+1) + "/" + emotions.length + ")...";
       var url = ""; try { url = await genCharacterImage(prompt, IMG_NEG, "512x512"); } catch(e){ url = ""; }
-      if(url){ immersion.avatarSet[emo[0]] = url; renderAvatarThumbs(); save(); }
+      if(url){ immersion.avatarSet[emo[0]] = url; ok++; renderAvatarThumbs(); save(); }
     }
-    el("imAvatarBusy").textContent = "done.";
+    el("imAvatarBusy").textContent = ok ? ("done - " + ok + "/" + emotions.length + " generated.") : "No images generated - check the DATA panel image plugin.";
   };
   function renderAvatarThumbs(){
     var c = el("imAvatarThumbs"); if(!c) return; c.innerHTML = "";
@@ -1204,14 +1209,15 @@
     if(typeof genCharacterImage !== "function"){ alert("Image generation unavailable - check the DATA panel import."); return; }
     var labels = (val("imBgLabels")||"").split(",").map(function(s){ return s.trim(); }).filter(Boolean);
     if(!labels.length){ alert("Enter at least one location keyword (comma-separated)."); return; }
+    var ok = 0;
     for(var i=0;i<labels.length;i++){
       var label = labels[i];
       var prompt = styleOnly() + "establishing background scene of " + label + ", scenery, no people, empty location" + styleSuffix();
       el("imBgBusy").textContent = "generating " + label + " (" + (i+1) + "/" + labels.length + ")...";
       var url = ""; try { url = await genCharacterImage(prompt, IMG_NEG, "768x512"); } catch(e){ url = ""; }
-      if(url){ immersion.bgSet[label.toLowerCase()] = url; renderBgThumbs(); save(); }
+      if(url){ immersion.bgSet[label.toLowerCase()] = url; ok++; renderBgThumbs(); save(); }
     }
-    el("imBgBusy").textContent = "done.";
+    el("imBgBusy").textContent = ok ? ("done - " + ok + "/" + labels.length + " generated.") : "No images generated - check the DATA panel image plugin.";
   };
   function renderBgThumbs(){
     var c = el("imBgThumbs"); if(!c) return; c.innerHTML = "";
@@ -1500,8 +1506,7 @@
     var list = [];
     var m = val("mainOut").trim(); if(m) list.push({ c: parseChar(m), p: false });
     var p = val("personaOut").trim(); if(p) list.push({ c: parseChar(p), p: true });
-    syncExtrasFromDOM();
-    extras.forEach(function(ex){ if((ex.out||"").trim()) list.push({ c: parseChar(ex.out), p: false }); });
+    activeExtras().forEach(function(ex){ if((ex.out||"").trim()) list.push({ c: parseChar(ex.out), p: false }); });
     return list;
   }
   function downloadTextFile(name, ext, text, mime){

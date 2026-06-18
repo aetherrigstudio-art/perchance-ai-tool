@@ -69,6 +69,10 @@ script += `
   });
   return buildDexie(rows);
 };
+;globalThis.__setBuildMode = function(m){ buildMode = m; };
+;globalThis.__addExtra = function(out){ var i = extras.length; extras.push({ notes: "", out: out }); document.getElementById("exOut_" + i).value = out; };
+;globalThis.__clearExtras = function(){ extras.length = 0; };
+;globalThis.__validateCast = function(){ return validateCast(); };
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -136,6 +140,49 @@ try {
   cfgJsonValid = obj.main === "nina" && obj.tts.voiceMap.alex.lang === "en-GB";
 } catch { cfgJsonValid = false; }
 check("embedded CFG is valid JSON", cfgJsonValid);
+
+// ---- regression cases for code-review findings #1-#5 ----
+
+// #1: directive/off modes must still produce clothed images — the scene
+// directive baked into writing instructions/reminder must mention clothing.
+globalThis.__I.enabled = false;
+store.sceneMode = "directive";
+let dir = charsOf(globalThis.__export())[0];
+check("#1 scene directive requires clothing (no nudity in directive mode)",
+  /clothing|wearing/i.test(dir.generalWritingInstructions) && /clothing|wearing/i.test(dir.reminderMessage));
+store.sceneMode = "both";
+
+// #2: single build mode exports only the main (+ persona), not hidden extras.
+globalThis.__clearExtras();
+globalThis.__addExtra("=== NAME ===\nJax\n=== ROLE INSTRUCTION ===\nJax is a regular.\n=== FIRST MESSAGE ===\nHey.\n=== APPEARANCE ===\nblond hair");
+globalThis.__setBuildMode("cast");
+check("#2 cast mode exports the side character", charsOf(globalThis.__export()).some((r) => r.name === "Jax"));
+globalThis.__setBuildMode("single");
+let single = charsOf(globalThis.__export());
+check("#2 single mode drops hidden side characters", !single.some((r) => r.name === "Jax"));
+check("#2 single mode still exports main + persona", single.some((r) => r.name === "Nina") && single.some((r) => r.customData.isPersona));
+globalThis.__setBuildMode("cast"); globalThis.__clearExtras();
+
+// #3: appearance-lock matches names on word boundaries (no substring over-fire).
+globalThis.__I.enabled = true;
+check("#3 appearance-lock uses word-boundary name matching",
+  charsOf(globalThis.__export())[0].customCode.includes("new RegExp("));
+globalThis.__I.enabled = false;
+
+// #4: duplicate-name check is among AI characters only; persona may share a name.
+store.personaOut = "=== NAME ===\nNina\n=== ROLE INSTRUCTION ===\nThe player, also called Nina.";
+check("#4 persona sharing the main's name does NOT block export", globalThis.__validateCast().every((s) => !/Duplicate/.test(s)));
+globalThis.__addExtra("=== NAME ===\nNina\n=== ROLE INSTRUCTION ===\nA second Nina.\n=== FIRST MESSAGE ===\nHi.");
+check("#4 two AI characters sharing a name IS flagged", globalThis.__validateCast().some((s) => /Duplicate/.test(s)));
+globalThis.__clearExtras();
+store.personaOut = "=== NAME ===\nAlex\n=== ROLE INSTRUCTION ===\nAlex is a visitor.\n=== APPEARANCE ===\nblack hair";
+
+// #5: image-generation failures are reported, not masked as "done."
+globalThis.window.genCharacterImage = async () => ""; // simulate unavailable plugin
+globalThis.genCharacterImage = globalThis.window.genCharacterImage;
+await globalThis.window.genExpressionAvatars();
+check("#5 failed avatar generation reports an error, not 'done.'",
+  /No images generated/i.test(elements["imAvatarBusy"].textContent));
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);
