@@ -217,6 +217,33 @@ Use the right dispatch for each type of work:
 | Parallel or isolated work | **Subagent** (`Agent` tool) | Isolated worktree or context; splits load |
 | Independent calls in one turn | **Parallel tool calls** | Batch in one message; faster |
 
+**When to use which skill.** Match the work to the most *specific* skill; if a
+built-in tool or a one-line edit suffices, use no skill. (`ON` = auto-fires on its
+description; `name-only` = no description loaded, so invoke it deliberately by name.)
+
+| Situation | Skill(s) |
+|---|---|
+| Plan any non-trivial / multi-file task (do FIRST) | **`/plan`** → `plan-mode` + `pi-planning-with-files` |
+| Build / edit the wizard UI (vanilla HTML/CSS/JS) | `vanilla-web`, `mobile-responsiveness` |
+| A11y / ARIA / live-regions / WCAG | `accessibility-engineer`, `aria-live-regions` |
+| Run / render / screenshot / lint the wizard | `run-perchance-ai-tool` |
+| Find bugs / review changed code | `debugger`, `code-review-quality`; or `/code-review` |
+| Security review of a change | `code-security-audit`; or `/security-review` |
+| Multi-source web research | `deep-research-agent`, `websearch-deep`, `web-search` |
+| Hard trade-off / competing-factor decision | `thought-based-reasoning` |
+| Author a command / hook / setting | `command-development`, `hook-development`, `plugin-settings` |
+| Orchestrate parallel / isolated multi-agent work | `parallel-agents`, `subagent-task-execution`, `agent-orchestrator-task` |
+| UX / information-architecture / layout calls | `ui-ux-pro-max`, `usability-testing` |
+| Roadmap / ACC-field prioritization | `roadmap-planning` |
+| Recap state / post-task reflect | `recap`, `reflect` |
+| Search for / install a new skill | `/find-skills` |
+
+Rules: (1) **`/plan` precedes any non-trivial change** (workspace rule 7). (2) One
+domain → one skill; don't stack overlapping skills on the same step. (3) Shared-file
+edits (`char-wiz-html`) stay inline or in one worktree — never fan out (below).
+(4) Prefer the project's own tooling (`test/smoke.mjs`, `run-perchance-ai-tool`,
+the hooks) over generic skills.
+
 **Installed slash commands** (`.claude/commands/`): `/plan`, `/recap`, `/reflect`, `/find-skills`, `/audit`
 
 **`/plan`** = the must-fire planning workflow: `plan-mode` (analysis) → `pi-planning-with-files` (durable `task_plan.md`/`progress.md`) → approval → tracked execution. Both skills are kept ON so the command can invoke them. Run it before any non-trivial change.
