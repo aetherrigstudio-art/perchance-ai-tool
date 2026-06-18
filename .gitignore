@@ -7,3 +7,11 @@
 #   .agents/skills/   = real skill content (installed via the skills CLI)
 #   .claude/skills/*  = symlinks into .agents/skills (Claude Code's discovery path)
 #   skills-lock.json  = the manifest (already tracked)
+
+# Shared Basic Memory: the markdown notes under ai-workspace/memory/ ARE
+# committed (that's the shared knowledge). The SQLite index is local and
+# rebuildable from the markdown via `basic-memory sync` — never commit it.
+ai-workspace/memory/.bm/
+*.db
+*.db-shm
+*.db-wal
