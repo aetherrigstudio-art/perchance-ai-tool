@@ -238,14 +238,41 @@ and supports `?data=Name~uuid.gz` share-link loading. Sources:
 - **Lorebooks by URL** (`loreBookUrls`), **in-chat `customCode`** (immersion),
   and the Petra-aware schema (`petraCustom*` fields already present).
 
-**To build (tighter connection)**
-1. **One-click share link** — replicate petrafied-acc's `~uuid.gz` upload
-   (`user.uploads.dev`) + share JSON format so the wizard emits a direct
-   `perchance.org/petrafied-acc?data=…` link (loads into chat, no file step).
-   Feasibility unverified — needs reverse-engineering the upload/format.
-2. **Confirm TavernAI PNG import** support in petrafied-acc (we already export
+**Shipped — one-click share link**
+- The wizard now builds the main character in petrafied-acc's exact share format
+  (`{ addCharacter:{…}, quickAdd:true }`, learned from a real export), gzips it
+  (`CompressionStream`), uploads via the data panel's `uploader =
+  {import:upload-plugin}` → `uploadShare()`, and assembles a
+  `perchance.org/<gen>?data=Name~uuid.gz` link (generator configurable; default
+  `petrafied-acc`). Best-effort (link-format reconstruction unverified live);
+  the raw uploaded file URL is also surfaced as a fallback. `shareMainRow` /
+  `rowToShare` / `buildShareJSON` / `shareLink` / `genShareLink` in
+  `char-wiz-html`; smoke regressions cover the format + link assembly.
+
+**Still to build**
+1. **Confirm TavernAI PNG import** support in petrafied-acc (we already export
    the cards).
-3. **Populate `petraCustom*` fields** once their semantics are confirmed (Tier 3).
+2. **Embed the persona** into the share's `userCharacter` (real exports do this).
+
+### Tier-3 field semantics — CONFIRMED from a real petrafied-acc export
+
+Inspecting a live share file (`user.uploads.dev/file/…gz`) resolved several
+previously-unverified fields (see Tier 3 above — these can now be implemented):
+- **`roleplay1Instructions` / `roleplay2Instructions`** are named writing-instruction
+  presets: `generalWritingInstructions` can be `"@roleplay1"` to pull in
+  `roleplay1Instructions`. So they ARE used (via `@roleplayN` references).
+- **`contextInfo` family** is a real structured-context channel: `contextInfoPrompt`
+  / `detailedContextInfoPrompt` hold extraction prompts, `*Toggle` enables them.
+- **`autoGenerateMemories`** takes `"v1"` (not just `"none"`) to enable memory.
+- **`avatar.shape`** accepts `"portrait"` (alongside square/circle); `avatar.size`
+  can be e.g. `1.5`.
+- **`messageWrapperStyle`** is inline CSS (e.g. `"backdrop-filter: blur(4px);
+  border-radius:5px; …"`) — confirms our per-character color format.
+- **`shortcutButtons`** items: `{name, message, insertionType:"replace", autoSend,
+  clearAfterSend, type:"message"}`.
+- **`userCharacter`** embeds the persona `{avatar, roleInstruction, reminderMessage}`;
+  **`systemCharacter`** is `{avatar, name}`.
+- **`scene.background.url` / `scene.music.url`** confirmed in active use (hosted URLs).
 
 **Hard limit (not possible)**
 - No live shared-database link: the wizard and petrafied-acc run on separate

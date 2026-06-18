@@ -79,6 +79,8 @@ script += `
 ;globalThis.__rotatePool = function(p, b){ return rotatePool(p, b); };
 ;globalThis.__seedTone = SEED.tone;
 ;globalThis.__inspirationLine = function(){ return inspirationLine(); };
+;globalThis.__buildShareJSON = function(){ return buildShareJSON(); };
+;globalThis.__shareLink = function(u,n,g){ return shareLink(u,n,g); };
 `;
 vm.runInThisContext(script, { filename: "char-wiz-html#script" });
 
@@ -252,6 +254,16 @@ let insp1 = globalThis.__inspirationLine();
 let insp2 = globalThis.__inspirationLine();
 check("word-bank words appear as optional flavor when available", /fresh words/i.test(insp1) && /adjective_/.test(insp1));
 check("word-bank words are cached per 4h window (stable within the window)", insp1 === insp2);
+
+// One-click share: build the petrafied-acc share JSON + assemble the link.
+let share = JSON.parse(globalThis.__buildShareJSON());
+check("share JSON is { addCharacter, quickAdd:true }", share.quickAdd === true && share.addCharacter && share.addCharacter.name === "Nina");
+check("share addCharacter drops export-only fields ($types/id/timestamps)", !("$types" in share.addCharacter) && !("id" in share.addCharacter) && !("creationTime" in share.addCharacter));
+check("share addCharacter sets uuid:null + folderName (matches real export shape)", share.addCharacter.uuid === null && share.addCharacter.folderName === "");
+check("share addCharacter keeps real character content", /Nina/.test(share.addCharacter.roleInstruction) && typeof share.addCharacter.roleInstruction === "string");
+check("share link matches petrafied-acc ?data=Name~uuid.gz format",
+  globalThis.__shareLink("https://user.uploads.dev/file/abc123def.gz", "Zhila Yanna", "petrafied-acc") === "https://perchance.org/petrafied-acc?data=Zhila_Yanna~abc123def.gz");
+check("share link target generator is configurable", /\/ai-character-chat\?data=/.test(globalThis.__shareLink("https://user.uploads.dev/file/x.gz", "Bob", "ai-character-chat")));
 
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);
