@@ -1,0 +1,38 @@
+ai = {import:ai-text-plugin}
+imageGen = {import:text-to-image-plugin}
+adjBank = {import:adjective}
+nounBank = {import:noun}
+verbBank = {import:verb}
+uploader = {import:upload-plugin}
+
+// v2 MINIMAL DATA PANEL. Only the load-time constructs Perchance requires live
+// here: the plugin imports above, the settings wiring below, and $meta. Every
+// function (generate, genCharacterImage, wordBank, uploadShare) now lives in the
+// loader-fetched HTML; the loader bridges the imports above onto window so the
+// HTML can use them. This file should now essentially never need re-pasting.
+
+settings
+  instruction() =>
+    return (window.buildWizardPrompt ? window.buildWizardPrompt() : "");
+  startWith = [ "" ]
+  hideStartWith = [ false ]
+  outputTo = [responseEl]
+  stopSequences() =>
+    return (window.WIZ_STOP_SEQUENCES || ["=== END ==="]);
+  onStart() =>
+    responseEl.value = "";
+  onChunk() =>
+    if(window.onWizChunk){ window.onWizChunk(responseEl); }
+    else if(window.activeOutputEl){
+      window.activeOutputEl.value = responseEl.value;
+      let e = window.activeOutputEl;
+      if(e.scrollTop + e.offsetHeight > e.scrollHeight - 60) e.scrollTop = e.scrollHeight;
+    }
+  onFinish() =>
+    if(window.activeOutputEl) window.activeOutputEl.value = responseEl.value;
+    if(window.onWizFinish) window.onWizFinish();
+  render = [ null ]
+
+$meta
+  title = AI Character Set Builder
+  description = Build a whole cast for AI Character Chat - scenario, main character, your persona, side characters, lore, relationships, generated portraits, and varied scene images - then export ready to import. Free, no login.
