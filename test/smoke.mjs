@@ -307,5 +307,27 @@ check("no unescaped [..] template expressions in HTML markup", badBracket.length
 check("no unescaped {a|b|c} template expressions in HTML markup", badBrace.length === 0);
 check("no entity-escaped brackets/braces in HTML markup (use <script> instead)", badEntity.length === 0);
 
+// 9) Review pass: the in-browser window.gradeCharacter port must track the node
+// grader (test/grade-generation.mjs) — strong on a good character, weak on a bad
+// one, and persona-aware (no first-message penalty).
+const GOOD_CHAR =
+  "=== NAME ===\nMira Vance\n=== TAGLINE ===\nA weary smuggler.\n" +
+  "=== ROLE INSTRUCTION ===\nMira runs cargo through the outer rings and trusts no one on the first meeting. She is dry, quick-witted, and fiercely loyal once you earn it. {{char}} speaks in clipped sentences and deflects with humor when cornered. She is haunted by a job that went wrong. Keep her competent, guarded, and warm underneath. {{user}} is a new contact she is sizing up.\n" +
+  "=== REMINDER ===\nStay guarded but fair.\n=== FIRST MESSAGE ===\n*She leans against the airlock.* \"You're late. Cargo doesn't wait.\"\n" +
+  "=== APPEARANCE ===\nshort black hair, brown eyes, lean build, a thin scar across her left eyebrow\n" +
+  "=== DEFAULT OUTFIT ===\nworn flight jacket, dark trousers\n=== WARDROBE ===\nflight jacket, trousers, boots\n" +
+  "=== IMAGE TRIGGERS ===\nMira: short black hair, brown eyes, lean build\n=== WRITING INSTRUCTION ===\nSecond person, terse.";
+const BAD_CHAR =
+  "=== NAME ===\nThis is a character who is brave and bold.\n=== ROLE INSTRUCTION ===\nHe is cool.\n" +
+  "=== FIRST MESSAGE ===\nHe stands there.\n=== APPEARANCE ===\n[describe appearance here]\n" +
+  "=== WRITING INSTRUCTION ===\nfollow the USER'S NOTES above and begin each section with its === LABEL ===\n=== END ===";
+const gGood = globalThis.window.gradeCharacter(GOOD_CHAR, {});
+const gBad = globalThis.window.gradeCharacter(BAD_CHAR, {});
+check("gradeCharacter scores a strong character A/B (>=80%)", gGood.score >= 0.8 && /[AB]/.test(gGood.grade));
+check("gradeCharacter scores a weak character low (<=50%)", gBad.score <= 0.5);
+check("gradeCharacter separates good from bad by >=40 points", gGood.score - gBad.score >= 0.4);
+const gPersona = globalThis.window.gradeCharacter(store.personaOut, { persona: true });
+check("gradeCharacter persona mode drops the first-message checks", gPersona.checks.every((x) => x.section !== "FIRST MESSAGE"));
+
 console.log("\n" + (failures ? failures + " FAILURE(S)" : "all checks passed"));
 process.exit(failures ? 1 : 0);

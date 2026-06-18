@@ -61,6 +61,33 @@ Update ROADMAP.md (Phase 8 preview) + CLAUDE.md skill-note correction (Phase 1),
 **Resume at Phase 3** (Part-2 in-browser review/refine: `window.gradeCharacter` +
 generalize `genConsistency`/`applyFix`/`doReroll` into ④ REVIEW).
 
+## Session 2026-06-18 (cont.) — Phase 3 COMPLETE (Review & refine / second pass)
+- **`window.gradeCharacter(raw, {persona})`** ports the `test/grade-generation.mjs`
+  rubric into the panel (12 checks; persona mode drops the 2 FIRST MESSAGE checks).
+  Uses a quiet section reader `gSec` (no console warns on expected misses).
+- **New `Review & refine (second pass)` card** at the top of ④ (after Opening,
+  before Consistency). `gradeCast()` grades main + persona + all extras; per
+  character it shows an A–F grade badge (green/amber/red) and lists each failing
+  check; flagged checks that map to a section get a one-click **re-roll <section>**
+  button. Re-grades automatically in `onWizFinish` whenever the review is open.
+- **Refactor:** pulled `window.rerollSection(outId, label, exclude)` out of
+  `doReroll` (which now delegates) so the Review buttons reuse the exact reroll
+  pipeline (`replaceSection`/`getSection`).
+- **Consistency** (genConsistency→applyFix) already sits in ④ REVIEW; left as-is.
+- **smoke.mjs:** 4 new assertions drive `window.gradeCharacter` on GOOD/BAD/persona
+  fixtures so the in-browser port stays in lock-step with the node grader.
+- **Mirrored** → `wizard-html-panel-22.txt`.
+
+| Check | Result |
+|-------|--------|
+| smoke.mjs (incl. 4 gradeCharacter assertions) | PASS |
+| node test/grade-generation.mjs (self-test) | exit 0 |
+| check-wizard.sh | exit 0 |
+| functional render (gradeCast in-browser) | 0 page errors; screenshot sent |
+
+**Resume at Phase 4** (correctness hardening: generate() try-finally + single-flight
+guard, RFC-4122 UUID fallback, resetAll clears accSchemaV1/accWB_*).
+
 ---
 ## ▶ NEXT SESSION — START HERE (resume the optimization initiative)
 
@@ -68,8 +95,9 @@ generalize `genConsistency`/`applyFix`/`doReroll` into ④ REVIEW).
 The `/plan` skill (pi-planning-with-files) auto-loads `task_plan.md` on start.
 
 **Where we are:** Phase 0 ✅, Phase 1 🟡 (skills 38→30, parked→name-only done;
-dispatcher skills NOT built), Phase 2 ✅ (IA regroup + a11y, mirrored to -21,
-all gates green). **Resume at Phase 3.**
+dispatcher skills NOT built), Phase 2 ✅ (IA regroup + a11y, mirrored to -21),
+Phase 3 ✅ (Review/refine second pass + window.gradeCharacter, mirrored to -22,
+all gates green). **Resume at Phase 4.**
 
 **Phase 2 = the original task: 4-phase IA regroup + a11y fixes** (`task_plan.md`).
 Workflow to execute it:

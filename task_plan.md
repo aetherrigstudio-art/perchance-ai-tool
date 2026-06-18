@@ -32,11 +32,12 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - **Gate:** ✅ smoke PASS · check-wizard exit 0 · render 0 page errors · screenshots (384/820px) sent to operator
 - **Side fix:** `test/smoke.mjs` fake DOM gained getAttribute/setAttribute/addEventListener/focus + `document.querySelector` so a11yInit runs headless; `validate-generator.py` now skips test harnesses (false-positive buildDexie table check on `smoke.mjs`).
 
-## Phase 3 — Part-2 review/refine phase (post-generation)  ⬜
-- [ ] Port `test/grade-generation.mjs` rubric → in-browser `window.gradeCharacter`
-- [ ] Grade each generated character; flag weak sections; one-click "re-roll this section" (reuse `doReroll`/`replaceSection`/`getSection`)
-- [ ] Generalize `genConsistency`→`applyFix` into the REVIEW phase
-- **Gate:** smoke + grader self-test + render
+## Phase 3 — Part-2 review/refine phase (post-generation)  ✅ complete
+- [x] Port `test/grade-generation.mjs` rubric → in-browser `window.gradeCharacter(raw, {persona})` (12 checks; persona mode drops the 2 FIRST MESSAGE checks → 10)
+- [x] New `Review & refine (second pass)` card at top of ④ (after Opening): `gradeCast()` grades main+persona+extras, shows A–F badge + per-character flagged sections, each with a one-click section re-roll (`rerollSection(outId,label,exclude)` — refactored out of `doReroll`); re-grades automatically on `onWizFinish`
+- [x] ~~Generalize `genConsistency`→`applyFix`~~ — already lives in ④ REVIEW (consistency card sits right after the new review card); left intact
+- **Gate:** ✅ smoke PASS (4 new gradeCharacter assertions track the node grader) · node grade-generation self-test exit 0 · check-wizard exit 0 · functional render (grade the cast) 0 page errors, screenshot sent
+- Mirror → `wizard-html-panel-22.txt`
 
 ## Phase 4 — Correctness hardening  ⬜
 - [ ] `window.generate()` try-finally + `_generating` single-flight guard (~:632)
