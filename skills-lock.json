@@ -104,6 +104,11 @@
       "source": "leonmelamud/claude-code-security-review",
       "skillPath": ".agents/skills/code-security-audit"
     },
+    "command-development": {
+      "source": "anthropics/claude-code",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/command-development/SKILL.md"
+    },
     "configure-web-session": {
       "source": "laurigates/claude-plugins",
       "sourceType": "github",
@@ -131,6 +136,11 @@
       "sourceType": "github",
       "skillPath": "skills/find-skills/SKILL.md",
       "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
+    },
+    "hook-development": {
+      "source": "anthropics/claude-code",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/hook-development/SKILL.md"
     },
     "knowledge-base-manager": {
       "source": "daffy0208/ai-dev-standards",
@@ -167,6 +177,11 @@
       "source": "onewave-ai/claude-skills",
       "skillPath": ".agents/skills/performance-profiler"
     },
+    "plugin-settings": {
+      "source": "anthropics/claude-code",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/plugin-settings/SKILL.md"
+    },
     "product-capability": {
       "source": "affaan-m/everything-claude-code",
       "sourceType": "github",
@@ -183,6 +198,11 @@
       "skill": "reflect",
       "installs": 610,
       "security": "Safe"
+    },
+    "roadmap-planning": {
+      "source": "deanpeters/product-manager-skills",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/roadmap-planning/SKILL.md"
     },
     "security-best-practices": {
       "source": "openai/skills",
@@ -242,21 +262,6 @@
     "websearch-deep": {
       "source": "thomasholknielsen/claude-code-config",
       "skillPath": ".agents/skills/websearch-deep"
-    },
-    "plugin-settings": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": ".agents/skills/plugin-settings/SKILL.md"
-    },
-    "hook-development": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": ".agents/skills/hook-development/SKILL.md"
-    },
-    "command-development": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": ".agents/skills/command-development/SKILL.md"
     }
   }
 }
