@@ -436,7 +436,25 @@
     if(!words.length) return "";
     return " You MAY draw on these fresh words for flavour if any fit naturally - ignore the ones that don't, and never list them: " + words.join(", ") + ".";
   }
-  function charSeed(){ return roll("Creative direction (use loosely; do NOT mention these words or list them): lean toward a " + rotatePool(SEED.tone) + " tone, give them " + rotatePool(SEED.trait) + ", and a " + rotatePool(SEED.speech) + " way of speaking. Let " + rotatePool(SEED.sensory) + " " + rotatePool(SEED.verb) + " the scene.\n\n" + VOCAB) + inspirationLine(); }
+  // charSeed: tone/trait/speech only — the sensory clause ("Let X verb the scene") was
+  // removed because it primed an atmospheric register that produced purple prose even when
+  // VOCAB explicitly banned it. Action and dialogue carry the scene per VOCAB.
+  function charSeed(){ return roll("Creative direction (use loosely; do NOT mention these words or list them): lean toward a " + rotatePool(SEED.tone) + " tone, give them " + rotatePool(SEED.trait) + ", and a " + rotatePool(SEED.speech) + " way of speaking.\n\n" + VOCAB) + inspirationLine(); }
+  // personaSeed: tone only — the user's notes define the persona's identity and
+  // personality, so injecting trait/speech seeds would compete with and override them.
+  function personaSeed(){ return roll("Creative direction (do NOT mention this): lean toward a " + rotatePool(SEED.tone) + " tone in how the persona is written.\n\n" + VOCAB) + inspirationLine(); }
+  // conditionalScenarioSeed: suppresses pacing/sensory clauses when the user has already
+  // stated a pace or vibe in their notes, preventing the random seed from overriding them.
+  function conditionalScenarioSeed(notes){
+    var n = (notes || "").toLowerCase();
+    var pacingTerms = ["fast", "slow", "languid", "brisk", "urgent", "atmospheric", "punchy", "quick", "simmering", "escalating", "action", "tense", "relaxed", "cozy", "intense"];
+    var hasPacing = pacingTerms.some(function(t){ return n.indexOf(t) >= 0; });
+    if(hasPacing){
+      // User specified pacing/vibe — offer only atmosphere colour, never a conflicting pace.
+      return roll("Creative direction (do NOT mention this): lean toward a " + rotatePool(SEED.vibe) + " atmosphere; respect the pace the user stated above.\n\n" + VOCAB) + inspirationLine();
+    }
+    return scenarioSeed();
+  }
   function scenarioSeed(){ return roll("Creative direction (do NOT mention this): lean toward a " + rotatePool(SEED.vibe) + " atmosphere with " + rotatePool(SEED.pacing) + " pacing; ground it in " + rotatePool(SEED.sensory) + ".\n\n" + VOCAB) + inspirationLine(); }
   function loreSeed(){ return roll("Lean the facts toward " + rotatePool(SEED.loreFocus) + "."); }
 
@@ -500,6 +518,10 @@
   function charPromptCtx(role, notes, ctx){
     return "You are a character designer for AI roleplay chat. Create a " + role + ", consistent with the scenario and the existing characters. Refer to the character as {{char}} and the human as {{user}}. Show personality through concrete detail and dialogue.\n\n" +
       "SCENARIO:\n" + ctx.scenario + "\n\nSTORY SO FAR:\n" + ctx.bible + "\n\nUSER'S NOTES:\n" + notes + "\n\n" +
+      "BINDING RULES — apply before writing anything:\n" +
+      "1. If USER'S NOTES give a name, use it exactly — do NOT rename, shorten, or replace it.\n" +
+      "2. If USER'S NOTES state an identity, role, relationship, or trait, build the character around it — do not invent a different person.\n" +
+      "3. These rules override creative direction and scenario atmosphere.\n\n" +
       "Write ALL sections in full, then stop. Output exactly these sections and nothing else:\n" +
       "=== NAME ===\nThe name on one line. If the user's notes give a name, use that exact name.\n" +
       "=== TAGLINE ===\nA single short sentence describing {{char}} at a glance.\n" +
@@ -518,9 +540,19 @@
       "Output exactly these sections and nothing else:\n=== NAME ===\nThe persona's name - use the exact name from the user's notes if they give one.\n=== TAGLINE ===\nA single short sentence describing {{user}} at a glance.\n=== ROLE INSTRUCTION ===\nAbout 100 to 160 words describing who {{user}} is, personality and appearance, so the AI knows who it talks to.\n=== APPEARANCE ===\nA short comma-separated list of PERMANENT physical features only - no clothing, no background, no art style.\n=== DEFAULT OUTFIT ===\nA short comma-separated default outfit, used only as a fallback.\n=== IMAGE TRIGGERS ===\nOne line: the persona's exact name, then a colon, then their permanent features plus default outfit as plain image tags (no art-style words, no lighting).\n=== WRITING INSTRUCTION ===\nOne or two sentences on how the AI should treat {{user}} in scenes.";
   }
   function refineWrap(prompt, current, adj, fmt){
-    return prompt + "\n\nCURRENT VERSION (improve this, do not start from scratch):\n" + current +
-      "\n\nADJUSTMENT REQUESTED:\n" + (adj || "(no specific note - just improve and tighten it)") +
-      "\n\nRewrite it incorporating the adjustment. " + fmt;
+    // When the user gives an explicit adjustment, mandate that it is visibly applied —
+    // not softened or hinted at. When there is no adjustment, ask only for targeted
+    // sharpening so the model does not make gratuitous changes.
+    var adjTrimmed = (adj || "").trim();
+    var adjBlock, instruction;
+    if(adjTrimmed){
+      adjBlock = "\n\nADJUSTMENT REQUESTED:\n" + adjTrimmed;
+      instruction = "Rewrite the full output so the adjustment is clearly and unmistakably applied — not hinted at or softened. If the adjustment changes tone, pace, or a specific section, make that change prominent and concrete. Keep structural elements (names, section format, established facts) that the adjustment does not contradict. " + fmt;
+    } else {
+      adjBlock = "";
+      instruction = "Sharpen the existing version: improve word choice, pacing, and specificity in the weakest parts. Do not change what is already working. " + fmt;
+    }
+    return prompt + "\n\nCURRENT VERSION:\n" + current + adjBlock + "\n\n" + instruction;
   }
   // Re-anchor the output format as the FINAL instruction. The creative seed is
   // appended after the section spec on first generation; without this the model
