@@ -35,7 +35,7 @@
   try { window.uploadShare = uploadShare; } catch (e) {}
 
   var OWNER = "aetherrigstudio-art", REPO = "perchance-ai-tool";
-  var BRANCH = "claude/init-9i0np9", FILE = "char-wiz-html";
+  var BRANCH = "claude/refinement", FILE = "char-wiz-html";
   var API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + FILE + "?ref=" + BRANCH;
   var RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/" + FILE;
   var root = document.getElementById("wiz-root");
