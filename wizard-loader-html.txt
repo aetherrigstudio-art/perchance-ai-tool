@@ -7,53 +7,54 @@
  * GitHub branch is live automatically - editing the repo IS deploying, so you
  * never copy-paste the HTML panel again.
  *
- * How it works: at runtime it fetches the real HTML panel (markup + <script> +
- * <style>) from GitHub raw, injects it, and re-executes its scripts (innerHTML
- * never runs <script>, so we re-create each one). Because the real markup is
- * injected by JS, Perchance never templates it - so the [ ] { } bracket rules
- * stop applying to it too.
+ * It fetches the real HTML panel (markup + <script> + <style>) at runtime,
+ * injects it, and re-executes its scripts (innerHTML never runs <script>, so we
+ * re-create each one). Because the markup is injected by JS, Perchance never
+ * templates it - so the [ ] { } bracket rules stop applying to it too.
  *
- * The data panel (char-wiz-dat) is still pasted once into the data/generator
- * editor; it rarely changes. Re-paste it only when char-wiz-dat itself changes.
+ * FRESHNESS: it fetches from the GitHub *API*, which returns the newest commit
+ * immediately. (raw.githubusercontent.com is CDN-cached ~5 min and ignores
+ * cache-busting query strings, so a push can take minutes to show.) If the API
+ * is unavailable - e.g. its 60-requests/hour unauthenticated limit per IP - it
+ * falls back to raw so the tool still loads (just up to ~5 min behind).
  *
- * Requires: the source repo/file readable without auth (it is - public + CORS *).
+ * The data panel (char-wiz-dat) is still pasted once into the data editor.
  */
 (function () {
-  // The ONE line to change if you move the source (e.g. after merging to main,
-  // point it at .../main/char-wiz-html instead of the branch):
-  var SRC = "https://raw.githubusercontent.com/aetherrigstudio-art/perchance-ai-tool/claude/init-9i0np9/char-wiz-html";
+  // Change these if you move the source (e.g. after merging to a stable branch):
+  var OWNER = "aetherrigstudio-art", REPO = "perchance-ai-tool";
+  var BRANCH = "claude/init-9i0np9", FILE = "char-wiz-html";
 
+  var API = "https://api.github.com/repos/" + OWNER + "/" + REPO + "/contents/" + FILE + "?ref=" + BRANCH;
+  var RAW = "https://raw.githubusercontent.com/" + OWNER + "/" + REPO + "/" + BRANCH + "/" + FILE;
   var root = document.getElementById("wiz-root");
 
+  function inject(htmlText) {
+    root.innerHTML = htmlText;                 // markup + <style> take effect now
+    // Re-create each <script> so it actually executes, in document order, on the
+    // global scope - exactly as a direct paste would do.
+    var scripts = root.querySelectorAll("script");
+    for (var i = 0; i < scripts.length; i++) {
+      var old = scripts[i], s = document.createElement("script");
+      for (var j = 0; j < old.attributes.length; j++) s.setAttribute(old.attributes[j].name, old.attributes[j].value);
+      s.textContent = old.textContent;
+      old.parentNode.replaceChild(s, old);
+    }
+  }
   function fail(msg) {
-    root.textContent =
-      "Could not load the latest build (" + msg + "). As a fallback, open " +
-      SRC + " and paste its contents here manually.";
+    root.textContent = "Could not load the latest build (" + msg + "). As a fallback, open " + RAW + " and paste its contents here manually.";
   }
 
-  fetch(SRC + "?t=" + Date.now(), { cache: "no-store" })
-    .then(function (r) {
-      if (!r.ok) throw new Error("HTTP " + r.status);
-      return r.text();
-    })
-    .then(function (html) {
-      root.innerHTML = html;                 // markup + <style> take effect now
-      // innerHTML does not execute <script> nodes; re-create them in order so
-      // the panel's logic (showTab, resetAll, load(), buildWizardPrompt, ...)
-      // is defined on the global scope, exactly as a direct paste would do.
-      var scripts = root.querySelectorAll("script");
-      for (var i = 0; i < scripts.length; i++) {
-        var old = scripts[i];
-        var s = document.createElement("script");
-        for (var j = 0; j < old.attributes.length; j++) {
-          s.setAttribute(old.attributes[j].name, old.attributes[j].value);
-        }
-        s.textContent = old.textContent;
-        old.parentNode.replaceChild(s, old);
-      }
-    })
-    .catch(function (e) {
-      fail(e && e.message ? e.message : "fetch blocked");
+  // Primary: GitHub API (fresh). Accept: raw returns the file bytes directly.
+  fetch(API + "&t=" + Date.now(), { cache: "no-store", headers: { Accept: "application/vnd.github.raw" } })
+    .then(function (r) { if (!r.ok) throw new Error("api " + r.status); return r.text(); })
+    .then(inject)
+    .catch(function () {
+      // Fallback: raw CDN (may be a few minutes behind, but always reachable).
+      fetch(RAW + "?t=" + Date.now(), { cache: "no-store" })
+        .then(function (r) { if (!r.ok) throw new Error("raw " + r.status); return r.text(); })
+        .then(inject)
+        .catch(function (e) { fail(e && e.message ? e.message : "fetch blocked"); });
     });
 })();
 </script>
