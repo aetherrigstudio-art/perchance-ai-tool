@@ -50,13 +50,40 @@
       "Bash(curl *)",
       "Bash(python3 *)",
       "Bash(bash *)",
-      "Bash(uvx basic-memory *)",
+      "Bash(npx *)",
+      "Bash(npm *)",
+      "Bash(uvx *)",
       "mcp__basic-memory__read_note",
       "mcp__basic-memory__search_notes",
       "mcp__basic-memory__recent_activity",
       "mcp__basic-memory__build_context",
-      "mcp__basic-memory__write_note"
+      "mcp__basic-memory__write_note",
+      "mcp__basic-memory__edit_note",
+      "mcp__basic-memory__list_memory_projects",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "WebFetch(domain:context7.com)"
     ]
+  },
+  "sandbox": {
+    "network": {
+      "allowedDomains": [
+        "registry.npmjs.org",
+        "*.npmjs.org",
+        "pypi.org",
+        "files.pythonhosted.org",
+        "*.pythonhosted.org",
+        "github.com",
+        "*.githubusercontent.com",
+        "codeload.github.com",
+        "skills.sh",
+        "context7.com",
+        "*.context7.com",
+        "*.upstash.io",
+        "playwright.azureedge.net",
+        "cdn.playwright.dev"
+      ]
+    }
   },
   "hooks": {
     "SessionStart": [

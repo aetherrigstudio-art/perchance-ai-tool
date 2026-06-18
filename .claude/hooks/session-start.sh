@@ -52,9 +52,36 @@ fi
 if command -v uvx >/dev/null 2>&1 && [ -d ai-workspace/memory ]; then
   ( export BASIC_MEMORY_HOME="$PWD/ai-workspace/memory"
     export BASIC_MEMORY_CONFIG_DIR="$PWD/ai-workspace/memory/.bm"
-    uvx basic-memory project add perchar "$BASIC_MEMORY_HOME" >/dev/null 2>&1 || true
+    cfg="$BASIC_MEMORY_CONFIG_DIR/config.json"
+    # basic-memory auto-seeds a project named "main" for the notes dir and then
+    # REFUSES `project add perchar` with "projects cannot share directory trees",
+    # so the old one-liner add silently failed (|| true) and perchar never
+    # resolved — queries fell through to cloud routing / "Project not found".
+    # The add only succeeds from an EMPTY config, so: if perchar is missing,
+    # reset the (gitignored, rebuildable) config and add it fresh. Idempotent;
+    # runs BEFORE Claude launches the MCP server so its registry includes perchar.
+    have=$(node -e 'try{var c=require(process.argv[1]);process.stdout.write(c.projects&&c.projects.perchar?"y":"n")}catch(e){process.stdout.write("n")}' "$cfg" 2>/dev/null || echo n)
+    if [ "$have" != "y" ]; then
+      mkdir -p "$BASIC_MEMORY_CONFIG_DIR"
+      echo '{"projects":{},"default_project":null}' > "$cfg"
+      uvx basic-memory project add perchar "$BASIC_MEMORY_HOME" >/dev/null 2>&1 || true
+    fi
     uvx basic-memory project default perchar >/dev/null 2>&1 || true
-  ) && echo "[session-start] basic-memory: uvx warmed + project registered" || true
+  ) && echo "[session-start] basic-memory: project 'perchar' ensured + uvx warmed" || true
+fi
+
+# Context7 MCP warm-up. Same cold-start trap as basic-memory: the server is
+# launched as `npx -y @upstash/context7-mcp` (see .mcp.json), and the FIRST run
+# downloads the package DURING the MCP handshake and races its connect timeout,
+# so context7 silently fails to load. Pre-fetch it here — before Claude Code
+# launches the server — so the real launch starts from npx cache and the
+# handshake is instant. context7 exits on stdin EOF (~1s when warm), so cheap.
+if command -v npx >/dev/null 2>&1; then
+  if echo '' | timeout 120 npx -y @upstash/context7-mcp >/dev/null 2>&1; then
+    echo "[session-start] context7: npx package warmed (cached for instant MCP launch)"
+  else
+    echo "[session-start] context7: warm-up failed (will cold-start on first use)" >&2
+  fi
 fi
 
 echo "[session-start] ready. Lint: bash .claude/hooks/check-wizard.sh  |  Test: node test/smoke.mjs  |  Skills: bash .claude/hooks/check-skills.sh"

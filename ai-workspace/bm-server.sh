@@ -23,7 +23,16 @@ export BASIC_MEMORY_CONFIG_DIR="$root/ai-workspace/memory/.bm"
 # uvx cold-start (which caused the "connecting" timeout). Fallback bootstrap here
 # (idempotent, backgrounded) covers the case where the hook didn't run — without
 # delaying the exec below.
-( uvx basic-memory project add perchar "$BASIC_MEMORY_HOME" >/dev/null 2>&1 || true
+( cfg="$BASIC_MEMORY_CONFIG_DIR/config.json"
+  # `project add perchar` only succeeds from an empty config — once basic-memory
+  # auto-seeds "main" for this tree it refuses ("cannot share directory trees").
+  # So reset the rebuildable config and add perchar only when it's missing.
+  have=$(node -e 'try{var c=require(process.argv[1]);process.stdout.write(c.projects&&c.projects.perchar?"y":"n")}catch(e){process.stdout.write("n")}' "$cfg" 2>/dev/null || echo n)
+  if [ "$have" != "y" ]; then
+    mkdir -p "$BASIC_MEMORY_CONFIG_DIR"
+    echo '{"projects":{},"default_project":null}' > "$cfg"
+    uvx basic-memory project add perchar "$BASIC_MEMORY_HOME" >/dev/null 2>&1 || true
+  fi
   uvx basic-memory project default perchar >/dev/null 2>&1 || true ) &
 
 exec uvx basic-memory mcp
