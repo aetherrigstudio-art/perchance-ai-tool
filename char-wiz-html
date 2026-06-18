@@ -584,7 +584,7 @@
       var ctx3 = buildContext("lore");
       var focus = val("loreNotes").trim();
       var coverage = focus
-        ? "Build the lorebook specifically around the FOCUS above: write 12 to 18 entries that develop it in depth - its key places, people, history, customs, relationships, and a few hooks or secrets - with every entry serving that focus. Do NOT drift onto unrelated topics."
+        ? "Write a focused lorebook of up to about 18 entries that cover ONLY what the FOCUS above describes. If the focus narrows the content type - for example only locations, only one character, or only the magic system - produce ONLY that type of entry and nothing else; do NOT add people, relationships, history, customs, or any other category unless the focus explicitly asks for it. Aim for breadth and detail WITHIN the focus."
         : "Write 12 to 18 entries spread across these areas: key places, important people and groups, how things came to be (history), everyday customs and the unwritten rules of this world, the relationships between the characters, and a few gentle hooks, rumours, or little secrets that could spark a scene.";
       var p3 = "You are the loremaster for a cute, wholesome, slice-of-life roleplay. Using the story so far, write a LOREBOOK - the world and character facts the AI should remember.\n\n" +
         "SCENARIO:\n" + ctx3.scenario + "\n\nSTORY SO FAR:\n" + ctx3.bible + "\n\n" +
