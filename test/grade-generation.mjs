@@ -77,9 +77,13 @@ const RUBRIC = [
     return { pass: !hit, detail: hit ? "leaked: " + hit.source : "clean" };
   }],
   ["no unfilled placeholders", (c) => {
+    // Strip valid ACC macros first — {{char}}, {{user}}, {{InputInformation}}
+    // are legitimate double-brace tokens the AI is *supposed* to emit
+    // (char-info §§ on persona/first-message), not unfilled scaffolding.
+    const cleaned = c.raw.replace(/\{\{[^}]*\}\}/g, "");
     const ph = [/\[[^\]]*\]/, /\{[^}]*\}/, /\bTODO\b/i, /lorem ipsum/i, /<name>/i, /your character/i, /\bplaceholder\b/i];
-    const hit = ph.find((re) => re.test(c.raw));
-    return { pass: !hit, detail: hit ? "placeholder: " + (c.raw.match(hit) || [""])[0].slice(0, 30) : "none" };
+    const hit = ph.find((re) => re.test(cleaned));
+    return { pass: !hit, detail: hit ? "placeholder: " + (cleaned.match(hit) || [""])[0].slice(0, 30) : "none" };
   }],
 ];
 
