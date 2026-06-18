@@ -88,6 +88,34 @@ generalize `genConsistency`/`applyFix`/`doReroll` into ④ REVIEW).
 **Resume at Phase 4** (correctness hardening: generate() try-finally + single-flight
 guard, RFC-4122 UUID fallback, resetAll clears accSchemaV1/accWB_*).
 
+## Session 2026-06-18 (cont.) — Phases 4 + 5 COMPLETE (correctness + security)
+- **Phase 4 (correctness):** `generate()` now single-flight (`window._generating`)
+  with try/catch/finally — failed gens no longer wedge the stop button / loader /
+  busy status; the 4 entry points (startGen/rerollSection/genConsistency/genStyle)
+  bail before mutating `activeOutputEl` so concurrent clicks can't misroute chunks.
+  `uuidV4()` = RFC-4122 v4 from `getRandomValues` (Math.random last resort), used by
+  `uniqueUuid` when `crypto.randomUUID` is absent. `resetAll()` also wipes
+  `accSchemaV1` + all `accWB_*` and nulls `window.learned`.
+- **Phase 5 (security):** `safeUrl()` protocol allowlist (http/https/blob/data:image)
+  guards all 6 image-src sinks. `prepUserInput()` neutralizes injected `=== HEADER ===`,
+  caps length, and fences notes in BEGIN/END USER INPUT (applied to char + persona
+  prompts, with a "data not instructions" binding rule). QA error sink switched off
+  `innerHTML` interpolation to safe DOM/textContent.
+- **smoke.mjs:** +2 (uuidV4) +6 (safeUrl) +4 (prepUserInput) assertions; URL stub
+  now augments Node's real `URL` constructor instead of replacing it.
+- **Two commits** (Phase 4 `51356a6`, Phase 5 below). **Mirrored → `wizard-html-panel-23.txt`.**
+
+| Check | Result |
+|-------|--------|
+| smoke.mjs (now ~70 assertions) | PASS |
+| node test/grade-generation.mjs | exit 0 |
+| check-wizard.sh | exit 0 |
+| headless render | 0 page errors |
+
+**Resume at Phase 6** (CI + loader integrity: `.github/workflows/verify.yml`;
+loader sha256 check). NOTE: Phase 6 is the highest-risk remaining phase — it
+touches CI + the live loader deploy path; read findings ③ + AUTOMATION.md first.
+
 ---
 ## ▶ NEXT SESSION — START HERE (resume the optimization initiative)
 
@@ -96,8 +124,9 @@ The `/plan` skill (pi-planning-with-files) auto-loads `task_plan.md` on start.
 
 **Where we are:** Phase 0 ✅, Phase 1 🟡 (skills 38→30, parked→name-only done;
 dispatcher skills NOT built), Phase 2 ✅ (IA regroup + a11y, mirrored to -21),
-Phase 3 ✅ (Review/refine second pass + window.gradeCharacter, mirrored to -22,
-all gates green). **Resume at Phase 4.**
+Phase 3 ✅ (Review/refine second pass + window.gradeCharacter, mirrored to -22),
+Phases 4 ✅ (correctness) + 5 ✅ (security) hardening, mirrored to -23, all gates
+green. **Resume at Phase 6.**
 
 **Phase 2 = the original task: 4-phase IA regroup + a11y fixes** (`task_plan.md`).
 Workflow to execute it:

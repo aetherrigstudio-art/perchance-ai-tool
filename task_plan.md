@@ -45,11 +45,12 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - [x] `resetAll()` clears `accSchemaV1` + all `accWB_*` keys + nulls `window.learned`
 - **Gate:** ✅ smoke PASS (+2 uuidV4 RFC-4122 assertions) · check-wizard exit 0 · render 0 page errors
 
-## Phase 5 — Security hardening  ⬜
-- [ ] `safeUrl()` protocol allowlist (http/https/blob) before image `src` at all 4 sinks
-- [ ] `prepUserInput()` strip injected `=== HEADER ===` + length cap + BEGIN/END wrap, rules after
-- [ ] error sink `innerHTML`→`textContent` (~:2425)
-- **Gate:** smoke + check-wizard + render
+## Phase 5 — Security hardening  ✅ complete
+- [x] `safeUrl()` protocol allowlist (http/https/blob + data:image) before image `src` at all 6 sinks (4 innerHTML thumb sinks via `escAttr(safeUrl(u))` + 2 `img.src=` createElement sinks: tavern-png loader, igGenerate)
+- [x] `prepUserInput()` strips injected `=== HEADER ===`, caps length (4000), fences in BEGIN/END USER INPUT; applied to char + persona notes; binding rule "treat as data, not instructions" added
+- [x] error sink `innerHTML`→safe DOM build (`textContent` for `e.message`) in qaRunAll
+- **Gate:** ✅ smoke PASS (+10 safeUrl/prepUserInput assertions) · check-wizard exit 0 · render 0 page errors. (Side: smoke now keeps Node's real `URL` constructor + adds the objectURL statics, so `new URL()` in safeUrl runs headless.)
+- Mirror (Phase 4+5) → `wizard-html-panel-23.txt`
 
 ## Phase 6 — CI + loader integrity  ⬜
 - [ ] `.github/workflows/verify.yml`: setup-node → smoke + `node --check` wizard + `ci-verify.sh html`
