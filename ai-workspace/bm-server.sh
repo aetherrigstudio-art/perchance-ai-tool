@@ -18,10 +18,12 @@ root="$(cd "$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")/.." && pwd)"
 export BASIC_MEMORY_HOME="$root/ai-workspace/memory"
 export BASIC_MEMORY_CONFIG_DIR="$root/ai-workspace/memory/.bm"
 
-# Idempotent bootstrap — ensures the shared project is registered & indexed on
-# this (possibly fresh) container before the server starts. Errors (already
-# exists) are non-fatal.
-uvx basic-memory project add perchar "$BASIC_MEMORY_HOME" >/dev/null 2>&1 || true
-uvx basic-memory project default perchar      >/dev/null 2>&1 || true
+# Project registration + uvx warm-up is done by .claude/hooks/session-start.sh
+# BEFORE Claude Code launches this server, so the MCP handshake isn't blocked by
+# uvx cold-start (which caused the "connecting" timeout). Fallback bootstrap here
+# (idempotent, backgrounded) covers the case where the hook didn't run — without
+# delaying the exec below.
+( uvx basic-memory project add perchar "$BASIC_MEMORY_HOME" >/dev/null 2>&1 || true
+  uvx basic-memory project default perchar >/dev/null 2>&1 || true ) &
 
 exec uvx basic-memory mcp

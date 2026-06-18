@@ -43,4 +43,18 @@ if command -v node >/dev/null 2>&1 && [ -f skills-lock.json ]; then
   bash .claude/hooks/check-skills.sh 2>&1 | sed 's/^/[session-start] /' || true
 fi
 
+# Basic Memory MCP warm-up. The MCP server (declared in .mcp.json -> bm-server.sh)
+# would otherwise cold-start `uvx` (downloads ~163 pkgs) DURING the MCP handshake
+# and time out, leaving the tools stuck "connecting". Doing it here — before
+# Claude Code launches the server — warms the uvx cache AND registers the shared
+# project, so the wrapper can exec the server immediately. Backgrounded + guarded
+# so it never blocks or fails the session.
+if command -v uvx >/dev/null 2>&1 && [ -d ai-workspace/memory ]; then
+  ( export BASIC_MEMORY_HOME="$PWD/ai-workspace/memory"
+    export BASIC_MEMORY_CONFIG_DIR="$PWD/ai-workspace/memory/.bm"
+    uvx basic-memory project add perchar "$BASIC_MEMORY_HOME" >/dev/null 2>&1 || true
+    uvx basic-memory project default perchar >/dev/null 2>&1 || true
+  ) && echo "[session-start] basic-memory: uvx warmed + project registered" || true
+fi
+
 echo "[session-start] ready. Lint: bash .claude/hooks/check-wizard.sh  |  Test: node test/smoke.mjs  |  Skills: bash .claude/hooks/check-skills.sh"
