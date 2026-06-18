@@ -52,6 +52,10 @@
       "skillPath": "awesome_agent_skills/debugger/SKILL.md",
       "computedHash": "609b0b6d79fe21bcb5eb8a01b38f5571b8ae05be826936a312bc04d9c5400193"
     },
+    "deep-research-agent": {
+      "source": "qodex-ai/ai-agent-skills",
+      "skillPath": ".agents/skills/deep-research-agent"
+    },
     "error-analysis": {
       "source": "hamelsmu/evals-skills",
       "sourceType": "github",
@@ -149,6 +153,10 @@
     "web-search": {
       "source": "qu-skills/skills",
       "skillPath": ".agents/skills/web-search"
+    },
+    "websearch-deep": {
+      "source": "thomasholknielsen/claude-code-config",
+      "skillPath": ".agents/skills/websearch-deep"
     }
   }
 }
