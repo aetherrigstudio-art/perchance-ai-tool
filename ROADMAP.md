@@ -17,22 +17,31 @@ Each entry: **field · default · what it does · source · approach · risk.**
 
 ## ⮕ Recommended build order (2026-06-18 optimization research)
 From the deep-research synthesis in `findings.md` / `task_plan.md` Phase 7:
-1. **`stopSequences: ["=== END ==="]`** in the data-panel `settings` (#15) — *do
-   first.* One line; deterministic output termination lets us delete the
-   length-control prompt scaffolding (simplifies `buildWizardPrompt`, improves
-   grader scores). Safe, isolated.
-2. **`shortcutButtons`** (#1) — schema `{name, message, autoSend,
-   insertionType:"replace", clearAfterSend}` externally corroborated; gate behind
-   advanced UI; empty `[]` is the safe default.
-3. **Richer `messageWrapperStyle`** (#7) — defer until rendering is confirmed
-   in-app; extend only with a strict `#hex`-style validator (CSS-injection surface).
+1. ✅ **SHIPPED** — **`stopSequences: ["=== END ==="]`** (#15). The data panel
+   already wired `stopSequences() => window.WIZ_STOP_SEQUENCES || ["=== END ==="]`,
+   so no data-panel change was needed; activated it by appending a terminal
+   `=== END ===` instruction to the character + persona multi-section prompts so
+   the model emits the stop marker. (Live-confirm it improves termination.)
+2. ✅ **SHIPPED** — **`shortcutButtons`** (#1) — "Quick reply buttons" UI in the
+   presentation card; exported per AI character as `{name, message,
+   insertionType:"replace", autoSend, clearAfterSend, type:"message"}`. Empty `[]`
+   default; persona gets none; partial entries filtered.
+3. **Richer `messageWrapperStyle`** (#7) — *still deferred* until rendering is
+   confirmed in-app; extend only with a strict `#hex`-style validator
+   (CSS-injection surface). The per-character `#hex` color is already shipped.
 
 **Also tracked (infra, not ACC fields — see `task_plan.md` Phases 5–6):**
-- **Loader integrity** (HIGH): `wizard-loader-html.txt` `innerHTML`s remote HTML
-  with no integrity check → CI publishes `char-wiz-html.sha256`, loader verifies
-  via `crypto.subtle.digest` (preserves auto-deploy) or pin to a commit-SHA URL.
-- **CI**: add `.github/workflows/` running `smoke.mjs` + `node --check` +
-  `ci-verify.sh html` on push/PR (no npm; the `dat` check stays local).
+- ✅ **SHIPPED — Loader integrity** (was HIGH): `wizard-loader-html.txt` now
+  fetches the committed `char-wiz-html.sha256` and compares it to a
+  `crypto.subtle.digest` of the injected bytes. **Soft-fail** — on mismatch it
+  shows a warning banner but never blocks (the loader is paste-once; a hard fail
+  would brick the generator). `scripts/gen-hash.sh` + `.githooks/pre-commit`
+  (enabled via `core.hooksPath`, auto-set by `session-start.sh`) keep the digest
+  in lock-step; CI fails on drift.
+- ✅ **SHIPPED — CI**: `.github/workflows/verify.yml` runs `smoke.mjs` +
+  `grade-generation.mjs` + `node --check` on the wizard `<script>` + the
+  hash-sync check on push/PR to `main`. (`ci-verify.sh` stays local/manual — it
+  compares against CDN-lagged GitHub raw and would flake in CI.)
 
 ## Already populated (not on the roadmap)
 
@@ -65,16 +74,22 @@ UI + `save`/`load`/`builderSnapshot`/`resetAll` state pattern (all in
 > **writing preset** selector (built-in / petrafied-acc `@roleplay1`/`@roleplay2`).
 > Off by default; smoke regressions cover off-unchanged, on-applied, persona-untouched.
 > The scene-image instruction also adopts Subject→Action→Setting ordering.
-> Remaining Tier-1: Batch C (`shortcutButtons` #1, richer `messageWrapperStyle` #7).
+> **Batch C partially shipped** (2026-06-18 optimization): item **1**
+> (`shortcutButtons`) is implemented as the "Quick reply buttons" sub-card in the
+> presentation card → exported per AI character in `characterRow()`. Remaining:
+> richer `messageWrapperStyle` (#7), still deferred until confirmed in-app.
 
-### 1. `shortcutButtons` · `[]`
+### 1. `shortcutButtons` · `[]` — ✅ SHIPPED (2026-06-18)
 - **What:** Buttons rendered above the reply box for common actions.
 - **Source:** Verified (docs). Schema: `{ name, message, autoSend,
-  insertionType: "replace", clearAfterSend }`; wrapping reply text in `<...>`
-  auto-highlights it as an editable placeholder.
-- **Approach:** Builder UI to add/edit buttons; an "AI-suggest" that proposes
-  scenario-appropriate actions ("continue", "describe the room", `/image`,
-  "advance time"). Write the array in `characterRow()`.
+  insertionType: "replace", clearAfterSend, type: "message" }`; wrapping reply
+  text in angle brackets auto-highlights it as an editable placeholder.
+- **Shipped:** "Quick reply buttons" sub-card in the "Character presentation"
+  card — a global list (name / message / auto-send / clear-after-send) on
+  `advanced.shortcutButtons`, exported per **AI** character in `characterRow()`
+  (persona gets none; entries missing a label or message are filtered out).
+- **Not done:** the optional "AI-suggest" that proposes scenario-appropriate
+  actions — left as a future nicety; buttons are entered manually.
 - **Risk:** Low. Cosmetic/UX; empty array is the safe default.
 
 ### 2. `avatar.shape` / `avatar.size` · `"square"` / `1`
@@ -183,13 +198,21 @@ unverified. **Action = controlled in-app experiment first, not blind population.
   consistency — these may surface in-app as the `contextInfo` / `detailedContextInfo`
   pair. Confirm against a real export before wiring.
 
-### 15. `stopSequences` · (unset)
+### 15. `stopSequences` · (unset) — ✅ SHIPPED (2026-06-18)
 - **Research update (2026-06-18):** The `ai-text-plugin` accepts a `stopSequences`
   array in the data panel's `settings` block. Setting `["=== END ==="]` gives
-  deterministic output termination, eliminating the length-control hacks in our
-  current prompts. This is a safe, low-risk improvement.
-- Also settable on the exported character row (ACC-side); worth testing whether
-  in-chat model stops cleanly vs. the data-panel-side sequence.
+  deterministic output termination.
+- **Shipped:** the data panel already wired
+  `stopSequences() => window.WIZ_STOP_SEQUENCES || ["=== END ==="]`, so no
+  data-panel change was needed. Activated it on the HTML side by appending a
+  terminal `=== END ===` instruction to the character + persona multi-section
+  prompts (`charPromptCtx`/`personaPromptCtx`) so the model emits the marker and
+  generation stops cleanly. stopSequences excludes the marker from the output, so
+  the grader's no-leak check still holds.
+- **Still open (live test):** confirm on Perchance that this improves termination
+  vs. the prompt's existing length guidance; if so, the length-control wording
+  could be trimmed further. Also settable on the exported character row (ACC-side)
+  — untested.
 - **Priority upgraded to Medium** — implement in data panel alongside the CI work.
 
 ### 16. Low-priority / mostly leave-default

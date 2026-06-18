@@ -65,11 +65,12 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - **Gate:** ✅ smoke PASS (+3 shortcutButtons assertions) · check-wizard exit 0 · markup bracket-clean · functional render 0 page errors + UI screenshot sent. **HTML-only → auto-deploys via loader; no data-panel re-paste.**
 - Mirror → `wizard-html-panel-24.txt`
 
-## Phase 8 — Docs / roadmap / memory + ship  ⬜
-- [ ] Update ROADMAP.md (build order, loader-integrity, CI items)
-- [ ] Reconcile CLAUDE.md / README / WORKSPACE STANDARD note (single home per fact)
-- [ ] `write_note` final state; push `main`
-- **Gate:** all prior gates green; repo clean
+## Phase 8 — Docs / roadmap / memory + ship  ✅ complete
+- [x] ROADMAP.md: build-order #15 `stopSequences` + #1 `shortcutButtons` marked ✅ SHIPPED; loader-integrity + CI marked shipped; Batch C note updated; `messageWrapperStyle` #7 still deferred.
+- [x] README.md §2 (current state → Phases 2–7) + §3 (former active task → "what shipped" summary; canonical pointer → -24).
+- [x] CLAUDE.md: canonical snapshot pointer -20 → -24; stale "in-progress active task" note replaced with the -21→-24 shipped log.
+- [x] Memory: handoff note `SESSION STATE 2026-06-18 — optimization Phases 2-7 done` (git-tracked markdown = source of truth; `write_note` MCP tool not surfaced this session) + sha256 recorded in progress.md.
+- **Gate:** all prior gates green; repo clean; pushed to `main`.
 
 ---
 **Decisions log**

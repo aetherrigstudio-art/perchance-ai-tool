@@ -178,8 +178,25 @@ e1a6369c6734e87f02c96e2ee75b9a4e0cd4bdc20205155c7832c58739772d0e
 | functional render (shortcut UI) | 0 page errors; screenshot sent |
 | hash in sync | e1a6369… |
 
-**Resume at Phase 8** (docs/ship: update ROADMAP.md, reconcile CLAUDE/README/memory,
-final verify). Most of the initiative is done — Phase 8 is documentation + wrap-up.
+**Phase 8 done in this session** — see the next entry. The 8-phase initiative is
+COMPLETE.
+
+## Session 2026-06-18 (cont.) — Phase 8 COMPLETE (docs/ship) → initiative DONE
+- **ROADMAP.md:** marked `stopSequences` (#15) + `shortcutButtons` (#1) ✅ SHIPPED;
+  loader-integrity + CI marked shipped in the build-order/infra section; Batch C
+  note updated; `messageWrapperStyle` (#7) left explicitly deferred.
+- **README.md:** §2 current-state rewritten to the Phases 2–7 summary + the optional
+  loader re-paste note; §3 "active task" replaced with a "what shipped" summary;
+  canonical pointer → `wizard-html-panel-24.txt`.
+- **CLAUDE.md:** canonical snapshot pointer `-20` → `-24`; removed the stale
+  "in-progress 4-phase regroup is the current active task" note, replaced with the
+  `-21`→`-24` shipped log (data panel unchanged throughout).
+- All doc-only; no code touched. Repo clean, pushed to `main`.
+
+**Initiative status: Phases 0–8 all ✅ complete.** Remaining future work lives in
+ROADMAP.md (richer `messageWrapperStyle`, AI-suggest for shortcutButtons, other
+unverified ACC fields) and Phase 1's optional dispatcher-skill consolidation.
+⚠️ Only pending real-world action: optional one-time loader re-paste (not public yet).
 
 ---
 ## ▶ NEXT SESSION — START HERE (resume the optimization initiative)

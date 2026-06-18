@@ -34,43 +34,51 @@ and clicking generate.
   branches**; commit + push to `main`. (If your session was auto-assigned a
   `claude/*` branch, fast-forward `main` to your work and push `main` instead, so
   the next agent isn't on a different page.)
-- **Canonical files:** `char-wiz-html` (== `wizard-html-panel-20.txt`) and
+- **Canonical files:** `char-wiz-html` (== `wizard-html-panel-24.txt`) and
   `char-wiz-dat`. Edit the canonical pair, then mirror to a new highest-numbered
   `wizard-html-panel-N.txt`. Don't touch older snapshots.
-- **Done + committed this session:** merged PR #13's base (build-mode dedupe,
-  grader, audits, Context7 config); restored `ui-ux-pro-max` + `usability-testing`
-  skills; fixed context7 + basic-memory MCP cold-start loading.
-- **Active task (approved, NOT yet built):** the 17-card wall → 4-phase IA
-  regroup + a new post-generation review phase. See §3.
+- **Done + committed (2026-06-18 optimization, Phases 2–7 on `main`):** 4-phase IA
+  regroup + a11y; in-browser Review/refine second pass (`window.gradeCharacter` +
+  per-section re-roll); correctness hardening (`generate()` single-flight, RFC-4122
+  uuid, `resetAll` cache clear); security hardening (`safeUrl` allowlist,
+  `prepUserInput` injection guard); CI (`.github/workflows/verify.yml`) + loader
+  soft-fail integrity digest; ROADMAP `stopSequences` + `shortcutButtons`.
+- **Active task:** none in flight — the regroup + second-pass work (former §3) is
+  shipped. Next candidates are in `ROADMAP.md` (e.g. richer `messageWrapperStyle`,
+  deferred until confirmed in-app) and `task_plan.md` Phase 8 wrap-up.
+- ⚠️ **One-time, optional:** re-paste `wizard-loader-html.txt` into the Perchance
+  HTML editor to activate the integrity banner (the loader is paste-once). All
+  Phase 2–7 work is HTML-side and auto-deploys via the loader — **no data-panel
+  re-paste needed.**
 
 ---
 
-## 3. The active task
+## 3. What shipped (former active task — done 2026-06-18)
 
-**Part 1 — 4-phase IA regroup of `char-wiz-html` (markup-only; ALL JS is
-`getElementById`, so reordering `<div class="card">` blocks is SAFE).**
+The 4-phase IA regroup + second-pass review are **complete and on `main`**. The
+builder UI (`char-wiz-html`) is now grouped into a labelled progress spine:
 
 ```
 ① START   Build mode · Import (load existing) · Scenario
-② BUILD   Main · Persona · Additional · Relationships · Lore · Opening scene
+② BUILD   Main · Persona · Additional · Relationships · Lore
 ③ POLISH ▸ (one collapsed <details>) Image style · Immersion · Presentation · Tuning
-④ REVIEW & EXPORT   Opening scene → top of REVIEW · [Part-2 second pass] · Consistency · Export · Share
+④ REVIEW & EXPORT   Opening scene · Review & refine · Consistency · Export · Share
 ```
-- Add phase `<h2>` headers (a progress spine); move **Test Drive** to the bottom.
-- **Confirmed decisions:** Part-2 scope = **full grade + flag + re-roll**;
-  **Opening scene → top of ④ REVIEW**.
-- **Fix while reordering** (from `ai-workspace/audit/`): add `:focus-visible`
-  styles (none exist); touch targets ≥24px (WCAG 2.5.8); label the 6 unlabeled
-  controls (`loreMode`, `lorebookUrl`, `imMusic`, `tunCtx`, `tunWriting`,
-  `sceneMode`). Mirror result → `wizard-html-panel-21.txt`.
+- `<h2>` phase headers; **Test Drive** moved to the bottom. (Opening scene lives at
+  the **top of ④ REVIEW** per the confirmed decision, not in BUILD.)
+- **a11y:** blanket `:focus-visible`; 44px touch targets + `<480px` media query;
+  `aria-label` set from `<script>` for the 6 formerly-unlabelled controls
+  (`loreMode`/`lorebookUrl`/`imMusic`/`tunCtx`/`tunWriting`/`sceneMode`); full ARIA
+  tabs (roving tabindex + arrow keys); single `role=status` announce + `aria-busy`.
+- **Review & refine (second pass):** `window.gradeCharacter(raw,{persona})` ports
+  the `test/grade-generation.mjs` rubric in-browser; the "Review & refine" card
+  (`gradeCast()`) shows an A–F grade + flagged weak sections per character, each
+  with a one-click **re-roll** (`rerollSection()`, reusing `replaceSection`/
+  `getSection`); it auto-re-grades on `onWizFinish`. Consistency-check
+  (`genConsistency`→`applyFix`) sits beside it in ④.
 
-**Part 2 — new "second pass / review & refine" phase (in ④).** ~70% of the
-engine already exists: `genConsistency`→`parseConsistency`→`renderConsistency`→
-`applyFix` reviews the cast and one-click-applies fixes via refine-mode regen;
-`doReroll`+`replaceSection`+`getSection` regenerate one `=== SECTION ===`.
-Generalize that into REVIEW **and** port `test/grade-generation.mjs`'s rubric to
-an in-browser `window.gradeCharacter` — grade each character, flag weak sections,
-one-click "re-roll this section."
+Subsequent hardening + features (Phases 4–7) are summarised in §2 and tracked in
+`task_plan.md`. Highest mirror snapshot: `wizard-html-panel-24.txt`.
 
 ---
 
