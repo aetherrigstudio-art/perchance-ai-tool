@@ -26,7 +26,7 @@ set -euo pipefail
 
 OWNER="aetherrigstudio-art"
 REPO="perchance-ai-tool"
-BRANCH="claude/init-9i0np9"
+BRANCH="main"
 HTML_FILE="char-wiz-html"
 DAT_FILE="char-wiz-dat"
 PERCHANCE_GENERATOR="q83iy9tti5"
