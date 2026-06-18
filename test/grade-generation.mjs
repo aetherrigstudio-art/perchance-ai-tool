@@ -33,12 +33,30 @@ function getSection(label, text) {
 
 const words = (s) => (s.trim() ? s.trim().split(/\s+/).length : 0);
 
+// Honorifics/titles that legitimately lead a character name (with or without a
+// trailing period). Used so "Dr. Elara Voss" reads as a name, not a sentence,
+// and so name<->trigger matching skips the title and uses the real name token.
+const HONORIFICS = new Set([
+  "dr", "mr", "mrs", "ms", "miss", "mx", "sir", "lady", "dame", "lord",
+  "sgt", "lt", "capt", "cpt", "cmdr", "col", "gen", "maj", "pvt", "adm",
+  "prof", "rev", "fr", "st", "sra", "snr", "jr",
+]);
+// Strip abbreviation dots from titles/initials so they don't read as sentence
+// punctuation: "Dr. Elara Voss" -> "Dr Elara Voss", "J.R.R. Tolkien" -> "JRR Tolkien".
+const stripAbbrevDots = (s) => s.replace(/\b([A-Z][a-z]{0,3})\./g, "$1");
+// Meaningful name tokens (drop leading honorifics + stray dots).
+const nameTokens = (name) =>
+  (name || "").replace(/\./g, "").split(/\s+/)
+    .filter((t) => t.length >= 2 && !HONORIFICS.has(t.toLowerCase()));
+
 // --- the rubric ---------------------------------------------------------------
 // Each check returns { pass, detail }. Weighted equally; score = passed/total.
 const RUBRIC = [
   ["name present", (c) => ({ pass: !!c.name, detail: c.name || "(missing)" })],
   ["name is name-like (<=5 words, no sentence punctuation)", (c) => {
-    const ok = !!c.name && words(c.name) <= 5 && !/[.!?]/.test(c.name) && !/===/.test(c.name);
+    // Allow honorific dots (Dr., Capt.) but still reject full sentences.
+    const probe = stripAbbrevDots(c.name || "");
+    const ok = !!c.name && words(c.name) <= 5 && !/[.!?]/.test(probe) && !/===/.test(c.name);
     return { pass: ok, detail: c.name ? `"${c.name}"` : "(missing)" };
   }],
   ["role instruction present", (c) => ({ pass: !!c.roleInstruction, detail: c.roleInstruction ? words(c.roleInstruction) + "w" : "(missing)" })],
@@ -64,9 +82,12 @@ const RUBRIC = [
   }],
   ["image triggers reference the character's name", (c) => {
     if (!c.imageTriggers || !c.name) return { pass: false, detail: "(missing triggers or name)" };
-    const first = c.name.split(/\s+/)[0];
-    const ok = new RegExp("\\b" + first.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(c.imageTriggers);
-    return { pass: ok, detail: ok ? `mentions ${first}` : `triggers don't mention ${first}` };
+    // Match ANY meaningful name token (skipping honorifics) so "Dr. Elara Voss"
+    // passes when the triggers say "Elara".
+    const tokens = nameTokens(c.name);
+    const hit = tokens.find((t) =>
+      new RegExp("\\b" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "\\b", "i").test(c.imageTriggers));
+    return { pass: !!hit, detail: hit ? `mentions ${hit}` : `triggers don't mention ${tokens.join("/") || "name"}` };
   }],
   ["no leaked prompt/instruction text", (c) => {
     const leaks = [
