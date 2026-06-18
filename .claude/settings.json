@@ -23,6 +23,7 @@
       "Bash(chmod:*)",
       "Bash(mkdir:*)",
       "Bash(node:*)",
+      "Bash(npx:*)",
       "Bash(python3:*)",
       "Bash(jq:*)",
       "Edit",
