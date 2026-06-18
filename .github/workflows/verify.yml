@@ -1,0 +1,37 @@
+name: verify
+
+# Deterministic code gates for the Perchance generator. No package manager / build
+# step exists here, so this just runs the repo's own Node test harnesses against a
+# checkout. Deploy-sync checks (scripts/ci-verify.sh) are intentionally NOT run here:
+# they compare against GitHub raw, which is CDN-cached a few minutes behind a push,
+# so they would flake. Run those manually when verifying a deploy.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Export-shape smoke test (Dexie import-safety + a11y init + grader port)
+        run: node test/smoke.mjs
+
+      - name: Generation grader self-test
+        run: node test/grade-generation.mjs
+
+      - name: Wizard <script> syntax check
+        run: |
+          node -e "const fs=require('fs');const h=fs.readFileSync('char-wiz-html','utf8');const s=[...h.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m=>m[1]).sort((a,b)=>b.length-a.length)[0];if(!s){console.error('no wizard <script> block found');process.exit(1);}fs.writeFileSync('/tmp/wiz.js',s);"
+          node --check /tmp/wiz.js

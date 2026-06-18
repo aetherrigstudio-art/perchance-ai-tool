@@ -52,10 +52,10 @@ without breaking paste-safety, export-safety, or the single-`main` workflow.
 - **Gate:** ✅ smoke PASS (+10 safeUrl/prepUserInput assertions) · check-wizard exit 0 · render 0 page errors. (Side: smoke now keeps Node's real `URL` constructor + adds the objectURL statics, so `new URL()` in safeUrl runs headless.)
 - Mirror (Phase 4+5) → `wizard-html-panel-23.txt`
 
-## Phase 6 — CI + loader integrity  ⬜
-- [ ] `.github/workflows/verify.yml`: setup-node → smoke + `node --check` wizard + `ci-verify.sh html`
-- [ ] CI publishes `char-wiz-html.sha256`; loader fetches + `crypto.subtle.digest` verifies (keeps auto-deploy)
-- **Gate:** Action green on a test push
+## Phase 6 — CI + loader integrity  🟡 in progress
+- [x] `.github/workflows/verify.yml`: checkout → setup-node@22 → `node test/smoke.mjs` + `node test/grade-generation.mjs` + `node --check` on the extracted wizard `<script>`. (Deliberately NOT running `ci-verify.sh` in CI — it compares vs GitHub raw which is CDN-lagged after a push and would flake; it's a manual deploy-sync tool.)
+- [ ] **Loader integrity (`char-wiz-html.sha256` + `crypto.subtle.digest` in the loader)** — DEFERRED pending operator decision. Risk: the loader is a paste-once live deploy path; a hash mismatch (e.g. forgetting to regen the .sha256 on a commit, or any byte/encoding skew vs GitHub-served bytes) bricks the generator for ALL users until re-pasted. Needs an agreed approach (commit-SHA pin vs digest+regen-hook) before touching the live loader.
+- **Gate:** CI Action green on the push (verify) ✅ pending run
 
 ## Phase 7 — ROADMAP features (ranked)  ⬜
 - [ ] `stopSequences: ["=== END ==="]` in data-panel `settings`; remove length-hack prompt scaffolding
