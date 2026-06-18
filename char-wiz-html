@@ -1115,7 +1115,7 @@
     return styleOnly() + body + styleSuffix();
   }
   function exampleLines(role){
-    var lines = (role || "").split("\n").filter(function(l){ var t = l.trim(); return t.indexOf("{{char}}:") === 0 || t.indexOf("{{user}}:") === 0; });
+    var lines = (role || "").split("\n").filter(function(l){ var t = l.trim(); return /^\{\{char\}\}\s*:/i.test(t) || /^\{\{user\}\}\s*:/i.test(t); });
     return lines.length ? ("<START>\n" + lines.join("\n")) : "";
   }
   function buildCharacterBook(){
