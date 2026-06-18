@@ -2,6 +2,30 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⬛ Workspace rules — standardized, read first
+
+Every session inherits this setup from **`main`**. Do not diverge from it — this
+is what keeps all agents on the same page.
+
+1. **One line: `main`.** Work directly on `main`; do **not** create feature
+   branches. If your session was auto-assigned a `claude/*` branch, fast-forward
+   `main` to your work and `git push origin main`. Never leave parallel branches.
+2. **One config.** `CLAUDE.md` + `.claude/` (committed on `main`) are THE shared
+   setup — identical hooks, skills, permissions, and MCP for everyone. Extend the
+   committed files; never spin up competing local/global configs.
+3. **Read order at start:** this file → **`README.md`** (environment, tooling,
+   pitfalls, end-of-life) → basic-memory note *"WORKSPACE STANDARD"* (live state).
+   README is the operational layer; this file is the contract.
+4. **MCP:** basic-memory uses project **`main`** (use it if `perchar` errors);
+   context7 loads only after the SessionStart warm-up. Details: README §4.
+5. **Memory:** at start, `recent_activity` / `search_notes` (project `main`);
+   before ending, `write_note` your state + decisions. The *"WORKSPACE STANDARD"*
+   note is the current source of truth; older session notes are historical.
+6. **End of life:** verify → commit → memory note → `git push origin main`
+   (README §6). The "Unverified signature" git nag is harmless — ignore it.
+
+Everything below is the build reference; the rules above govern *how we work*.
+
 See `ROADMAP.md` for the prioritized list of ACC character/user fields not yet
 implemented by the wizard.
 
