@@ -35,4 +35,12 @@ fi
 
 echo "[session-start] node: $(command -v node || echo MISSING) ($(node --version 2>/dev/null || echo '?'))"
 echo "[session-start] jq:   $(command -v jq || echo MISSING) ($(jq --version 2>/dev/null || echo '?'))"
-echo "[session-start] ready. Lint: bash .claude/hooks/check-wizard.sh  |  Test: node test/smoke.mjs"
+
+# Skills are committed to the repo (not reinstalled per session). Report drift
+# between skills-lock.json, .agents/skills/, and the discovery symlinks.
+# Informational only — never blocks the session.
+if command -v node >/dev/null 2>&1 && [ -f skills-lock.json ]; then
+  bash .claude/hooks/check-skills.sh 2>&1 | sed 's/^/[session-start] /' || true
+fi
+
+echo "[session-start] ready. Lint: bash .claude/hooks/check-wizard.sh  |  Test: node test/smoke.mjs  |  Skills: bash .claude/hooks/check-skills.sh"

@@ -1,69 +1,16 @@
 {
   "version": 1,
   "skills": {
-    "Accessibility Engineer": {
+    "accessibility-engineer": {
       "source": "daffy0208/ai-dev-standards",
       "sourceType": "github",
-      "skillPath": "skills/accessibility-engineer/SKILL.md",
+      "skillPath": ".agents/skills/accessibility-engineer/SKILL.md",
       "computedHash": "f14b0dcd1bf73f7bce06e9d85cda8c2873f67f6366ed47efaf702d8b4f26c121"
-    },
-    "Agent Development": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/plugin-dev/skills/agent-development/SKILL.md",
-      "computedHash": "4931c2867890bfef5881225adb691c3d719fe9ad556e3d5fae15f83e0668fa60"
-    },
-    "Command Development": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/plugin-dev/skills/command-development/SKILL.md",
-      "computedHash": "bca581f0a2789f75d9501499b9f4dc354eb40b213ccd23d13f5b87299db1f84a"
-    },
-    "Hook Development": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/plugin-dev/skills/hook-development/SKILL.md",
-      "computedHash": "a1721df65785b6c0439d4326cdee0cb2b6aa98de09fc98463afc3e040fe00ce9"
-    },
-    "MCP Integration": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/plugin-dev/skills/mcp-integration/SKILL.md",
-      "computedHash": "99cfef49810cb80a39762a79dbb6a80d486ea56cfa1a81ed10cae0a5a296b496"
-    },
-    "Plugin Settings": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/plugin-dev/skills/plugin-settings/SKILL.md",
-      "computedHash": "b4be0bf62782da83e962aa759e7d5efb1d5934b81554f1d15801fdf5e01b18a4"
-    },
-    "Plugin Structure": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/plugin-dev/skills/plugin-structure/SKILL.md",
-      "computedHash": "c4e9b3ea36efad4ab599465aaac71f81dc3320a183920678fe1587181c446b07"
-    },
-    "Skill Development": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/plugin-dev/skills/skill-development/SKILL.md",
-      "computedHash": "8d262f08f33825947ea20204ebf5101e36056c98090251bd973a552ec8ef0c0c"
-    },
-    "Writing Hookify Rules": {
-      "source": "anthropics/claude-code",
-      "sourceType": "github",
-      "skillPath": "plugins/hookify/skills/writing-rules/SKILL.md",
-      "computedHash": "429463a57a711ee42d1373a726e66ccc2189118022f0c281dbb48b28796d417f"
     },
     "agent-issue-tracker": {
       "source": "ruvnet/ruflo",
       "sourceType": "github",
       "skillPath": ".agents/skills/agent-issue-tracker/SKILL.md"
-    },
-    "agent-orchestration": {
-      "source": "yonatangross/orchestkit",
-      "skillPath": ".agents/skills/agent-orchestration",
-      "version": "2.0.0"
     },
     "agent-orchestrator-task": {
       "source": "ruvnet/ruflo",
@@ -74,20 +21,21 @@
     "aria-live-regions": {
       "source": "mgifford/accessibility-skills",
       "sourceType": "github",
-      "skillPath": "skills/aria-live-regions/SKILL.md",
+      "skillPath": ".agents/skills/aria-live-regions/SKILL.md",
       "computedHash": "2e28131039d6dc27e31ea1eda1e17434343329cc13e3f6c010f480574b433f02"
     },
     "browser-tools": {
       "source": "badlogic/pi-skills",
       "sourceType": "github",
-      "skillPath": "browser-tools/SKILL.md",
+      "skillPath": ".agents/skills/browser-tools/SKILL.md",
       "computedHash": "84d66f8bfdd5cfdb0b6f448b61f192c504e4ffa9e4943969c1d394e5eed0daee"
     },
     "caveman": {
       "source": "juliusbrussee/caveman",
       "skill": "caveman",
       "installs": 259800,
-      "security": "Safe"
+      "security": "Safe",
+      "skillPath": ".agents/skills/caveman/SKILL.md"
     },
     "changelog-writer": {
       "source": "patricio0312rev/skills",
@@ -97,44 +45,38 @@
     "code-review-quality": {
       "source": "proffesor-for-testing/agentic-qe",
       "sourceType": "github",
-      "skillPath": ".claude/skills/code-review-quality/SKILL.md",
+      "skillPath": ".agents/skills/code-review-quality/SKILL.md",
       "computedHash": "2b1c2c4ba6cfa06d17e4dd4d67f2133736e2d3a5612d79514287bbe252370e3b"
     },
     "code-security-audit": {
       "source": "leonmelamud/claude-code-security-review",
-      "skillPath": ".agents/skills/code-security-audit"
+      "skillPath": ".agents/skills/code-security-audit/SKILL.md"
     },
     "command-development": {
       "source": "anthropics/claude-code",
       "sourceType": "github",
       "skillPath": ".agents/skills/command-development/SKILL.md"
     },
-    "configure-web-session": {
-      "source": "laurigates/claude-plugins",
-      "sourceType": "github",
-      "skillPath": "configure-plugin/skills/configure-web-session/SKILL.md",
-      "computedHash": "7f0684bbec319c5eb90034654e99546d0cb540292165d0367129278d2de9c71e"
-    },
     "debugger": {
       "source": "shubhamsaboo/awesome-llm-apps",
       "sourceType": "github",
-      "skillPath": "awesome_agent_skills/debugger/SKILL.md",
+      "skillPath": ".agents/skills/debugger/SKILL.md",
       "computedHash": "609b0b6d79fe21bcb5eb8a01b38f5571b8ae05be826936a312bc04d9c5400193"
     },
     "deep-research-agent": {
       "source": "qodex-ai/ai-agent-skills",
-      "skillPath": ".agents/skills/deep-research-agent"
+      "skillPath": ".agents/skills/deep-research-agent/SKILL.md"
     },
     "error-analysis": {
       "source": "hamelsmu/evals-skills",
       "sourceType": "github",
-      "skillPath": "skills/error-analysis/SKILL.md",
+      "skillPath": ".agents/skills/error-analysis/SKILL.md",
       "computedHash": "64840896ab089c9315fc69764e5ebba7d4c3468dabf69b04423c19e8d9c23c87"
     },
     "find-skills": {
       "source": "vercel-labs/skills",
       "sourceType": "github",
-      "skillPath": "skills/find-skills/SKILL.md",
+      "skillPath": ".agents/skills/find-skills/SKILL.md",
       "computedHash": "d31e234f0c90694a670222cdd1dafa853e051d7066beda389f1097c22dadd461"
     },
     "hook-development": {
@@ -142,40 +84,25 @@
       "sourceType": "github",
       "skillPath": ".agents/skills/hook-development/SKILL.md"
     },
-    "knowledge-base-manager": {
-      "source": "daffy0208/ai-dev-standards",
-      "sourceType": "github",
-      "skillPath": ".agents/skills/knowledge-base-manager/SKILL.md"
-    },
-    "literature-search-arxiv": {
-      "source": "google-deepmind/science-skills",
-      "skillPath": ".agents/skills/literature-search-arxiv"
-    },
     "llm-prompt-optimizer": {
       "source": "sickn33/antigravity-awesome-skills",
       "sourceType": "github",
-      "skillPath": "skills/llm-prompt-optimizer/SKILL.md",
+      "skillPath": ".agents/skills/llm-prompt-optimizer/SKILL.md",
       "computedHash": "eef460bc1c02545bc7754e0b8f113e662a3294fad1ea2bfd92f0385efb2c42d4"
     },
     "mobile-responsiveness": {
       "source": "hoodini/ai-agents-skills",
-      "skillPath": ".agents/skills/mobile-responsiveness"
-    },
-    "openless-voice-input": {
-      "source": "aradotso/trending-skills",
-      "sourceType": "github",
-      "skillPath": "skills/openless-voice-input/SKILL.md",
-      "computedHash": "6d7cc4b82d2b323f646b4cf84bdf58a9fadda6a6bc3243db72945f48a907f2a7"
+      "skillPath": ".agents/skills/mobile-responsiveness/SKILL.md"
     },
     "parallel-agents": {
       "source": "parcadei/continuous-claude-v3",
       "sourceType": "github",
-      "skillPath": ".claude/skills/parallel-agents/SKILL.md",
+      "skillPath": ".agents/skills/parallel-agents/SKILL.md",
       "computedHash": "43d406f2716cff0ec9acb4319768615c51708abb9571b1f3a4cfeb6a470a204e"
     },
     "performance-profiler": {
       "source": "onewave-ai/claude-skills",
-      "skillPath": ".agents/skills/performance-profiler"
+      "skillPath": ".agents/skills/performance-profiler/SKILL.md"
     },
     "plugin-settings": {
       "source": "anthropics/claude-code",
@@ -185,63 +112,61 @@
     "product-capability": {
       "source": "affaan-m/everything-claude-code",
       "sourceType": "github",
-      "skillPath": "skills/product-capability/SKILL.md",
+      "skillPath": ".agents/skills/product-capability/SKILL.md",
       "computedHash": "126569a04b17b0f86c41f9566fc397c6c9ab3bd5895875165a5ff4bbc896a125"
     },
     "recap": {
       "source": "rohitg00/agentmemory",
       "skill": "recap",
-      "installs": 4300
+      "installs": 4300,
+      "skillPath": ".agents/skills/recap/SKILL.md"
     },
     "reflect": {
       "source": "camacho/ai-skills",
       "skill": "reflect",
       "installs": 610,
-      "security": "Safe"
+      "security": "Safe",
+      "skillPath": ".agents/skills/reflect/SKILL.md"
     },
     "roadmap-planning": {
       "source": "deanpeters/product-manager-skills",
       "sourceType": "github",
       "skillPath": ".agents/skills/roadmap-planning/SKILL.md"
     },
-    "security-best-practices": {
-      "source": "openai/skills",
-      "skillPath": ".agents/skills/security-best-practices"
-    },
     "self-reflecting-chain": {
       "source": "kimasplund/claude_cognitive_reasoning",
       "sourceType": "github",
-      "skillPath": "cognitive-skills/self-reflecting-chain/SKILL.md",
+      "skillPath": ".agents/skills/self-reflecting-chain/SKILL.md",
       "computedHash": "fc030371b2688c621f134c8d70b9aff94715b47eb03b18bbc1b252a1de36ffd3"
     },
     "session-start-hook": {
       "source": "camacho/ai-skills",
       "sourceType": "github",
-      "skillPath": "skills/session-start-hook/SKILL.md",
+      "skillPath": ".agents/skills/session-start-hook/SKILL.md",
       "computedHash": "cd1e85d931a5b5419f0cbbc2b6f730e5fe7f5392dc4e371a877256479d8c9a71"
     },
     "smoke-test": {
       "source": "tobihagemann/turbo",
       "sourceType": "github",
-      "skillPath": "claude/skills/smoke-test/SKILL.md",
+      "skillPath": ".agents/skills/smoke-test/SKILL.md",
       "computedHash": "f4239c14d2876d216bc1eebc9e03f2aaaa8808a924bb6f1ba302cb90449b9223"
     },
     "subagent-task-execution": {
       "source": "davidkiss/smart-ai-skills",
       "sourceType": "github",
-      "skillPath": "skills/subagent-task-execution/SKILL.md",
+      "skillPath": ".agents/skills/subagent-task-execution/SKILL.md",
       "computedHash": "518b84b845c126c2b833968db242168b9af7c58bef28ff56dd5698d61cc5c3cd"
     },
     "thought-based-reasoning": {
       "source": "guia-matthieu/clawfu-skills",
       "sourceType": "github",
-      "skillPath": "skills/thinking/thought-based-reasoning/SKILL.md",
+      "skillPath": ".agents/skills/thought-based-reasoning/SKILL.md",
       "computedHash": "15358ade86da843b9abec50fb0500b00e7dd34f9b9554134c0cc2b984d59b653"
     },
     "token-efficiency": {
       "source": "nickcrew/claude-ctx-plugin",
       "sourceType": "github",
-      "skillPath": "skills/token-efficiency/SKILL.md",
+      "skillPath": ".agents/skills/token-efficiency/SKILL.md",
       "computedHash": "8fbee231049b8c08504b2c1478b76db91eafb31cc577550ec43583aab0ea99e9"
     },
     "track-management": {
@@ -252,16 +177,16 @@
     "vanilla-web": {
       "source": "janjaszczak/cursor",
       "sourceType": "github",
-      "skillPath": "skills/vanilla-web/SKILL.md",
+      "skillPath": ".agents/skills/vanilla-web/SKILL.md",
       "computedHash": "71d55c038df13f897175218b6040de5d3a7749f15b4117a25ca9598c3cf77233"
     },
     "web-search": {
       "source": "qu-skills/skills",
-      "skillPath": ".agents/skills/web-search"
+      "skillPath": ".agents/skills/web-search/SKILL.md"
     },
     "websearch-deep": {
       "source": "thomasholknielsen/claude-code-config",
-      "skillPath": ".agents/skills/websearch-deep"
+      "skillPath": ".agents/skills/websearch-deep/SKILL.md"
     }
   }
 }
