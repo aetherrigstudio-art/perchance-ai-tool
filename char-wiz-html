@@ -219,7 +219,7 @@
   function getSection(label, text){
     var header = "=== " + label + " ===";
     var i = text.indexOf(header);
-    if(i < 0) return "";
+    if(i < 0){ console.warn("[wizard] getSection: label not found:", label); return ""; }
     var le = text.indexOf("\n", i);
     if(le < 0) return "";
     var rest = text.slice(le + 1);
@@ -240,8 +240,10 @@
     return full.slice(0, afterHeader + 1) + newBody + (tail || "\n");
   }
   function parseChar(raw){
+    var name = getSection("NAME", raw);
+    if(!name){ console.warn("[wizard] parseChar: NAME section missing — exported as 'Character'"); name = "Character"; }
     return {
-      name: getSection("NAME", raw) || "Character",
+      name: name,
       tagline: getSection("TAGLINE", raw),
       roleInstruction: getSection("ROLE INSTRUCTION", raw),
       reminder: getSection("REMINDER", raw),
@@ -851,6 +853,7 @@
       }
       var content = line.replace(/^[-*\d.\s]+/, "").trim();
       var key = (content.match(/[A-Z][a-zA-Z'\-]+/) || [content.split(" ")[0] || "lore"])[0];
+      console.warn("[wizard] parseLore: line did not match key:value format — guessing trigger key:", key);
       return { keys: [key], content: content };
     }).filter(function(x){ return x && x.content; });
   }
@@ -935,11 +938,15 @@
   }
   function downloadFile(name, text){
     var blob = new Blob([text], { type:"application/json" });
+    var url = URL.createObjectURL(blob);
     var a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
+    a.href = url;
     a.download = name.replace(/[^a-z0-9_\-]+/gi, "_") + ".json";
-    document.body.appendChild(a); a.click();
-    setTimeout(function(){ a.remove(); URL.revokeObjectURL(a.href); }, 100);
+    try {
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    } finally {
+      URL.revokeObjectURL(url);
+    }
   }
 
   if(typeof window.learned === "undefined") window.learned = null;
