@@ -55,6 +55,17 @@
 | `buildSceneCode` template replacement unsafe | S | 1056–1058 | If wardrobe JSON contains `__WARDROBE__` literal, output is corrupted; use a unique delimiter |
 | wardrobeMap embedded in customCode | S | 1545 | Large wardrobe inflates customCode; consider external reference or size cap |
 | `SCENE_DIRECTIVE` 365 chars repeated per character | XS | 365 | Trim or reference once in system message instead of per-character |
+| `SCENE_SHOTS_TEMPLATE` ignores user genre/style selection | S | 1042 | Interpolate `styleNotes` or selected style tag into the scene-shot instruction inside `buildSceneCode()` |
+| `IMMERSION_FN` serialized via `.toString()` embeds ~1184 lines per export | M | 1073 | Document the serialization approach with a comment; consider a pre-minified string constant to decouple from source formatting |
+| `withRels()` appends relationship text with no size cap | S | 1022–1025 | Cap relationship text at N chars or summarize if cast is large; prevents `roleInstruction` overflow past ACC context limits |
+| Zero accessibility attributes across 2256 lines | M | throughout | Add `aria-label` to all buttons and major inputs; add `aria-live="polite"` to `#busyHint` and `#status` |
+| No mobile keyboard hints on any input or textarea | S | throughout | Add `inputmode="numeric"` to number inputs, `inputmode="url"` to URL inputs, `autocorrect="off" autocapitalize="off"` to all textareas |
+| `onWizFinish()` calls `save()` unconditionally after every generation | XS | 706 | Skip if no state changed, or rely on the debounced save already triggered by textarea `onInput` |
+| `getSection()` fallback in `rerollBuf` uses raw LLM text on header-not-found | S | 692 | If fallback triggered, strip leading lines until first non-empty non-header line before using text |
+| `validateCast()` only checks NAME + ROLE INSTRUCTION + FIRST MESSAGE | S | 938–963 | Add checks for APPEARANCE, TAGLINE, WRITING INSTRUCTION; warn on export if missing |
+| `load()` registers 30+ event handlers every call; stacks on repeated calls | M | 823–842 | Guard with a `handlersAttached` flag; only attach once |
+| `updateStatus()` runs `parseChar()` on all textareas every keystroke | S | 899, 824 | Memoize last-seen textarea values; only re-parse if content changed |
+| `parseLore()` silently guesses trigger keys when format not matched | S | 1752 | Log a warning in `importStatus` when fallback guessing is used |
 
 ---
 
@@ -67,6 +78,7 @@
 | Style adj inputs lose focus on mobile Safari keyboard dismiss | S | adj inputs | Add `touchend` handler to re-focus; set `inputmode="text"` |
 | No `aria-label` on icon buttons or textareas | M | throughout | Add accessibility labels for screen reader compatibility |
 | `crc32` implemented from scratch inline | XS | 1959 | Works fine, but worth a comment explaining why (no crypto dependency allowed in Perchance) |
+| No viewport meta tag in `char-wiz-html`; mobile scaling deferred to Perchance outer page | XS | n/a | Document as a known Perchance constraint in `CLAUDE.md`; no fix available within the tool |
 
 ---
 
