@@ -1,0 +1,11 @@
+# Perchance API client dependencies
+# Install with: pip install -r scripts/requirements.txt
+
+# Optional: eeemoon/perchance async client for text generation (uses Playwright/Chromium).
+# Note: this package works outside Anthropic environments; inside them the egress
+# gateway's custom TLS cert triggers ERR_CERT_AUTHORITY_INVALID in Playwright.
+# The download_generator() function does NOT require this package.
+perchance>=0.1.0
+
+# HTTP client for generator source fetching. Falls back to stdlib urllib if absent.
+requests>=2.28.0
