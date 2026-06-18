@@ -61,3 +61,12 @@ Details: README §3 + CLAUDE.md.
 - [fact] context7 + basic-memory need SessionStart warm-ups to load (cold-start race)
 - [state] main @ 85c9430; 6 stale remote branches need manual UI deletion
 - [task] 4-phase regroup + second-pass review — designed/approved, not built
+
+## Planning workflow (added)
+- **`/plan`** is the must-fire planning command (`.claude/commands/plan.md`). It
+  chains two skills, both kept ON: `plan-mode` (system-aware analysis) →
+  `pi-planning-with-files` (durable `task_plan.md`/`findings.md`/`progress.md`
+  that survive `/clear` + cold containers) → approval → tracked execution.
+- Run `/plan` before any non-trivial / multi-file task (CLAUDE.md workspace rule 7).
+  A slash command is deterministic; auto-trigger descriptions are not.
+- [standard] non-trivial work starts with `/plan`; plan/progress files are committed so agents share state
