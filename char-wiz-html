@@ -522,6 +522,13 @@
       "\n\nADJUSTMENT REQUESTED:\n" + (adj || "(no specific note - just improve and tighten it)") +
       "\n\nRewrite it incorporating the adjustment. " + fmt;
   }
+  // Re-anchor the output format as the FINAL instruction. The creative seed is
+  // appended after the section spec on first generation; without this the model
+  // reads the seed last and drifts into freeform prose instead of the labelled
+  // === SECTION === blocks (refine already ends with a format reminder).
+  function sectionTail(what){
+    return "Now write the " + what + " using ONLY the sections specified above - begin each section with its exact === LABEL === header, in the same order, and output nothing else. Do not repeat, list, or mention the creative direction or any word lists, and add no preamble or commentary before the first === header.";
+  }
 
   window.buildWizardPrompt = function(){
     if(window.rerollInfo){
@@ -566,12 +573,12 @@
         var adj = sec === "main" ? val("mainAdj") : getExtraAdj(window.activeExtraIndex);
         return refineWrap(p, cur, adj, "Keep the exact same === SECTION === labels and output only those sections.");
       }
-      return p + "\n\n" + charSeed();
+      return p + "\n\n" + charSeed() + "\n\n" + sectionTail("character");
     }
     if(sec === "persona"){
       var ctx2 = buildContext("persona");
       var p2 = personaPromptCtx(val("personaNotes"), ctx2);
-      return refine ? refineWrap(p2, val("personaOut"), val("personaAdj"), "Keep the same === SECTION === labels and output only those sections.") : (p2 + "\n\n" + charSeed());
+      return refine ? refineWrap(p2, val("personaOut"), val("personaAdj"), "Keep the same === SECTION === labels and output only those sections.") : (p2 + "\n\n" + charSeed() + "\n\n" + sectionTail("persona"));
     }
     if(sec === "lore"){
       var ctx3 = buildContext("lore");
