@@ -3,7 +3,7 @@
     "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "enableAllProjectMcpServers": true,
-  "enabledMcpjsonServers": ["basic-memory"],
+  "enabledMcpjsonServers": ["basic-memory", "context7"],
   "enableWorkflows": true,
   "workflowKeywordTriggerEnabled": true,
   "skillOverrides": {
