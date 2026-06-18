@@ -30,6 +30,12 @@
       "skillPath": "browser-tools/SKILL.md",
       "computedHash": "84d66f8bfdd5cfdb0b6f448b61f192c504e4ffa9e4943969c1d394e5eed0daee"
     },
+    "caveman": {
+      "source": "juliusbrussee/caveman",
+      "skill": "caveman",
+      "installs": 259800,
+      "security": "Safe"
+    },
     "code-review-quality": {
       "source": "proffesor-for-testing/agentic-qe",
       "sourceType": "github",
