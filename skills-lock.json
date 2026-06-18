@@ -110,6 +110,11 @@
       "skillPath": "skills/product-capability/SKILL.md",
       "computedHash": "126569a04b17b0f86c41f9566fc397c6c9ab3bd5895875165a5ff4bbc896a125"
     },
+    "recap": {
+      "source": "rohitg00/agentmemory",
+      "skill": "recap",
+      "installs": 4300
+    },
     "reflect": {
       "source": "camacho/ai-skills",
       "skill": "reflect",
