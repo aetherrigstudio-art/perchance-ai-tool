@@ -415,7 +415,7 @@
   // Prose-quality directive: vivid, varied, precise vocabulary. Used both in the
   // generation prompts (HTML) and baked into the exported character so the
   // in-chat AI writes well too.
-  var VOCAB = "Write with rich, precise, varied vocabulary: choose strong specific nouns and vivid active verbs over generic ones, add concrete sensory adjectives and the occasional well-placed adverb, and vary sentence length and rhythm. Avoid repeating the same words, weak intensifiers (very, really, suddenly, somewhat), and filler; show through specific detail instead of telling.";
+  var VOCAB = "Write with strong specific nouns and vivid active verbs. Vary sentence length and rhythm. Let action and dialogue carry the scene; do not pad with atmosphere. Avoid: ornate metaphors and simile chains (skin like honey, silk, smoke, velvet), adjective stacking, weak intensifiers (very, really, suddenly, somewhat), and filler. Show through specific detail instead of telling.";
   // Fresh real words pulled from Perchance's shared word banks (data panel's
   // wordBank, backed by {import:adjective|noun|verb}), CACHED per 4-hour bucket
   // so they swap on the same 4h cadence as the pool rotation — not every gen.
