@@ -143,6 +143,28 @@ exercise it; for the character/fixer tools, confirm the downloaded `.json`
 imports cleanly into ACC. Treat the "Minimal checklist" in `char-info` §11 as
 the acceptance checklist.
 
+## Skills, commands & tools — routing rules
+
+Use the right dispatch for each type of work:
+
+| What | Use | Why |
+|---|---|---|
+| Deep knowledge, fires rarely (<30% of turns) | **Skill** | Auto-triggered by description; large context |
+| Small, must-fire workflow you explicitly invoke | **Slash command** `/name` | Deterministic; no routing uncertainty |
+| Parallel or isolated work | **Subagent** (`Agent` tool) | Isolated worktree or context; splits load |
+| Independent calls in one turn | **Parallel tool calls** | Batch in one message; faster |
+
+**Installed slash commands** (`.claude/commands/`): `/recap`, `/reflect`, `/find-skills`, `/audit`
+
+**Subagent delegation rules** (from `ai-workspace/workflow-tool-calling-research.md`):
+- The delegation prompt is the *only* input channel — make it fully self-contained.
+- Hand off via explicit file paths, not descriptions.
+- Use `isolation: "worktree"` for any work that modifies `char-wiz-html` or other shared files.
+- Cherry-pick the worktree branch back to main after review; resolve conflicts keeping the newest ARIA/CSS attrs.
+
+**Skill count discipline**: keep installed skills ≤ 20. Past that, auto-triggering degrades.
+Currently 22 skills are parked as `user-invocable-only` via `skillOverrides` in `.claude/settings.json`.
+
 ## Shared memory (basic-memory MCP)
 
 `ai-workspace/memory/` (basic-memory MCP, project `perchar`, declared in `.mcp.json`)
