@@ -9,15 +9,16 @@ See `AUTOMATION.md` for the **loader** deploy path: `wizard-loader-html.txt` is
 pasted into the Perchance HTML editor once, then fetches `char-wiz-html` from
 GitHub at runtime — so editing the repo deploys, with no re-paste.
 
-**Perchance API — status (verified 2026-06-18):** `/api/downloadGenerator` is
-reachable without a browser but now returns the **rendered HTML page**, not raw
-source. `/api/getGeneratorsAndDependencies` returns HTTP 400 without a browser
-session. Direct API automation is not currently viable. The runtime-fetch loader
-(`wizard-loader-html.txt` → fetches `char-wiz-html` from GitHub at runtime) is
-still the correct deploy path. `pip install perchance` (`eeemoon/perchance`) and
-client scripts in `scripts/` exist but are blocked by the session requirement.
-See `ai-workspace/perchance-api-research.md` + `scripts/perchance-api.mjs` for
-details.
+**Perchance API — status (verified 2026-06-18):** `/api/downloadGenerator`
+is reachable via plain GET (no browser, no auth). It returns a rendered HTML
+page, but the generator source is **embedded as URL-encoded JSON** in
+`<script id="preloaded-generator-data">` — keys `modelText` (data panel) and
+`outputTemplate` (HTML panel). `scripts/perchance_api.py` parses this and works;
+`scripts/ci-verify.sh` uses it for sync checks. `pip install perchance`
+(`eeemoon/perchance`) uses Playwright internally — avoid it. No upload/publish
+API exists; the runtime-fetch loader (`wizard-loader-html.txt` → fetches
+`char-wiz-html` from GitHub) remains the correct deploy path. See
+`ai-workspace/perchance-api-research.md` and `scripts/` for full details.
 
 ## What this repository is
 
