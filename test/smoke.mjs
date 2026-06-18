@@ -229,11 +229,11 @@ globalThis.__I.enabled = false;
 const seedSamples = Array.from({ length: 20 }, () => globalThis.__charSeed() + globalThis.__scenarioSeed());
 check("variety seeds expand fully (no leftover { | } reach the prompt)", seedSamples.every((s) => !/[{}|]/.test(s)));
 check("variety seeds actually vary across runs", new Set(seedSamples).size > 1);
-check("variety seeds carry the vivid-vocabulary directive", globalThis.__charSeed().includes("varied vocabulary"));
+check("variety seeds carry the prose-quality directive", globalThis.__charSeed().includes("vivid active verbs"));
 // exported character carries the vocabulary directive (improves in-chat prose).
 let voc = charsOf(globalThis.__export())[0];
-check("exported character's writing instructions request vivid varied vocabulary",
-  /varied vocabulary/.test(voc.generalWritingInstructions) && /vivid active verbs/.test(voc.generalWritingInstructions));
+check("exported character's writing instructions use grounded prose directive",
+  /vivid active verbs/.test(voc.generalWritingInstructions) && /specific nouns/.test(voc.generalWritingInstructions));
 
 // 4-hour rotation: a large pool keeps a rotating ~60% active subset that swaps per window.
 const fullTone = globalThis.__seedTone.replace(/[{}]/g, "").split("|");

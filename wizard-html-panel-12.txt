@@ -357,7 +357,6 @@
   // Model & memory tuning (Tier 1 Batch B, global defaults). Defaults mirror the
   // current behaviour so exports are unchanged unless enabled.
   var tuning = { enabled:false, temperature:0.8, maxTokens:800, autoMemory:"none", fitMethod:"summarizeOld", maxParas:0, writingPreset:"builtin", contextTracking:"off" };
-  var _saveTimer; var _snap = null; var _idSeq = 0;
   // Best-practice default context-tracking prompts (state memory). Generalised
   // from a real petrafied-acc export; use ACC's {{InputInformation}} /
   // {{PreviousContextInformation}} template vars. petrafied-acc-specific fields.
@@ -462,7 +461,7 @@
   function getSection(label, text){
     var header = "=== " + label + " ===";
     var i = text.indexOf(header);
-    if(i < 0){ console.warn("[wizard] getSection: label not found:", label); return ""; }
+    if(i < 0) return "";
     var le = text.indexOf("\n", i);
     if(le < 0) return "";
     var rest = text.slice(le + 1);
@@ -483,10 +482,8 @@
     return full.slice(0, afterHeader + 1) + newBody + (tail || "\n");
   }
   function parseChar(raw){
-    var _name = getSection("NAME", raw);
-    if(!_name) console.warn("[wizard] parseChar: NAME section missing — exported as 'Character'");
     return {
-      name: _name || "Character",
+      name: getSection("NAME", raw) || "Character",
       tagline: getSection("TAGLINE", raw),
       roleInstruction: getSection("ROLE INSTRUCTION", raw),
       reminder: getSection("REMINDER", raw),
@@ -800,8 +797,7 @@
       tuning: tuning,
       extras: extras, rels: rels
     };
-    _snap = snap;
-    clearTimeout(_saveTimer); _saveTimer = setTimeout(function(){ try { localStorage.setItem(STORE_KEY, JSON.stringify(_snap)); } catch(e){} }, 500);
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(snap)); } catch(e){}
   }
   function load(){
     var snap = null;
@@ -933,18 +929,16 @@
     b.textContent = parts.length ? ("Role-instruction size: " + parts.join(", ") + "  -  cast total " + total + "w" + (warn ? "  -  (!) some over ~500w; trim or move detail to lore" : "")) : "";
   }
   function updateStatus(){
-    clearTimeout(updateStatus._t); updateStatus._t = setTimeout(function(){
-      var names = [];
-      var m = val("mainOut").trim(); if(m) names.push("Main: " + parseChar(m).name);
-      var p = val("personaOut").trim(); if(p) names.push("You: " + parseChar(p).name);
-      syncExtrasFromDOM();
-      extras.forEach(function(ex){ if((ex.out||"").trim()) names.push(parseChar(ex.out).name); });
-      var lore = val("loreOut").split("\n").filter(function(x){ return x.trim().length>0; }).length;
-      el("status").textContent = (names.length ? "cast: " + names.join(", ") : "no characters yet") + (lore ? "  -  " + lore + " lore facts" : "");
-      updateBudget(); updateExportPreview(); refreshRelSelects(); renderRels();
-      if(immersion.enabled && el("imVoiceList")) renderVoiceList();
-      if(advanced.enabled){ var cl = el("advColorList"); if(cl && cl.querySelectorAll(".advColor").length !== castNames().length) renderColorList(); }
-    }, 50);
+    var names = [];
+    var m = val("mainOut").trim(); if(m) names.push("Main: " + parseChar(m).name);
+    var p = val("personaOut").trim(); if(p) names.push("You: " + parseChar(p).name);
+    syncExtrasFromDOM();
+    extras.forEach(function(ex){ if((ex.out||"").trim()) names.push(parseChar(ex.out).name); });
+    var lore = val("loreOut").split("\n").filter(function(x){ return x.trim().length>0; }).length;
+    el("status").textContent = (names.length ? "cast: " + names.join(", ") : "no characters yet") + (lore ? "  -  " + lore + " lore facts" : "");
+    updateBudget(); updateExportPreview(); refreshRelSelects(); renderRels();
+    if(immersion.enabled && el("imVoiceList")) renderVoiceList();
+    if(advanced.enabled){ var cl = el("advColorList"); if(cl && cl.querySelectorAll(".advColor").length !== castNames().length) renderColorList(); }
   }
   function updateExportPreview(){
     var b = el("exportPreview"); if(!b) return;
@@ -1674,7 +1668,7 @@
     if(!s) return DEFAULT_SUFFIX;
     return /^[,\s]/.test(s) ? s : (", " + s);
   }
-  function uniqueId(){ return Date.now() * 10000 + (++_idSeq % 10000); }
+  function uniqueId(seed){ return Date.now() + (seed*1000) + Math.floor(Math.random()*1000); }
   function uniqueUuid(){ return (typeof crypto !== "undefined" && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + "-" + Math.floor(Math.random()*1e9)); }
 
   function defaultTemplate(){
@@ -1750,7 +1744,7 @@
         if(advanced.musicUrl) base.scene.music.url = advanced.musicUrl;
       }
     }
-    base.uuid = uniqueUuid(); base.id = uniqueId();
+    base.uuid = uniqueUuid(); base.id = uniqueId(seed);
     base.creationTime = now; base.lastMessageTime = now;
     if(base.folderPath == null) base.folderPath = "";
     base["$types"] = { initialMessages:"arrayNonindexKeys", shortcutButtons:"arrayNonindexKeys", loreBookUrls:"arrayNonindexKeys" };
@@ -1796,7 +1790,6 @@
       }
       var content = line.replace(/^[-*\d.\s]+/, "").trim();
       var key = (content.match(/[A-Z][a-zA-Z'\-]+/) || [content.split(" ")[0] || "lore"])[0];
-      console.warn("[wizard] parseLore: line did not match key:value format — guessing trigger key:", key);
       return { keys: [key], content: content };
     }).filter(function(x){ return x && x.content; });
   }
@@ -1899,8 +1892,8 @@
     var a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
     a.download = name.replace(/[^a-z0-9_\-]+/gi, "_") + "." + ext;
-    document.body.appendChild(a);
-    try { a.click(); } finally { setTimeout(function(){ a.remove(); URL.revokeObjectURL(a.href); }, 100); }
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ a.remove(); URL.revokeObjectURL(a.href); }, 100);
   }
   function downloadFile(name, text){ downloadTextFile(name, "json", text, "application/json"); }
 
@@ -2081,7 +2074,7 @@
     return styleOnly() + body + styleSuffix();
   }
   function exampleLines(role){
-    var lines = (role || "").split("\n").filter(function(l){ var t = l.trim(); return /^\{\{char\}\}\s*:/i.test(t) || /^\{\{user\}\}\s*:/i.test(t); });
+    var lines = (role || "").split("\n").filter(function(l){ var t = l.trim(); return t.indexOf("{{char}}:") === 0 || t.indexOf("{{user}}:") === 0; });
     return lines.length ? ("<START>\n" + lines.join("\n")) : "";
   }
   function buildCharacterBook(){
