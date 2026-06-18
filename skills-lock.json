@@ -7,6 +7,12 @@
       "skillPath": "skills/accessibility-engineer/SKILL.md",
       "computedHash": "f14b0dcd1bf73f7bce06e9d85cda8c2873f67f6366ed47efaf702d8b4f26c121"
     },
+    "agent-orchestrator-task": {
+      "source": "ruvnet/ruflo",
+      "sourceType": "github",
+      "skillPath": ".agents/skills/agent-orchestrator-task/SKILL.md",
+      "computedHash": "f0c2445a8bca4f2d7f5b624022152ba55bf0d42c970234cd357b2a9f62ab6eae"
+    },
     "aria-live-regions": {
       "source": "mgifford/accessibility-skills",
       "sourceType": "github",
@@ -43,6 +49,18 @@
       "skillPath": "skills/llm-prompt-optimizer/SKILL.md",
       "computedHash": "eef460bc1c02545bc7754e0b8f113e662a3294fad1ea2bfd92f0385efb2c42d4"
     },
+    "openless-voice-input": {
+      "source": "aradotso/trending-skills",
+      "sourceType": "github",
+      "skillPath": "skills/openless-voice-input/SKILL.md",
+      "computedHash": "6d7cc4b82d2b323f646b4cf84bdf58a9fadda6a6bc3243db72945f48a907f2a7"
+    },
+    "parallel-agents": {
+      "source": "parcadei/continuous-claude-v3",
+      "sourceType": "github",
+      "skillPath": ".claude/skills/parallel-agents/SKILL.md",
+      "computedHash": "43d406f2716cff0ec9acb4319768615c51708abb9571b1f3a4cfeb6a470a204e"
+    },
     "session-start-hook": {
       "source": "camacho/ai-skills",
       "sourceType": "github",
@@ -54,6 +72,18 @@
       "sourceType": "github",
       "skillPath": "claude/skills/smoke-test/SKILL.md",
       "computedHash": "f4239c14d2876d216bc1eebc9e03f2aaaa8808a924bb6f1ba302cb90449b9223"
+    },
+    "subagent-task-execution": {
+      "source": "davidkiss/smart-ai-skills",
+      "sourceType": "github",
+      "skillPath": "skills/subagent-task-execution/SKILL.md",
+      "computedHash": "518b84b845c126c2b833968db242168b9af7c58bef28ff56dd5698d61cc5c3cd"
+    },
+    "token-efficiency": {
+      "source": "nickcrew/claude-ctx-plugin",
+      "sourceType": "github",
+      "skillPath": "skills/token-efficiency/SKILL.md",
+      "computedHash": "8fbee231049b8c08504b2c1478b76db91eafb31cc577550ec43583aab0ea99e9"
     },
     "vanilla-web": {
       "source": "janjaszczak/cursor",

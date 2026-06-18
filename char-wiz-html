@@ -567,7 +567,9 @@
       var info = window.rerollInfo;
       var raw = val(info.outId);
       var ctx0 = buildContext(info.exclude);
-      return "You are refining ONE section of an AI roleplay character. Keep it consistent with the rest of the character and the scenario, but make it a fresh, different take.\n\nSCENARIO:\n" + ctx0.scenario + "\n\nCHARACTER SO FAR:\n" + raw + "\n\nProduce ONLY the \"" + info.label + "\" section in this exact format and nothing else:\n=== " + info.label + " ===\n<new content>";
+      return "You are rewriting ONE section of an AI roleplay character. Rewrite ONLY the \"" + info.label + "\" section with a different angle — vary the expression and approach, but keep the character's name, core identity, and role identical. Do not rename or reinvent the character.\n\n" +
+        VOCAB + "\n\n" +
+        "SCENARIO:\n" + ctx0.scenario + "\n\nCHARACTER SO FAR:\n" + raw + "\n\nProduce ONLY the \"" + info.label + "\" section in this exact format and nothing else — no preamble, no commentary:\n=== " + info.label + " ===\n<new content>";
     }
     var sec = window.activeSection, refine = window.refineMode;
     if(sec === "style"){ return buildStyleText(refine); }
@@ -578,7 +580,7 @@
       var cp = val("personaOut").trim(); if(cp) dump += "PERSONA:\n" + cp + "\n\n";
       syncExtrasFromDOM();
       extras.forEach(function(ex,i){ if((ex.out||"").trim()) dump += "CHARACTER " + (i+1) + ":\n" + ex.out.trim() + "\n\n"; });
-      return "You are a story editor reviewing a roleplay cast for consistency.\n\nSCENARIO:\n" + scenC + "\n\nCAST:\n" + dump + "\nFind real problems only: duplicate or clashing names, characters that ignore or contradict the scenario, contradictory facts between characters, or timeline/relationship contradictions. Do not comment on things that are fine.\n\nFor each problem, output a block in EXACTLY this format, with a blank line between blocks and nothing else:\nISSUE: <one short sentence describing the problem>\nCHARACTER: <the exact name of the single character whose card should be changed to fix it>\nFIX: <a concrete instruction that, applied to that one character, resolves the problem>\n\nIf there are no real problems, reply with exactly: No issues found.";
+      return "You are a story editor reviewing a roleplay cast for structural consistency.\n\nSCENARIO:\n" + scenC + "\n\nCAST:\n" + dump + "\nFind ONLY problems that would break a reader's immersion or cause import errors: duplicate or clashing names, characters that directly contradict the scenario premise, contradictory facts between two characters, or irreconcilable relationship/timeline conflicts. Ignore stylistic differences, tonal gaps, and anything that is merely optional to improve. If you find multiple problems, rank them from most to least disruptive.\n\nFor each problem, output a block in EXACTLY this format, with a blank line between blocks and nothing else:\nISSUE: <one short sentence describing the structural conflict>\nCHARACTER: <the exact name of the single character whose card should be changed to fix it>\nFIX: <one sentence — a concrete change to that character's card that directly resolves the conflict>\n\nIf there are no real problems, reply with exactly: No issues found.";
     }
     if(sec === "opening"){
       var scenO = val("scenarioOut").trim() || val("scenarioNotes").trim();
@@ -587,12 +589,12 @@
       var mo = val("mainOut").trim(); if(mo){ var mc = parseChar(mo); dumpO += "[" + mc.name + "] (main): " + short(mc.roleInstruction) + "\n"; }
       syncExtrasFromDOM();
       extras.forEach(function(ex){ if((ex.out||"").trim()){ var c = parseChar(ex.out); dumpO += "[" + c.name + "]: " + short(c.roleInstruction) + "\n"; } });
-      var po = "You are scripting the OPENING of a group roleplay chat that brings the WHOLE cast into one shared scene. " + personaName + " is the user and must NOT be scripted.\n\nSCENARIO:\n" + scenO + "\n\nCAST - these are the ONLY characters that exist; script exactly these and invent NO others:\n" + dumpO + "\nOutput the opening as a sequence of lines in EXACTLY this format and nothing else:\n[SYSTEM]: one or two sentences of hidden stage-setting context for the AI - the location, time, who is present - written as notes, not dialogue.\n[CharacterName]: that character's moment in the scene - one or two short paragraphs using *italic narration and actions* and \"quoted dialogue\". Use the character's exact name in the brackets.\n\nInclude every listed cast member at least once in a natural order, have them react to each other, and end on a beat that invites " + personaName + " to jump in. Do NOT write a line for " + personaName + ". CRITICAL: do NOT introduce, name, or script any character who is not in the CAST list above - if the scenario implies a crowd, entourage, or background people, keep them unnamed with no dialogue lines of their own.";
-      return refine ? refineWrap(po, val("openingOut"), val("openingAdj"), "Keep the same [SYSTEM]: and [CharacterName]: line format.") : po;
+      var po = "You are scripting the OPENING of a group roleplay chat that brings the WHOLE cast into one shared scene. " + personaName + " is the user and must NOT be scripted.\n\nSCENARIO:\n" + scenO + "\n\nCAST - these are the ONLY characters that exist:\n" + dumpO + "\nOutput the opening as a sequence of lines in EXACTLY this format and nothing else — begin immediately with [SYSTEM]:, no preamble:\n[SYSTEM]: one or two sentences of hidden stage-setting context for the AI - the location, time, who is present - written as notes, not dialogue.\n[CharacterName]: that character's moment in the scene - one or two short paragraphs using *italic narration and actions* and \"quoted dialogue\". Use the character's exact name in the brackets.\n\nInclude every listed cast member at least once in a natural order, have them react to each other, and end on a beat that invites " + personaName + " to jump in. Do NOT write a line for " + personaName + ".\n\nHARD RULE: The CAST list above is exhaustive. You MUST NOT introduce, name, give dialogue to, or describe any character not in that list. If the scenario implies a crowd, staff, bystanders, or entourage, they are silent backdrop only — they get no name and no bracketed line. Any character with a speaking bracket MUST appear by exact name in the CAST list above.";
+      return refine ? refineWrap(po, val("openingOut"), val("openingAdj"), "Keep the same [SYSTEM]: and [CharacterName]: line format. The CAST list is still exhaustive — do not add any character not in it.") : po;
     }
     if(sec === "scenario"){
       var p = "You are a worldbuilding assistant for AI roleplay chat. Expand the user's idea into a vivid but concise SCENARIO (setting, situation, tone) of about 120 to 180 words. Address the user as {{user}}.\n\nUSER'S IDEA:\n" + val("scenarioNotes") + "\n\nOutput ONLY the scenario prose - no preamble, no headers.";
-      return refine ? refineWrap(p, val("scenarioOut"), val("scenarioAdj"), "Output ONLY the scenario prose.") : (p + "\n\n" + scenarioSeed() + "\n\nMOST IMPORTANT: follow the USER'S IDEA above exactly, including any pace, tone, genre, or specific details they state - if they say \"fast paced\" the scenario must read fast and energetic, not slow or languid. The creative direction is loose flavour only and must never override or contradict the user's idea.");
+      return refine ? refineWrap(p, val("scenarioOut"), val("scenarioAdj"), "Output ONLY the scenario prose.") : (p + "\n\n" + conditionalScenarioSeed(val("scenarioNotes")) + "\n\nMOST IMPORTANT: the USER'S IDEA above takes absolute precedence. Any creative direction above is loose flavour that applies ONLY where the user's idea leaves something unspecified. If the user states a pace, genre, tone, or specific detail, honor it exactly — the creative direction cannot override or soften it.");
     }
     if(sec === "main" || sec === "extra"){
       var key = sec === "main" ? "main" : ("extra" + window.activeExtraIndex);
@@ -610,24 +612,29 @@
     if(sec === "persona"){
       var ctx2 = buildContext("persona");
       var p2 = personaPromptCtx(val("personaNotes"), ctx2);
-      return refine ? refineWrap(p2, val("personaOut"), val("personaAdj"), "Keep the same === SECTION === labels and output only those sections.") : (p2 + "\n\n" + charSeed() + "\n\n" + sectionTail("persona"));
+      return refine ? refineWrap(p2, val("personaOut"), val("personaAdj"), "Keep the same === SECTION === labels and output only those sections. The persona's name, role, and identity come from the USER'S NOTES — do not alter them.") : (p2 + "\n\n" + personaSeed() + "\n\n" + sectionTail("persona"));
     }
     if(sec === "lore"){
       var ctx3 = buildContext("lore");
       var focus = val("loreNotes").trim();
       var coverage = focus
-        ? "Write a focused lorebook of up to about 18 entries that cover ONLY what the FOCUS above describes. If the focus narrows the content type - for example only locations, only one character, or only the magic system - produce ONLY that type of entry and nothing else; do NOT add people, relationships, history, customs, or any other category unless the focus explicitly asks for it. Aim for breadth and detail WITHIN the focus."
+        ? "Write a focused lorebook of up to about 18 entries that cover ONLY what the FOCUS above describes. If the focus narrows the content type - for example only locations, only one character, or only the magic system - produce ONLY that type of entry and nothing else; do NOT add people, relationships, history, customs, or any other category unless the focus explicitly asks for it. Spread the entries across distinct aspects of the focus — do not cluster them all on one sub-topic."
         : "Write 12 to 18 entries spread across these areas: key places, important people and groups, how things came to be (history), everyday customs and the unwritten rules of this world, the relationships between the characters, and a few gentle hooks, rumours, or little secrets that could spark a scene.";
-      var p3 = "You are the loremaster for a cute, wholesome, slice-of-life roleplay. Using the story so far, write a LOREBOOK - the world and character facts the AI should remember.\n\n" +
+      var p3 = "You are the loremaster for an AI roleplay chat. Write a LOREBOOK — the world and character facts the in-chat AI should recall.\n\n" +
         "SCENARIO:\n" + ctx3.scenario + "\n\nSTORY SO FAR:\n" + ctx3.bible + "\n\n" +
-        (focus ? ("FOCUS - this is the most important instruction, follow it above all else:\n" + focus + "\n\n") : "") +
-        coverage + "\n\n" +
-        "Output ONE entry per line in EXACTLY this format and nothing else:\n" +
-        "[trigger, trigger] A self-contained fact of one or two sentences that repeats the proper noun so it reads on its own.\n\n" +
-        "The words in [square brackets] are the trigger words that should pull this fact into a scene - usually the place name, person, group, or topic the fact is about. Keep everything wholesome and consistent with the scenario.";
-      // With a focus, anchor it last and skip the random creative seed - the seed
+        (focus ? ("FOCUS (most important — follow this above all else):\n" + focus + "\n\n") : "") +
+        "CONTENT RULES:\n" +
+        "- Keep all entries wholesome and consistent with the scenario.\n" +
+        "- Each entry must be self-contained: repeat the proper noun so the fact reads without the trigger.\n" +
+        "- One to two sentences per entry — no more, no less. Do not pad.\n" +
+        (focus ? "- Spread the entries across different aspects of the focus; do not cluster them on the same sub-topic.\n" : "") +
+        "\n" + coverage + "\n\n" +
+        "OUTPUT FORMAT — one entry per line, exactly:\n" +
+        "[trigger word, alternate trigger] Fact sentence(s) that repeat the proper noun.\n\n" +
+        "Trigger words: use the place name, person name, group, or topic the entry is about. Include at least one alternate trigger (nickname, plural, or related term) where natural. Output ONLY the entries — no headers, no numbered list, no preamble.";
+      // With a focus, anchor it last and skip the random creative seed — the seed
       // ("lean the facts toward <random>") is what pulled focused lore off-topic.
-      var loreTail = focus ? ("\n\nEvery entry must stay on the focus: " + focus) : ("\n\n" + loreSeed());
+      var loreTail = focus ? ("\n\nFinal check: every entry must stay within the focus — " + focus + " — and cover a distinct angle of it.") : ("\n\n" + loreSeed());
       return refine ? refineWrap(p3, val("loreOut"), val("loreAdj"), "Keep the same [trigger] line format, one entry per line, and output only the entries.") : (p3 + loreTail);
     }
     return "";
