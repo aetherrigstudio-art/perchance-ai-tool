@@ -1,0 +1,19 @@
+{
+  "id": "hud-amber",
+  "name": "HUD Amber",
+  "description": "Tighter, drier blobs in an amber technical-HUD palette, crisp scanlines.",
+  "params": {
+    "colA": [0.9, 0.55, 0.08],
+    "colB": [1.0, 0.78, 0.25],
+    "blobCount": 4,
+    "sminK": 0.4,
+    "warpAmt": 0.35,
+    "glow": 0.8,
+    "sss": 1.0,
+    "bloom": 0.8,
+    "grain": 0.08,
+    "scanline": 0.3,
+    "chroma": 0.004,
+    "vignette": 0.6
+  }
+}
