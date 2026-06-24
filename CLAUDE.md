@@ -88,6 +88,24 @@ unverified fields or community speculation (model names, context sizes) as
 fact, and do not auto-build group threads or seeded messages (those table
 shapes are unverified).
 
+**Supplementary research (read after `char-info`, not instead of it).** The
+`ai-workspace/` directory now holds deeper reference material gathered via the
+Perchance API. Treat these as research context — `char-info`'s verified/
+unverified boundary still wins on any conflict:
+- `ai-workspace/petra-acc-guide-merged.md` — merged ACC + "petrafied" fork guide,
+  cross-referenced against three live forks and pulled via the API.
+- `ai-workspace/petra-guide-prose.txt` — petra's full prose notebook (owner-supplied).
+- `ai-workspace/acc-complete-guide.txt` — the official ACC "Complete Guide".
+- `ai-workspace/perchance-generator-tutorial.txt` — the Perchance templating-engine
+  reference (the `[...]`/`{a|b|c}` rules from the source up).
+- `ai-workspace/perchance-ecosystem-research.md` — the `{import:...}` plugin catalog
+  and generator/tool landscape.
+- `ai-workspace/perchance-api-research.md` — the `/api/downloadGenerator` findings
+  that the `scripts/` sync tooling relies on.
+
+`ISSUES.md` is the implementation-ready issue tracker (open/closed items keyed to
+`char-wiz-html` line numbers); skim it before picking up bug/hardening work.
+
 ## Anatomy of a tool: two blocks
 
 Every generator is delivered as **two separate blocks** that must never be
@@ -145,13 +163,15 @@ names, and the differences between near-versions are the real signal — diff
 before assuming. Current state at time of writing:
 
 - `char-info` == `perchance-character-creation-3.md` (identical).
-- **Wizard current build (v2):** `char-wiz-html` == `wizard-html-panel-24.txt`
+- **Wizard current build (v2):** `char-wiz-html` == `wizard-html-panel-25.txt`
   (canonical HTML) and `char-wiz-dat` == `wizard-data-panel-14.txt` (canonical,
   minimal v2 data stub). These are the newest and the ones to edit. Lower-numbered
   `wizard-html-panel-*` / `wizard-data-panel-*` are historical snapshots — do not
   edit them. (`-21`→`-24` are the 2026-06-18 optimization: `-21` 4-phase IA regroup
   + a11y, `-22` in-browser Review/refine second pass, `-23` correctness+security
-  hardening, `-24` `stopSequences` activation + `shortcutButtons`. The data panel
+  hardening, `-24` `stopSequences` activation + `shortcutButtons`; `-25` applies
+  `prepUserInput()` to the scenario + lore prompt paths (security audit Finding A —
+  sanitizer parity). The data panel
   was unchanged throughout — all of it is HTML-side and auto-deploys via the loader.
   See `task_plan.md`/`progress.md` and the "SESSION STATE 2026-06-18 — optimization
   Phases 2-7 done" handoff note.)
@@ -208,6 +228,13 @@ Three layers, in order of cost:
    (HTML = the loader, data = `char-wiz-dat`) and exercise it; confirm the
    downloaded `.json` imports cleanly into ACC. Treat the "Minimal checklist" in
    `char-info` §11 as the acceptance checklist.
+
+Other test/script helpers: `test/perchance-api.test.mjs` and
+`test/diag-buttons.mjs` cover the API client and the shortcut-button diagnostics;
+`scripts/` holds the API tooling the CI sync check depends on — `perchance_api.py`
+/ `perchance-api.mjs` (parse a live generator's `preloaded-generator-data`),
+`ci-verify.sh` (the GitHub Actions sync check, see `.github/`), `gen-hash.sh`
+(refresh `char-wiz-html.sha256`, the loader-integrity digest), and `deploy.sh`.
 
 ## Skills, commands & tools — routing rules
 

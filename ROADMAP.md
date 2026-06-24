@@ -227,6 +227,34 @@ unverified. **Action = controlled in-app experiment first, not blind population.
 
 ---
 
+## Tier 4 — Plugin-backed features (architectural, not row fields)
+
+> New from `ai-workspace/research-synthesis-2026-06-18.md` (ecosystem research,
+> `✓src` — mined from 3 fork sources). char-wiz hand-rolls immersion in `customCode`
+> and pastes lorebook URLs; the `{import:...}` catalog offers maintained alternatives.
+> These are bigger than field additions and need their own triage — capture here, do
+> not start without a plan. Keep the fork/official portability split intact.
+
+### 17. Live lorebook via `fetch-plugin` / `super-fetch-plugin`
+- **What:** generator fetches a hosted lorebook itself at chat time, replacing the
+  current paste-a-URL flow. Pairs with the loader-integrity work.
+- **Open question:** CORS / reliability for arbitrary lorebook hosts. Confirm before building.
+- **Risk:** Medium (outbound HTTP, host trust).
+
+### 18. Share gallery via `comments-plugin`
+- **What:** the realistic "browse characters others made" surface (ACC uses
+  `comments-plugin` heavily); opt-in publish of a built character.
+- **Risk:** Medium–High (moderation, public submissions). Largest item here.
+
+### 19. Immersion on `background-image-plugin` / `background-audio-plugin`
+- **What:** replace hand-rolled immersion `customCode` where a maintained plugin
+  already does dynamic backgrounds / ambient audio.
+- **Risk:** Medium (regression vs. current immersion behavior).
+
+### 20. Offline name suggestions via `markov-name-generator-plugin`
+- **What:** name suggestions for cast/persona without an AI call.
+- **Risk:** Low.
+
 ## Notes & guardrails
 
 - Keep honoring `char-info` §9: all 9 Dexie tables present, high-entropy

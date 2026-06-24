@@ -47,6 +47,86 @@ These were addressed in Phase 2A/B/C (branch reconciliation 2026-06-18):
 
 ---
 
+## NEW — Content-authoring quality (research synthesis 2026-06-18)
+
+From `ai-workspace/research-synthesis-2026-06-18.md` (petra's prose §2.2.2 / §3.3 +
+Part 2.5-C, all `✓verified`). These change what char-wiz's prompts **emit**, not the
+schema — high quality-per-effort, no export-shape risk. Line refs are approximate
+against `wizard-html-panel-24` (re-confirm before editing).
+
+| Task | Effort | Where | Fix Summary |
+|---|---|---|---|
+| Lore entries not self-contained | S | lore-gen prompt in `buildWizardPrompt` / `withLore()` | Instruct: each entry stands alone, **repeat the subject's proper name** (no "he"/"the above" — AI retrieves entries in isolation), order-independent |
+| Lore over-split into fragments | S | lore-gen prompt | Instruct: **merge related facts**, ~120–200 words per entry; the AI often won't retrieve all entries on a subject |
+| Character info leaking into lore | XS | lore-gen prompt + grader | Keep character facts in the **description/role**, not lore (description is the reliable channel); grader flag if lore entries describe the main character |
+| `reminderMessage` unconstrained | S | reminder generation in `buildWizardPrompt` | Restrict generated reminder to **only four** kinds: conversational style, quirks, custom-race physiology, one very strong belief. Blank is allowed |
+| No explicit RP formatting directive | XS | prompt binding-rules (~419 `VOCAB`) | Add: "asterisks around actions, quotes around speech, typical roleplay style" (petra Part 2.5-C) |
+| `shortcutButtons` manual-entry only | S | "Quick reply buttons" card | Offer petra's verified defaults as one-click presets: `🖼️ Image → "/image --num=1"` (autoSend); `📜 Narrator → "/nar …"` (no autoSend) |
+| Image-Style tool ignores petra's prompt formula | S | `buildStylePrompt` (`image-style-builder-html-panel-8.txt`) | Offer her template `[style] drawing of [subject]. [build/expr]. [hair]. [clothing]. [eyes]. [background], [time], [weather].`; note Bing/DALL-E ~480-char cap |
+
+---
+
+## Improvement review (catalog 2026-06-18)
+
+From the 30-pass improvement review — full detail + the prioritized **Top 20** in
+`ai-workspace/improvement-review-2026-06-18.md` (per-finding source:
+`.planning/2026-06-18-improvement-review-30-pass/findings-agent-{1..6}.md`). 158 findings;
+the **NEW / actionable (value ≥ Med)** ones are listed below. Items that merely CONFIRM
+existing entries above are referenced, not duplicated.
+
+**Sister-tool parity (fixer + image-style — bring up to wizard level)** — mostly XS, batch together:
+| Item | Tool | Effort | Ref |
+|---|---|---|---|
+| Add status region (`role=status`/`aria-live`) — fixer has none | fixer | XS | F18-01/F16-02 |
+| Add `aria-live`/`role=status` to `#status` + `#busyHint` | image-style | XS | F17-10/F18-02 |
+| Add `:focus-visible` outline rule | fixer, image-style | XS | F19-01/F19-02 |
+| Add `button,input{min-height:44px}` (+ `.styleBtn`) | fixer, image-style | XS | 20-B/20-C |
+| Add `input,textarea,select{font-size:16px}` (iOS zoom) | fixer, image-style | XS | 22-B |
+| Add `aria-pressed` to style-picker toggles | image-style, wizard | XS | 22-C |
+| `aria-label` on `#generateBtn`, `#styleRaw`, download btn | fixer, image-style | XS | F17-02/09 |
+| Add `@media` responsive rules (none today) | fixer, image-style | XS–S | 21-B/21-C |
+| `try/finally` on `await onFinishPromise` (spinner stuck on error) | fixer, image-style data | S | P8-2 |
+| Add `prepUserInput` (full / header-preserving variant) | fixer, image-style | S | P8-3 |
+| Disable action buttons + loading state during gen | image-style | XS | F15-03 |
+| Co-locate busy feedback with the action button | fixer | S | F15-01 |
+| RFC-4122 UUID fallback (copy wizard `uuidV4`) | fixer | S | P8-5 |
+| `maxTokensPerMessage` 500→800 (match wizard) | fixer | XS | P8-7/F16-08 |
+| "start over" button + section-format/onboarding hints | fixer | XS–S | F16-01/10-3 |
+| H1→H3 heading skip → H2; add `<main>` landmark | fixer, image-style | XS | 23-A/23-B |
+| Focus-to-result + Enter-key submit on inputs | fixer, image-style | XS–S | F19-03/05/06 |
+
+**Prose & prompt quality (wizard + image-style — batch together):**
+| Item | Effort | Ref |
+|---|---|---|
+| Lore entry length 1–2 sentences → **80–200 words**; count 12–18→8–14 | XS | 27-A |
+| Lore CONTENT RULE: no character psychology/backstory in lore | XS | 27-B |
+| Explicit pronoun prohibition in lore self-containment rule | XS | 27-C |
+| REMINDER spec → petra's four categories; remove format directive from append | S | 24-C/24-D/28-A |
+| RP asterisk/quote formatting rule in binding rules + exported `generalWritingInstructions` | XS | 25-B/29-D |
+| Extend VOCAB cliché list (orbs/cascading/crimson/soft-breathed) | XS | 25-A |
+| Remove/repurpose unused `SEED.verb`; rebalance `SEED.tone`; broaden `loreFocus` | XS | 26-A/B/D |
+| Replace "Nina" IMAGE TRIGGERS example with generic template | XS | 29-A |
+| TAGLINE 20-word cap; WRITING INSTRUCTION 80-word cap; WARDROBE min richness | XS | 29-E/B/F |
+| Raise main-char ROLE INSTRUCTION budget (220→~400; warn 500→600) | S | 28-B |
+| image-style: petra subject formula in UI (set from `<script>`) + 480-char counter | S | 30-A/30-B |
+| image-style: strengthen negativePrompt guard; adopt `refineWrap` decisive mandate | XS | 30-C/30-D |
+
+**Maintainability / DX (wizard unless noted):**
+| Item | Effort | Ref |
+|---|---|---|
+| Unify `builderSnapshot()` and `save()` state assembly (one source of truth) | S | P6-5 |
+| "keep in sync" comments on the 3 `getSection` copies + `buildDexie` | XS | P7-1/P8-8 |
+| Surface image-gen failures via existing `window.__imgErr` (6 silent catches) | S | 13-1 |
+| Replace ~23 blocking `alert()`/`confirm()` with inline status + `_snap` undo | S | 9-1/9-2/9-3 |
+| First-run onboarding banner (from `<script>` when localStorage null) | S | 10-1 |
+| Make per-field re-roll discoverable; "re-roll"→"rewrite this section" copy | S/XS | F14-01/12-1 |
+| Magic-number constants (rotation/debounce/word-caps/panel geometry) | XS | P3-1..9 |
+| Split `characterRow`/`IMMERSION_FN`/`buildWizardPrompt`; `renderExtras`→createElement | S–M | P4-1..4 |
+| Dynamic `startWith` priming in `char-wiz-dat` (delegated, per-section) | S | P8-1 |
+| Minimal `prefers-color-scheme` dark override; CSS token set for inline styles | S–M | P2-1/P2-4 |
+
+---
+
 ## CRITICAL
 
 | Issue | Effort | Line | Fix Summary |

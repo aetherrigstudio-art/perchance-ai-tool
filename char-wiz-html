@@ -725,7 +725,7 @@
       return refine ? refineWrap(po, val("openingOut"), val("openingAdj"), "Keep the same [SYSTEM]: and [CharacterName]: line format. The CAST list is still exhaustive — do not add any character not in it.") : po;
     }
     if(sec === "scenario"){
-      var p = "You are a worldbuilding assistant for AI roleplay chat. Expand the user's idea into a vivid but concise SCENARIO (setting, situation, tone) of about 120 to 180 words. Address the user as {{user}}.\n\nUSER'S IDEA:\n" + val("scenarioNotes") + "\n\nOutput ONLY the scenario prose - no preamble, no headers.";
+      var p = "You are a worldbuilding assistant for AI roleplay chat. Expand the user's idea into a vivid but concise SCENARIO (setting, situation, tone) of about 120 to 180 words. Address the user as {{user}}.\n\nUSER'S IDEA:\n" + prepUserInput(val("scenarioNotes")) + "\n\nOutput ONLY the scenario prose - no preamble, no headers.";
       return refine ? refineWrap(p, val("scenarioOut"), val("scenarioAdj"), "Output ONLY the scenario prose.") : (p + "\n\n" + conditionalScenarioSeed(val("scenarioNotes")) + "\n\nMOST IMPORTANT: the USER'S IDEA above takes absolute precedence. Any creative direction above is loose flavour that applies ONLY where the user's idea leaves something unspecified. If the user states a pace, genre, tone, or specific detail, honor it exactly — the creative direction cannot override or soften it.");
     }
     if(sec === "main" || sec === "extra"){
@@ -749,12 +749,13 @@
     if(sec === "lore"){
       var ctx3 = buildContext("lore");
       var focus = val("loreNotes").trim();
+      var focusSafe = prepUserInput(focus); // sanitize user focus before it enters the prompt (parity with character/persona notes)
       var coverage = focus
         ? "Write a focused lorebook of up to about 18 entries that cover ONLY what the FOCUS above describes. If the focus narrows the content type - for example only locations, only one character, or only the magic system - produce ONLY that type of entry and nothing else; do NOT add people, relationships, history, customs, or any other category unless the focus explicitly asks for it. Spread the entries across distinct aspects of the focus — do not cluster them all on one sub-topic."
         : "Write 12 to 18 entries spread across these areas: key places, important people and groups, how things came to be (history), everyday customs and the unwritten rules of this world, the relationships between the characters, and a few gentle hooks, rumours, or little secrets that could spark a scene.";
       var p3 = "You are the loremaster for an AI roleplay chat. Write a LOREBOOK — the world and character facts the in-chat AI should recall.\n\n" +
         "SCENARIO:\n" + ctx3.scenario + "\n\nSTORY SO FAR:\n" + ctx3.bible + "\n\n" +
-        (focus ? ("FOCUS (most important — follow this above all else):\n" + focus + "\n\n") : "") +
+        (focus ? ("FOCUS (most important — follow this above all else):\n" + focusSafe + "\n\n") : "") +
         "CONTENT RULES:\n" +
         "- Keep all entries wholesome and consistent with the scenario.\n" +
         "- Each entry must be self-contained: repeat the proper noun so the fact reads without the trigger.\n" +
@@ -766,7 +767,7 @@
         "Trigger words: use the place name, person name, group, or topic the entry is about. Include at least one alternate trigger (nickname, plural, or related term) where natural. Output ONLY the entries — no headers, no numbered list, no preamble.";
       // With a focus, anchor it last and skip the random creative seed — the seed
       // ("lean the facts toward <random>") is what pulled focused lore off-topic.
-      var loreTail = focus ? ("\n\nFinal check: every entry must stay within the focus — " + focus + " — and cover a distinct angle of it.") : ("\n\n" + loreSeed());
+      var loreTail = focus ? ("\n\nFinal check: every entry must stay within the focus — " + focusSafe + " — and cover a distinct angle of it.") : ("\n\n" + loreSeed());
       return refine ? refineWrap(p3, val("loreOut"), val("loreAdj"), "Keep the same [trigger] line format, one entry per line, and output only the entries.") : (p3 + loreTail);
     }
     return "";
