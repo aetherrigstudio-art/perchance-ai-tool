@@ -1,0 +1,17 @@
+# codebase-memory exclusions (gitignore syntax). Defense-in-depth so the
+# auto-index watcher never ingests secrets. Layered after .gitignore + built-ins.
+
+# Real secret files (templates like .env.example stay indexable)
+.env
+.env.*
+!.env.example
+!.env.sample
+*.key
+*.pem
+*.p12
+*.pfx
+id_rsa*
+*.token
+**/*credentials*.json
+**/*secret*.json
+**/ai_keys*
